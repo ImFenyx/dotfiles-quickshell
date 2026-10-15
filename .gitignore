@@ -1,0 +1,33 @@
+# Quickshell / QML
+.qmlls.ini
+*.qmlc
+*.jsc
+
+# Backups e temporários
+*.bak
+*.bak-*
+*.orig
+*.rej
+*~
+*.swp
+*.swo
+.#*
+
+# Refs locais (clones de consulta, ~91MB - caelestia/noctalia)
+refs/
+
+# Build / cache
+build/
+out/
+dist/
+.cache/
+.qt/
+node_modules/
+
+# OS
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Logs
+*.log
