@@ -11,7 +11,7 @@ Item {
   property var corner: RoundCorner.CornerEnum.TopLeft
   property int implicitSize: 16
   property int tail: 6
-  property color color: "#ff1e1e2e"
+  property color color: Theme.base
   property color borderColor: "transparent"
   property int borderWidth: 0
 

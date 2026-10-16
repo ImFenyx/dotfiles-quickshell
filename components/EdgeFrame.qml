@@ -18,10 +18,10 @@ PanelWindow {
   mask: Region {}
   color: "transparent"
 
-  property color bg: "#ff1e1e2e"
-  property int edge: 8
-  property int topH: 64 // barH + scoop: a faixa da barra e dela, aqui recorta
-  property int bendR: 8 // raio interno da dobra inferior (= scoop - edge)
+  property color bg: Theme.base
+  property int edge: Theme.edge
+  property int topH: Theme.topH // barH + scoop: a faixa da barra e dela, aqui recorta
+  property int bendR: Theme.bendR // raio interno da dobra inferior (= scoop - edge)
 
   Shape {
     id: frame
