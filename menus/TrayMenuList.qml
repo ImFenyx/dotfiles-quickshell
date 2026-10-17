@@ -9,7 +9,8 @@ import Quickshell
 //  - hover numa entrada COM submenu, parado por 140ms -> pede para abrir
 //  - hover numa entrada SEM submenu, parado por 140ms -> pede para fechar o
 //    submenu aberto (o atraso evita fechar ao cruzar linhas na diagonal)
-//  - clique numa entrada com submenu abre na hora
+//  - clique numa entrada com submenu abre na hora; clicar de novo na mesma
+//    entrada (submenu aberto) fecha
 ColumnLayout {
   id: list
 
@@ -59,7 +60,10 @@ ColumnLayout {
       onUnhovered: hoverTimer.stop()
       onSubmenuClicked: {
         hoverTimer.stop();
-        if (row.modelData !== list.activeEntry)
+        // clique alterna: submenu ja aberto -> fecha (e os mais fundos); senao abre
+        if (row.modelData === list.activeEntry)
+          list.submenuDismissed();
+        else
           list.submenuRequested(row.modelData, row);
       }
     }
