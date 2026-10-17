@@ -20,7 +20,7 @@ services/        estado compartilhado (singletons)
   Audio (PipeWire), Wifi, Updates, Brightness, Battery,
   Notifs (swaync), Time, Workspaces, Fullscreen
 bar/             widgets da barra (Bar.qml compoe os outros)
-menus/           NetMenu, TrayMenu (+ TrayEntryRow), PowerMenu
+menus/           NetMenu, PowerMenu, TrayMenu (+ TrayMenuLevel recursivo, TrayEntryRow)
 overlays/        Launcher, Osd
 scripts/         helpers de shell (updates, frecency, wifi-*, netinfo)
 ```
@@ -69,9 +69,6 @@ O OSD de volume aparece sozinho (PipeWire).
 
 ## Pendencias conhecidas
 
-- A senha do Wi-Fi ainda vai por argumento de linha de comando para
-  `scripts/wifi-connect.sh` (visivel em `/proc/*/cmdline` durante a conexao).
-  Alternativa a testar: `nmcli --ask` lendo de stdin.
 - `services/Workspaces.qml`: testar se o contador `rev` ainda e necessario
   (`Hyprland.workspaces.values` ja e reativo).
 

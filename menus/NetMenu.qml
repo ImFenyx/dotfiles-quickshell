@@ -75,6 +75,25 @@ PopupBase {
     }
   }
 
+  // Conexao com senha: a senha vai por stdin (nunca por argv, que e legivel em
+  // /proc/*/cmdline). O Process vive na janela, entao sobrevive ao fechar o menu.
+  function connectWithPassword(ssid, password) {
+    connectProc.ssid = ssid;
+    connectProc.password = password;
+    connectProc.running = true;
+  }
+  Process {
+    id: connectProc
+    property string ssid: ""
+    property string password: ""
+    stdinEnabled: true
+    command: ["sh", Quickshell.shellPath("scripts/wifi-connect.sh"), ssid, "--stdin"]
+    onStarted: {
+      write(password + "\n");
+      password = "";
+    }
+  }
+
   // o estado do Wi-Fi vem de services/Wifi; aqui so o "networking" geral
   Process {
     id: stateProc
@@ -235,8 +254,7 @@ PopupBase {
         onAccepted: {
           if (text === "")
             return;
-          // TODO: a senha ainda vai por argv (visivel em /proc/*/cmdline); ver README
-          Quickshell.execDetached(["sh", Quickshell.shellPath("scripts/wifi-connect.sh"), root.pwSSID, text]);
+          root.connectWithPassword(root.pwSSID, text);
           text = "";
           root.pwSSID = "";
           root.close();
