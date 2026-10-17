@@ -20,6 +20,10 @@ PanelWindow {
   id: root
 
   default property alias content: slot.data
+  // Painéis flutuantes (ex.: submenus em cascata): ficam numa camada do tamanho
+  // da janela, FORA do clip do painel principal, e atras dele (slide "de tras").
+  property alias floating: floatHost.data
+  property alias floatLayer: floatHost
   property alias spacing: slot.spacing
   readonly property real contentImplicitWidth: slot.implicitWidth
 
@@ -97,10 +101,17 @@ PanelWindow {
 
   MouseArea {
     anchors.fill: parent
+    z: -2   // abaixo da camada flutuante (cliques nos submenus nao chegam aqui)
     enabled: root.interactive
     focus: root.open && root.backdropFocus
     Keys.onEscapePressed: root.close()
     onClicked: root.close()
+  }
+
+  Item {
+    id: floatHost
+    anchors.fill: parent
+    z: -1   // abaixo do painel principal
   }
 
   Item {

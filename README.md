@@ -13,14 +13,14 @@ components/      blocos reutilizaveis
   Config.qml       programas externos (terminal, mixer, locker...)
   Pill / PillText / PillGlyph / UiText / Glyph
   TipArea / TipWindow   tooltip
-  PopupBase.qml    base de todo popup (menus, launcher, OSD)
+  PopupBase.qml    base de todo popup (menus, launcher, OSD); `floating` = camada p/ paineis extras
   MenuRow.qml      linha de menu
   EdgeFrame / EdgeExclusions / RoundCorner
 services/        estado compartilhado (singletons)
   Audio (PipeWire), Wifi, Updates, Brightness, Battery,
   Notifs (swaync), Time, Workspaces, Fullscreen
 bar/             widgets da barra (Bar.qml compoe os outros)
-menus/           NetMenu, PowerMenu, TrayMenu (+ TrayMenuLevel recursivo, TrayEntryRow)
+menus/           NetMenu, PowerMenu, TrayMenu (cascata: TrayMenuList, TrayFlyout, TrayEntryRow)
 overlays/        Launcher, Osd
 scripts/         helpers de shell (updates, frecency, wifi-*, netinfo)
 ```

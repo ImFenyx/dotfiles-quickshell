@@ -3,22 +3,31 @@ import QtQuick.Layouts
 import Quickshell
 import qs.components
 
-// Menu nativo do tray (StatusNotifierItem / DBusMenu): botao direito abre
-// as opcoes que o app expoe. Os niveis (e submenus, em qualquer profundidade)
-// ficam em TrayMenuLevel, que e recursivo e anima a altura do painel.
+// Menu nativo do tray (StatusNotifierItem / DBusMenu), como um menu de
+// contexto: o painel principal (colado na barra) lista o 1o nivel; entradas
+// com submenu abrem outro painel AO LADO (hover ou clique), em cascata, na
+// profundidade que o app expuser. Cada nivel e um TrayFlyout na camada
+// flutuante do PopupBase (fora do clip do painel principal).
 PopupBase {
   id: root
 
   panelWidth: 280
   panelX: Math.max(8, Math.min(root.width - panelWidth - 8, anchorX - panelWidth / 2))
-  // a altura anima quadro a quadro: o fundo e redesenhado a cada frame,
-  // entao nada de shape assincrono (ficaria um quadro atras do conteudo)
-  asyncShape: false
 
   property var trayItem: null
   property real anchorX: 0
 
+  // Cascata: chain[i] = { entry, y } -> o painel flutuante i mostra o submenu
+  // de "entry", alinhado a y (topo da linha, coordenadas da janela).
+  // O Repeater usa so a PROFUNDIDADE como modelo: trocar a entrada de um nivel
+  // reaproveita o painel; so criar/remover niveis cria/destroi paineis.
+  property var chain: []
+  readonly property int depth: chain.length
+  readonly property int flyWidth: 240
+  readonly property int flyGap: 6
+
   function show(item, p) {
+    chain = [];
     trayItem = item;
     // multi-monitor: p vem de mapToGlobal (desktop). Converte p/ local da tela
     // (ShellScreen.x = origem do monitor, ex. HDMI em -1920).
@@ -27,12 +36,82 @@ PopupBase {
     open = true;
   }
   onOpenChanged: {
-    if (!open)
-      trayItem = null;   // destroi os niveis: expansoes voltam fechadas
+    if (!open) {
+      trayItem = null;
+      chain = [];
+    }
   }
 
-  TrayMenuLevel {
+  // abre (ou troca) o submenu do nivel pai "parentLevel" (0 = painel principal)
+  function openSubmenu(parentLevel, entry, anchorY) {
+    const cur = chain[parentLevel];
+    if (cur && cur.entry === entry)
+      return;
+    chain = chain.slice(0, parentLevel).concat([
+      {
+        entry: entry,
+        y: anchorY
+      }
+    ]);
+  }
+  // fecha o submenu do nivel pai e todos os mais fundos
+  function closeSubmenusFrom(parentLevel) {
+    if (chain.length > parentLevel)
+      chain = chain.slice(0, parentLevel);
+  }
+
+  // x final e lado do painel i: abre a direita do pai; sem espaco, inverte p/ a
+  // esquerda. Niveis mais fundos herdam o lado e so invertem se nao couber.
+  function flyPlace(i) {
+    let left = panelX, right = panelX + panelWidth, dir = 1, x = 0;
+    for (let k = 0; k <= i; k++) {
+      if (dir > 0) {
+        x = right + flyGap;
+        if (x + flyWidth > width - 8) {
+          dir = -1;
+          x = left - flyGap - flyWidth;
+        }
+      } else {
+        x = left - flyGap - flyWidth;
+        if (x < 8) {
+          dir = 1;
+          x = right + flyGap;
+        }
+      }
+      left = x;
+      right = x + flyWidth;
+    }
+    return {
+      x: x,
+      dir: dir
+    };
+  }
+
+  TrayMenuList {
     menu: root.trayItem ? root.trayItem.menu : null
     popup: root
+    activeEntry: root.chain.length > 0 ? root.chain[0].entry : null
+    onSubmenuRequested: (entry, row) => root.openSubmenu(0, entry, row.mapToItem(root.floatLayer, 0, 0).y)
+    onSubmenuDismissed: root.closeSubmenusFrom(0)
+  }
+
+  floating: Repeater {
+    model: root.depth
+    delegate: TrayFlyout {
+      id: fly
+      required property int index
+      entry: root.chain[index] ? root.chain[index].entry : null
+      anchorY: root.chain[index] ? root.chain[index].y : 0
+      activeEntry: root.chain[index + 1] ? root.chain[index + 1].entry : null
+      place: root.flyPlace(index)
+      popup: root
+      width: root.flyWidth
+      gap: root.flyGap
+      layerHeight: root.height
+      minY: root.topY
+      z: -index   // niveis mais fundos ficam atras (slide "de tras" de cada pai)
+      onSubmenuRequested: (e, y) => root.openSubmenu(index + 1, e, y)
+      onSubmenuDismissed: root.closeSubmenusFrom(index + 1)
+    }
   }
 }
