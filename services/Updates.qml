@@ -36,7 +36,8 @@ Singleton {
 
   Process {
     id: poll
-    command: ["sh", Quickshell.shellPath("scripts/updates.sh")]
+    // nice 19: checkupdates/paru nao competem com a sessao por CPU
+    command: ["nice", "-n", "19", "sh", Quickshell.shellPath("scripts/updates.sh")]
     stdout: StdioCollector {
       onStreamFinished: root.parse(text)
     }
@@ -51,8 +52,9 @@ Singleton {
     }
   }
 
+  // 30min na tomada, 2h na bateria (menos rede/CPU acordando o notebook).
   Timer {
-    interval: 1800000
+    interval: Battery.onBattery ? 7200000 : 1800000
     repeat: true
     running: true
     triggeredOnStart: true

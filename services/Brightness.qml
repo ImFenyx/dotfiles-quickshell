@@ -43,8 +43,11 @@ Singleton {
     }
   }
 
+  // Mudancas pelo atalho chamam showOsd (IPC) e o hover na pill relê; este
+  // poll so cobre alteracoes externas. Cada refresh abre um sh + 3 cat, entao
+  // 30s -> 5min corta ~110 processos/hora em idle.
   Timer {
-    interval: 30000
+    interval: 300000
     repeat: true
     running: true
     triggeredOnStart: true

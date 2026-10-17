@@ -11,6 +11,7 @@ Pill {
   spacing: 5
   tipWindow: root.tip
   tipText: "Brilho " + Brightness.text
+  onTipRequested: Brightness.refresh()
 
   PillText {
     text: Brightness.text

@@ -21,6 +21,7 @@ RowLayout {
       anchors.fill: parent
       tipWindow: root.tip
       tipText: Wifi.strength === "" ? Wifi.name : Wifi.name + " \u00b7 " + Wifi.strength
+      onTipRequested: Wifi.refresh()
       onClicked: {
         if (root.tip)
           root.tip.hide();

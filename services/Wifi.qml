@@ -23,26 +23,40 @@ Singleton {
     radioProc.running = true;
   }
 
+  // Sem "sh -c ... | grep | head": 1 processo em vez de 4. O nmcli -t escapa ':'
+  // e '\\' dentro dos campos (SSID com ':' vem como "a\\:b"), por isso o parse.
+  function parseConn(text) {
+    for (const line of text.split("\n")) {
+      const m = line.match(/^\*:((?:\\.|[^:\\])*):(\d+)/);
+      if (m)
+        return {
+          ssid: m[1].replace(/\\(.)/g, "$1"),
+          sig: parseInt(m[2], 10)
+        };
+    }
+    return null;
+  }
+
   Process {
     id: connProc
-    command: ["sh", "-c", "nmcli -t -f IN-USE,SSID,SIGNAL dev wifi list --rescan no 2>/dev/null | grep '^\\*:' | head -n1"]
+    command: ["nmcli", "-t", "-f", "IN-USE,SSID,SIGNAL", "dev", "wifi", "list", "--rescan", "no"]
     // StdioCollector (e nao SplitParser): dispara mesmo com saida vazia,
     // senao ao desconectar o SSID antigo ficava preso na pill.
     stdout: StdioCollector {
       onStreamFinished: {
-        const m = text.trim().match(/^\*:([^:]*):(\d+)/m);
-        if (!root.on || !m) {
+        const c = root.parseConn(text);
+        if (!root.on || !c) {
           root.name = root.on ? "--" : "off";
           root.strength = "";
           root.icon = "";
           return;
         }
-        const sig = parseInt(m[2], 10);
-        root.name = m[1] || "--";
-        root.strength = isNaN(sig) ? "" : sig + "%";
-        root.icon = isNaN(sig) ? "" : Icons.level(sig, Icons.wifi);
+        root.name = c.ssid || "--";
+        root.strength = isNaN(c.sig) ? "" : c.sig + "%";
+        root.icon = isNaN(c.sig) ? "" : Icons.level(c.sig, Icons.wifi);
       }
     }
+    stderr: StdioCollector {}
   }
 
   Process {
@@ -77,9 +91,11 @@ Singleton {
     onTriggered: monitor.running = true
   }
 
-  // fallback caso algum evento escape
+  // Fallback caso algum evento escape. O nmcli monitor ja cobre tudo; 30s aqui
+  // acordava a CPU e abria 3 processos 120x/hora sem necessidade. Alem disso o
+  // hover no SSID releh na hora (WifiStatus -> Wifi.refresh).
   Timer {
-    interval: 30000
+    interval: 300000
     repeat: true
     running: true
     triggeredOnStart: true

@@ -9,6 +9,8 @@ Singleton {
   id: root
 
   readonly property var dev: UPower.displayDevice
+  // true = na bateria (usado p/ espacar tarefas periodicas)
+  readonly property bool onBattery: UPower.onBattery === true
   readonly property bool present: dev !== null && dev.isPresent !== false
   readonly property int percent: {
     const p = dev ? dev.percentage : 0;

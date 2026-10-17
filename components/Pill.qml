@@ -17,6 +17,7 @@ Rectangle {
   property bool tipMono: false
   property bool clickable: false
   signal clicked
+  signal tipRequested   // hover: quem usa pode atualizar o dado antes do tooltip
 
   radius: 99
   implicitHeight: 28
@@ -50,5 +51,6 @@ Rectangle {
     tipText: root.tipText
     mono: root.tipMono
     onClicked: root.clicked()
+    onTipRequested: root.tipRequested()
   }
 }
