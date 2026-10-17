@@ -67,11 +67,6 @@ qs ipc call osd showMic      # depois de mutar/desmutar o mic
 
 O OSD de volume aparece sozinho (PipeWire).
 
-## Pendencias conhecidas
-
-- `services/Workspaces.qml`: testar se o contador `rev` ainda e necessario
-  (`Hyprland.workspaces.values` ja e reativo).
-
 ## Desenvolvimento
 
 ```sh
