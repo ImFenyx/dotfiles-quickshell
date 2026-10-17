@@ -23,8 +23,9 @@ Pill {
       readonly property bool isSpecial: wsName.startsWith("special:")
       // HyprlandWorkspace nao tem "windows": conta os toplevels (fallback: ocupado)
       readonly property bool occupied: modelData.toplevels ? modelData.toplevels.values.length > 0 : true
-      // sincronizado entre monitores: destaca o focado global
-      readonly property bool isActive: Hyprland.focusedWorkspace != null && Hyprland.focusedWorkspace.name === wsName
+      // sincronizado entre monitores: destaca o focado global. O special (ex.:
+      // magic) acende junto com o workspace normal enquanto estiver aberto.
+      readonly property bool isActive: isSpecial ? Workspaces.activeSpecial === wsName : (Hyprland.focusedWorkspace != null && Hyprland.focusedWorkspace.name === wsName)
 
       Layout.preferredWidth: isActive ? 48 : 26
       Layout.preferredHeight: 26
