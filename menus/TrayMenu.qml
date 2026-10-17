@@ -4,18 +4,16 @@ import Quickshell
 import qs.components
 
 // Menu nativo do tray (StatusNotifierItem / DBusMenu): botao direito abre
-// as opcoes que o app expoe. Submenus inline, ate 3 niveis (cobre menus
-// reais de tray).
-//
-// Cada nivel e um ColumnLayout DENTRO do fluxo do layout: quando um submenu
-// expande, a altura do painel cresce junto. Antes o submenu usava
-// anchors.top: row.bottom, que nao ocupa espaco no layout (sobrepunha as
-// linhas seguintes e era cortado pelo clip).
+// as opcoes que o app expoe. Os niveis (e submenus, em qualquer profundidade)
+// ficam em TrayMenuLevel, que e recursivo e anima a altura do painel.
 PopupBase {
   id: root
 
   panelWidth: 280
   panelX: Math.max(8, Math.min(root.width - panelWidth - 8, anchorX - panelWidth / 2))
+  // a altura anima quadro a quadro: o fundo e redesenhado a cada frame,
+  // entao nada de shape assincrono (ficaria um quadro atras do conteudo)
+  asyncShape: false
 
   property var trayItem: null
   property real anchorX: 0
@@ -30,79 +28,11 @@ PopupBase {
   }
   onOpenChanged: {
     if (!open)
-      trayItem = null;   // destroi os delegates: expansoes voltam fechadas
+      trayItem = null;   // destroi os niveis: expansoes voltam fechadas
   }
 
-  QsMenuOpener {
-    id: mainOpener
+  TrayMenuLevel {
     menu: root.trayItem ? root.trayItem.menu : null
-  }
-
-  Repeater {
-    model: mainOpener.children
-    delegate: ColumnLayout {
-      id: l0
-      required property var modelData
-      property bool expanded: false
-      Layout.fillWidth: true
-      spacing: 2
-
-      QsMenuOpener {
-        id: op1
-        menu: l0.expanded ? l0.modelData : null
-      }
-      TrayEntryRow {
-        entry: l0.modelData
-        indent: 0
-        expanded: l0.expanded
-        popup: root
-        onExpandToggled: l0.expanded = !l0.expanded
-      }
-
-      // nivel 1
-      ColumnLayout {
-        visible: l0.expanded
-        Layout.fillWidth: true
-        spacing: 2
-        Repeater {
-          model: op1.children
-          delegate: ColumnLayout {
-            id: l1
-            required property var modelData
-            property bool expanded: false
-            Layout.fillWidth: true
-            spacing: 2
-
-            QsMenuOpener {
-              id: op2
-              menu: l1.expanded ? l1.modelData : null
-            }
-            TrayEntryRow {
-              entry: l1.modelData
-              indent: 1
-              expanded: l1.expanded
-              popup: root
-              onExpandToggled: l1.expanded = !l1.expanded
-            }
-
-            // nivel 2 (folhas)
-            ColumnLayout {
-              visible: l1.expanded
-              Layout.fillWidth: true
-              spacing: 2
-              Repeater {
-                model: op2.children
-                delegate: TrayEntryRow {
-                  required property var modelData
-                  entry: modelData
-                  indent: 2
-                  popup: root
-                }
-              }
-            }
-          }
-        }
-      }
-    }
+    popup: root
   }
 }

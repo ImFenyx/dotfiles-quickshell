@@ -74,7 +74,6 @@ O OSD de volume aparece sozinho (PipeWire).
   Alternativa a testar: `nmcli --ask` lendo de stdin.
 - `services/Workspaces.qml`: testar se o contador `rev` ainda e necessario
   (`Hyprland.workspaces.values` ja e reativo).
-- `TrayMenu` suporta 3 niveis de submenu (suficiente para menus reais de tray).
 
 ## Desenvolvimento
 
