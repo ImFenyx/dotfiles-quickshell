@@ -12,6 +12,7 @@ components/      blocos reutilizaveis
   Icons.qml        glifos Nerd Font (sempre via escape \u...)
   Config.qml       programas externos (terminal, mixer, locker...)
   Pill / PillText / PillGlyph / UiText / Glyph
+  Genie.qml        efeito "magic lamp" (abre/fecha painel a partir de um ponto)
   TipArea / TipWindow   tooltip
   PopupBase.qml    base de todo popup (menus, launcher, OSD); `floating` = camada p/ paineis extras
   MenuRow.qml      linha de menu
@@ -20,7 +21,7 @@ services/        estado compartilhado (singletons)
   Audio (PipeWire), Wifi, Updates, Brightness, Battery,
   Notifs (swaync), Time, Workspaces, Fullscreen
 bar/             widgets da barra (Bar.qml compoe os outros)
-menus/           NetMenu, PowerMenu, TrayMenu (cascata: TrayMenuList, TrayFlyout, TrayEntryRow)
+menus/           NetMenu, PowerMenu, TrayMenu (cascata: TrayMenuList, TrayFlyout + Genie, TrayEntryRow)
 overlays/        Launcher, Osd
 scripts/         helpers de shell (updates, frecency, wifi-*, netinfo)
 ```

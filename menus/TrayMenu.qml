@@ -6,8 +6,9 @@ import qs.components
 // Menu nativo do tray (StatusNotifierItem / DBusMenu), como um menu de
 // contexto: o painel principal (colado na barra) lista o 1o nivel; entradas
 // com submenu abrem outro painel AO LADO (hover ou clique), em cascata, na
-// profundidade que o app expuser. Cada nivel e um TrayFlyout na camada
-// flutuante do PopupBase (fora do clip do painel principal).
+// profundidade que o app expuser (ate maxFly niveis). Cada nivel e um
+// TrayFlyout na camada flutuante do PopupBase (fora do clip do painel
+// principal); abrem e fecham com o efeito magic lamp.
 PopupBase {
   id: root
 
@@ -19,12 +20,14 @@ PopupBase {
 
   // Cascata: chain[i] = { entry, y } -> o painel flutuante i mostra o submenu
   // de "entry", alinhado a y (topo da linha, coordenadas da janela).
-  // O Repeater usa so a PROFUNDIDADE como modelo: trocar a entrada de um nivel
-  // reaproveita o painel; so criar/remover niveis cria/destroi paineis.
+  // Os paineis sao um conjunto FIXO (maxFly): cada um recebe "request" (ou null)
+  // e anima sozinho a entrada/saida; trocar a entrada de um nivel reaproveita
+  // o painel (ele so segue a nova linha).
   property var chain: []
   readonly property int depth: chain.length
+  readonly property int maxFly: 8
   readonly property int flyWidth: 240
-  readonly property int flyGap: 6
+  readonly property int flyGap: 4
 
   function show(item, p) {
     chain = [];
@@ -96,12 +99,11 @@ PopupBase {
   }
 
   floating: Repeater {
-    model: root.depth
+    model: root.maxFly
     delegate: TrayFlyout {
       id: fly
       required property int index
-      entry: root.chain[index] ? root.chain[index].entry : null
-      anchorY: root.chain[index] ? root.chain[index].y : 0
+      request: index < root.chain.length ? root.chain[index] : null
       activeEntry: root.chain[index + 1] ? root.chain[index + 1].entry : null
       place: root.flyPlace(index)
       popup: root
@@ -109,7 +111,7 @@ PopupBase {
       gap: root.flyGap
       layerHeight: root.height
       minY: root.topY
-      z: -index   // niveis mais fundos ficam atras (slide "de tras" de cada pai)
+      z: -index   // niveis mais fundos ficam atras (cada um nasce de tras do pai)
       onSubmenuRequested: (e, y) => root.openSubmenu(index + 1, e, y)
       onSubmenuDismissed: root.closeSubmenusFrom(index + 1)
     }
