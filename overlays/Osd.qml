@@ -11,7 +11,9 @@ PopupBase {
   id: root
 
   interactive: false       // click-through
-  compact: false           // teste real: janela compacta engasgava a barra com a tecla segurada; fullscreen e mais suave
+  // Janela compacta (2b5c4b9) engasgava a barra de progresso: a largura do
+  // layer-shell acompanha o texto e cada reconfigure custa frames. Fullscreen
+  // anima melhor — medido com a tecla de volume/brilho segurada.
   asyncShape: false
   tuck: 1                  // 1px p/ dentro da barra (mesma cor opaca = sem hairline de AA)
   padTop: 12
