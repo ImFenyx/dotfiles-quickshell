@@ -8,8 +8,9 @@ MouseArea {
   property var tipWindow: null     // TipWindow da tela
   property string tipText: ""      // vazio = sem tooltip
   property bool mono: false
-  // true = o tooltip acompanha o mouse (cada movimento reposiciona a janela)
-  property bool follow: false
+  // true = o tooltip acompanha o mouse (cada movimento move a caixa dentro da
+  // janela fullscreen do tip: segue 1:1 sem reconfigure de layer-shell)
+  property bool follow: true
   // emitido antes de mostrar (ex.: atualizar o texto sob demanda)
   signal tipRequested
 
