@@ -1,7 +1,7 @@
 # dotfiles-quickshell
 
 Shell do Hyprland feita em [Quickshell](https://quickshell.org): barra, menus
-(rede, tray, energia), launcher e OSD. Tema Catppuccin Mocha.
+(rede, tray, energia), launcher, OSD e centro de notificacoes. Tema Catppuccin Mocha.
 
 ## Estrutura
 
@@ -13,16 +13,21 @@ components/      blocos reutilizaveis
   Config.qml       programas externos (terminal, mixer, locker...)
   Pill / PillText / PillGlyph / UiText / Glyph
   Genie.qml        efeito "magic lamp" (abre/fecha painel a partir de um ponto)
+  EdgeTab.qml      aba colada no filete direito (orelhas concavas); fundo de toasts e centro
+  NotifCard.qml    cartao de uma notificacao (toast e lista do centro)
   TipArea / TipWindow   tooltip
-  PopupBase.qml    base de todo popup (menus, launcher, OSD); `floating` = camada p/ paineis extras
+  PopupBase.qml    base de todo popup (menus, launcher, OSD, centro); `floating` = camada p/ paineis extras;
+                   `fromRight` = aba no filete direito
   MenuRow.qml      linha de menu
   EdgeFrame / EdgeExclusions / RoundCorner
 services/        estado compartilhado (singletons)
   Audio (PipeWire), Wifi, Updates, Brightness, Battery,
-  Notifs (swaync), Time, Workspaces, Fullscreen
+  Notifs (daemon de notificacoes), Media (MPRIS), Time, Workspaces, Fullscreen
+  NotifItem = uma notificacao (criada pelo Notifs)
 bar/             widgets da barra (Bar.qml compoe os outros)
-menus/           NetMenu, PowerMenu, TrayMenu (cascata: TrayMenuList, TrayFlyout + Genie, TrayEntryRow)
-overlays/        Launcher, Osd
+menus/           NetMenu, PowerMenu, TrayMenu (cascata: TrayMenuList, TrayFlyout + Genie, TrayEntryRow),
+                 NotifCenter (NotifStatusBar, NotifQuickTile, NotifMedia)
+overlays/        Launcher, Osd, NotifToasts
 scripts/         helpers de shell (updates, frecency, wifi-*, netinfo)
 ```
 
@@ -41,7 +46,10 @@ Regras de bolso:
 - Fontes: Rubik, JetBrainsMono Nerd Font (Propo)
 - Tema de icones: MacTahoe-purple-dark (`//@ pragma IconTheme` no `shell.qml`)
 - NetworkManager (`nmcli`, `nm-connection-editor`)
-- `swaync` (`swaync-client`), `libnotify` (`notify-send`)
+- `libnotify` (`notify-send`, so para testar). A propria shell e o daemon de
+  notificacoes: **pare o swaync/dunst/mako** (tire o `exec-once` do Hyprland),
+  senao eles seguram o nome `org.freedesktop.Notifications` e nada chega.
+- Midia no centro: qualquer player MPRIS (Spotify, mpv, navegador...). `playerctl` e opcional.
 - `pacman-contrib` (`checkupdates`) e `paru` — badge de atualizacoes
 - `kitty`, `pavucontrol`, `hyprlock`, `cal` (util-linux), `hyprctl`
 - `uwsm` (opcional; usado no "Sair")
@@ -67,6 +75,37 @@ qs ipc call osd showMic      # depois de mutar/desmutar o mic
 ```
 
 O OSD de volume aparece sozinho (PipeWire).
+
+## Notificacoes
+
+A shell recebe as notificacoes (`services/Notifs.qml`) e mostra em dois lugares,
+ambos colados no filete direito da moldura:
+
+- **Toasts** (`overlays/NotifToasts.qml`): aba unica que desliza pela borda, no
+  monitor focado. Hover pausa o tempo; clique no corpo roda a acao padrao do app;
+  criticas ficam ate dispensar. Somem quando o centro abre.
+- **Centro** (`menus/NotifCenter.qml`): abre no sino. Em cima, status bar (hora,
+  data, rede/som/bateria) e atalhos (Nao perturbe, Wi-Fi, Mudo); no meio, a lista
+  com "Limpar"; embaixo, o cartao de midia (so quando algo toca).
+
+Sino: clique esquerdo abre o centro, direito liga o Nao perturbe (toasts param,
+criticas furam; o historico continua enchendo).
+
+```sh
+qs ipc call notifs toggle   # abre/fecha o centro (monitor focado)
+qs ipc call notifs dnd      # nao perturbe
+qs ipc call notifs clear    # apaga tudo
+
+# testes
+notify-send -a Teste "Titulo" "Corpo da notificacao"
+notify-send -u critical "Critica" "Fica ate dispensar"
+notify-send -A abrir=Abrir -A depois=Depois "Com acoes" "Botoes do app"
+notify-send -i dialog-information -t 15000 "Com icone" "15 s na tela"
+```
+
+Midia: o MPRIS nao diz se e musica ou video, entao o rotulo (Musica/Video/Midia)
+e uma heuristica em `Media.classify` (nome do app, depois a URL da faixa). Com
+mais de um player aparece uma seta p/ trocar; o que esta tocando tem prioridade.
 
 ## Desempenho
 

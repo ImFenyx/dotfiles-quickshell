@@ -17,6 +17,7 @@ PanelWindow {
   signal trayMenuRequested(var item, var pos)
   signal netMenuRequested
   signal powerMenuRequested
+  signal notifCenterRequested
 
   anchors.top: true
   anchors.left: true
@@ -159,7 +160,9 @@ PanelWindow {
         BatteryPill {
           tip: root.tip
         }
-        NotifButton {}
+        NotifButton {
+          onClicked: root.notifCenterRequested()
+        }
         SessionButtons {
           onPowerClicked: root.powerMenuRequested()
         }

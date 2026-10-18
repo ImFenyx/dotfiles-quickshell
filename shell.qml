@@ -17,13 +17,14 @@ import qs.overlays
 //   components/  tema, icones, pills, popups (PopupBase), tooltip, moldura
 //   services/    estado compartilhado (singletons): audio, wifi, updates...
 //   bar/         widgets da barra
-//   menus/       popups de clique (rede, tray, energia)
-//   overlays/    launcher e OSD (instancia unica, seguem o monitor focado)
+//   menus/       popups de clique (rede, tray, energia, centro de notificacoes)
+//   overlays/    launcher, OSD e toasts (instancia unica, seguem o monitor focado)
 //   scripts/     helpers de shell
 //
 // Multi-monitor: barra + moldura + exclusoes + tooltip + menus sao per-screen
 // (Variants model: Quickshell.screens). Launcher + OSD sao instancia unica que
-// segue o monitor focado.
+// segue o monitor focado. O centro de notificacoes tambem e instancia unica:
+// abre no monitor do sino clicado (centerScreen) ou, por IPC, no focado.
 ShellRoot {
   id: root
 
@@ -38,6 +39,9 @@ ShellRoot {
     return ss.length > 0 ? ss[0] : null;
   }
 
+  // monitor do sino que abriu o centro (null = o focado, p.ex. via IPC)
+  property var centerScreen: null
+
   // ---- per-screen: barra + moldura + tooltip + menus + exclusoes ----
   Variants {
     model: Quickshell.screens
@@ -49,6 +53,7 @@ ShellRoot {
         // um popup por vez: abrir um fecha os outros (e o tooltip)
         function closeMenusExcept(keep) {
           hoverTip.hide();
+          notifCenter.close();
           for (const m of [netMenu, trayMenu, powerMenu]) {
             if (m !== keep)
               m.close();
@@ -69,6 +74,11 @@ ShellRoot {
           onPowerMenuRequested: {
             scr.closeMenusExcept(powerMenu);
             powerMenu.toggle();
+          }
+          onNotifCenterRequested: {
+            scr.closeMenusExcept(null);
+            root.centerScreen = scr.modelData;
+            notifCenter.toggle();
           }
         }
 
@@ -102,7 +112,7 @@ ShellRoot {
     }
   }
 
-  // ---- single-instance (segue o foco): launcher + OSD ----
+  // ---- single-instance (segue o foco): launcher + OSD + notificacoes ----
   Launcher {
     id: launcher
     screen: root.focusedScreen
@@ -111,6 +121,18 @@ ShellRoot {
   Osd {
     id: osd
     screen: root.focusedScreen
+  }
+
+  NotifCenter {
+    id: notifCenter
+    screen: root.centerScreen ?? root.focusedScreen
+  }
+
+  // com o centro aberto os toasts somem (ele ja mostra tudo)
+  NotifToasts {
+    id: toasts
+    screen: root.focusedScreen
+    suppress: notifCenter.open
   }
 
   // eventos de audio/brilho -> OSD (a mesma janela serve os tres)
@@ -135,6 +157,21 @@ ShellRoot {
     target: "launcher"
     function toggle(): void {
       launcher.toggle();
+    }
+  }
+
+  // qs ipc call notifs toggle | clear | dnd
+  IpcHandler {
+    target: "notifs"
+    function toggle(): void {
+      root.centerScreen = null;
+      notifCenter.toggle();
+    }
+    function clear(): void {
+      Notifs.clearAll();
+    }
+    function dnd(): void {
+      Notifs.toggleDnd();
     }
   }
 
