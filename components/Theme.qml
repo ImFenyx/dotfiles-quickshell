@@ -12,6 +12,7 @@ Singleton {
   readonly property color surface0: "#313244"
   readonly property color surface1: "#45475a"
   readonly property color overlay0: "#6c7086"
+  readonly property color subtext0: "#a6adc8"
   readonly property color text: "#cdd6f4"
   readonly property color mauve: "#cba6f7"
   readonly property color lavender: "#b4befe"
@@ -34,4 +35,8 @@ Singleton {
   readonly property int edge: gap / 2          // largura do filete lateral/inferior
   readonly property int bendR: scoop - edge    // raio interno da dobra inferior
   readonly property int topH: barH + scoop     // faixa da barra (barra + scoop)
+
+  // aba colada no filete direito (toasts + centro de notificacoes)
+  readonly property int sideTabTop: topH + gap / 2   // y onde a concordancia comeca, abaixo do scoop da barra
+  readonly property int sideTabW: 380                // largura do corpo (sem o filete)
 }

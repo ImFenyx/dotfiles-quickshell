@@ -13,6 +13,10 @@ import Quickshell.Wayland
 // Modelo: mascara fixa (clip) + conteudo rigido que desliza dentro dela.
 // Filhos declarados em quem usa vao para um ColumnLayout interno (slot).
 //
+// Tres formatos de fundo: notch pendurado na barra (padrao), colado embaixo
+// (`fromBottom`) e aba colada no filete direito (`fromRight`, EdgeTab: slide
+// horizontal; padTop/padBottom devem incluir a orelha da concordancia).
+//
 // Desmapeada quando fechada (menos RAM): layerrule noanim p/ namespace
 // quickshell evita o fadeLayersIn do Hyprland, o slide continua 100% QML.
 // offsetScale<1 mantem mapeada durante a animacao de saida.
@@ -32,6 +36,7 @@ PanelWindow {
   property bool interactive: true      // false = click-through (OSD)
   property bool backdropFocus: true    // false = quem usa cuida do foco (Launcher, senha)
   property bool fromBottom: false      // true = colado embaixo, abre p/ cima
+  property bool fromRight: false       // true = aba no filete direito, abre p/ a esquerda
   property bool asyncShape: true
   property bool pill: false            // fundo em pilula solta (sem notch)
 
@@ -42,6 +47,7 @@ PanelWindow {
   property int padTop: 14
   property int padBottom: 10
   property int padX: 18
+  property int padRight: padX          // fromRight: some o filete aqui (edge + respiro)
   property real bendK: 10              // altura da curva do notch
   property color menuBg: Theme.base
 
@@ -129,11 +135,13 @@ PanelWindow {
     Item {
       width: parent.width
       height: parent.height
-      y: (root.fromBottom ? 1 : -1) * height * root.offsetScale
+      x: root.fromRight ? width * root.offsetScale : 0
+      y: root.fromRight ? 0 : (root.fromBottom ? 1 : -1) * height * root.offsetScale
 
       Shape {
         id: bgShape
         anchors.fill: parent
+        visible: !root.fromRight
         preferredRendererType: Shape.CurveRenderer
         asynchronous: root.asyncShape
         ShapePath {
@@ -146,6 +154,12 @@ PanelWindow {
         }
       }
 
+      EdgeTab {
+        anchors.fill: parent
+        visible: root.fromRight
+        color: root.menuBg
+      }
+
       ColumnLayout {
         id: slot
         anchors.top: parent.top
@@ -153,7 +167,7 @@ PanelWindow {
         anchors.right: parent.right
         anchors.topMargin: root.padTop
         anchors.leftMargin: root.padX
-        anchors.rightMargin: root.padX
+        anchors.rightMargin: root.padRight
         spacing: 2
       }
     }

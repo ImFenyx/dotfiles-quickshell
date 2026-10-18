@@ -10,6 +10,7 @@ Singleton {
   readonly property var volume: ["\uf026", "\uf027", "\uf028"]
   readonly property var backlight: ["\ue38d", "\ue3d3", "\ue3d1", "\ue3cf", "\ue3ce", "\ue3cd", "\ue3ca", "\ue3c8", "\ue39b"]
   readonly property var wifi: ["\u{F091F}", "\u{F0922}", "\u{F0925}", "\u{F0928}"]
+  readonly property var battery: ["\uf244", "\uf243", "\uf242", "\uf241", "\uf240"]
 
   // barra
   readonly property string volumeMuted: "\uf026"
@@ -23,6 +24,18 @@ Singleton {
   readonly property string bell: "\uf0a2"
   readonly property string lock: "\uf023"
   readonly property string power: "\u23fb"
+
+  // centro de notificacoes
+  readonly property string bellSlash: "\uf1f6"
+  readonly property string close: "\uf00d"
+  readonly property string trash: "\uf1f8"
+  readonly property string play: "\uf04b"
+  readonly property string pause: "\uf04c"
+  readonly property string prev: "\uf048"
+  readonly property string next: "\uf051"
+  readonly property string music: "\uf001"
+  readonly property string video: "\uf03d"
+  readonly property string mediaGeneric: "\uf144"
 
   // launcher / menus
   readonly property string search: "\uf002"
