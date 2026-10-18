@@ -11,7 +11,7 @@ PopupBase {
   id: root
 
   interactive: false       // click-through
-  compact: true            // janela do tamanho do OSD, nao de tela cheia
+  compact: false           // teste real: janela compacta engasgava a barra com a tecla segurada; fullscreen e mais suave
   asyncShape: false
   tuck: 1                  // 1px p/ dentro da barra (mesma cor opaca = sem hairline de AA)
   padTop: 12
