@@ -11,6 +11,7 @@ Singleton {
   readonly property var weekdaysShort: ["dom", "seg", "ter", "qua", "qui", "sex", "sáb"]
   readonly property var weekdaysLong: ["domingo", "segunda-feira", "terça-feira", "quarta-feira", "quinta-feira", "sexta-feira", "sábado"]
 
+  readonly property string clockText: Qt.formatDateTime(date, "hh:mm")
   readonly property string barText: weekdaysShort[date.getDay()] + Qt.formatDateTime(date, " dd/MM hh:mm")
   readonly property string longDate: weekdaysLong[date.getDay()] + Qt.formatDateTime(date, " dd/MM/yyyy")
 
