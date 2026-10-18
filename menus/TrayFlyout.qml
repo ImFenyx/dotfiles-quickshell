@@ -97,6 +97,8 @@ Item {
 
   Genie {
     source: content
+    // abrindo: conteudo ainda pode chegar (menu do app); fechando: estatico
+    live: fly.wanted
     progress: fly.progress
     dir: fly.place.dir
     // a origem fica um pouco por baixo do pai (que e opaco e fica por cima)

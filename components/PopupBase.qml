@@ -26,6 +26,7 @@ PanelWindow {
   property alias floatLayer: floatHost
   property alias spacing: slot.spacing
   readonly property real contentImplicitWidth: slot.implicitWidth
+  readonly property real panelHeight: slot.implicitHeight + padTop + padBottom
 
   property bool open: false
   property bool interactive: true      // false = click-through (OSD)
@@ -33,6 +34,10 @@ PanelWindow {
   property bool fromBottom: false      // true = colado embaixo, abre p/ cima
   property bool asyncShape: true
   property bool pill: false            // fundo em pilula solta (sem notch)
+  // true = a janela tem o tamanho do painel (layer-shell: so topo, centralizada,
+  // margem = topY). Para popups sem clique-fora/float (OSD): em vez de uma
+  // superficie de tela cheia, ~80x menos pixels por frame de animacao.
+  property bool compact: false
 
   property int topY: Theme.barH
   property int tuck: 0                 // 1px p/ dentro da borda (mesma cor = sem hairline)
@@ -73,9 +78,12 @@ PanelWindow {
   }
 
   anchors.top: true
-  anchors.bottom: true
-  anchors.left: true
-  anchors.right: true
+  anchors.bottom: !compact
+  anchors.left: !compact
+  anchors.right: !compact
+  margins.top: compact ? topY - tuck : 0
+  implicitWidth: compact ? panelWidth : 0
+  implicitHeight: compact ? panelHeight : 0
   WlrLayershell.layer: WlrLayer.Overlay
   exclusionMode: ExclusionMode.Ignore
   mask: (interactive && open) ? fullMask : emptyMask
@@ -116,10 +124,10 @@ PanelWindow {
 
   Item {
     width: root.panelWidth
-    height: slot.implicitHeight + root.padTop + root.padBottom
+    height: root.panelHeight
     clip: true
-    x: root.panelX
-    y: root.fromBottom ? root.height - height + root.tuck : root.topY - root.tuck
+    x: root.compact ? 0 : root.panelX
+    y: root.compact ? 0 : (root.fromBottom ? root.height - height + root.tuck : root.topY - root.tuck)
     visible: root.offsetScale < 1
 
     Item {

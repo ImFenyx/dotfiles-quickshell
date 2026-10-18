@@ -8,6 +8,8 @@ MouseArea {
   property var tipWindow: null     // TipWindow da tela
   property string tipText: ""      // vazio = sem tooltip
   property bool mono: false
+  // true = o tooltip acompanha o mouse (cada movimento reposiciona a janela)
+  property bool follow: false
   // emitido antes de mostrar (ex.: atualizar o texto sob demanda)
   signal tipRequested
 
@@ -19,7 +21,7 @@ MouseArea {
       root.tipWindow.show(root.tipText, mapToGlobal(width / 2, height / 2), root.mono);
   }
   onPositionChanged: event => {
-    if (root.tipWindow)
+    if (root.follow && root.tipWindow)
       root.tipWindow.move(mapToGlobal(event.x, event.y));
   }
   onExited: {

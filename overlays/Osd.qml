@@ -11,6 +11,7 @@ PopupBase {
   id: root
 
   interactive: false       // click-through
+  compact: true            // janela do tamanho do OSD, nao de tela cheia
   asyncShape: false
   tuck: 1                  // 1px p/ dentro da barra (mesma cor opaca = sem hairline de AA)
   padTop: 12
