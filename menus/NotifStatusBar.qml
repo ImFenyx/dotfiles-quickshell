@@ -6,7 +6,8 @@ import qs.services
 
 // "Status bar" do centro: so atalhos. Hora, data, Wi-Fi, som e bateria ja
 // estao na barra, entao aqui ficam os interruptores (e o Wi-Fi saiu do NetMenu).
-// Clique liga/desliga; clique direito abre o app de configuracao quando ha um.
+// Clique liga/desliga; clique direito abre o app de configuracao quando ha um
+// (Wi-Fi, Bluetooth, mixer, tlpui).
 // Os que dependem de hardware/programa (Bluetooth, luz noturna, energia,
 // microfone) somem quando nao existem.
 GridLayout {
@@ -79,7 +80,8 @@ GridLayout {
     icon: Energy.icon
     label: "Energia"
     sub: Energy.label
-    active: !Energy.balanced
+    active: Energy.profile !== "" && !Energy.balanced
     onClicked: Energy.cycle()
+    onSecondary: Quickshell.execDetached([Config.powerManager])
   }
 }

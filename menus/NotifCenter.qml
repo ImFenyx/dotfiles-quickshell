@@ -48,6 +48,7 @@ PopupBase {
     if (open) {
       Notifs.hidePopups();
       mediaSticky = Media.playing;
+      Energy.refresh();
     } else {
       mediaSticky = false;
     }

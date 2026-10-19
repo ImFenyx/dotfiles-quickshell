@@ -53,7 +53,10 @@ Regras de bolso:
 - Midia no centro: qualquer player MPRIS (Spotify, mpv, navegador...). `playerctl` e opcional.
 - Som das notificacoes: `sound-theme-freedesktop` + `pipewire` (`pw-play`; ou `paplay`/`ffplay`/`canberra-gtk-play`)
 - Atalhos do centro: Bluetooth (BlueZ), Cafeina (`systemd-inhibit`; o `hypridle` respeita), Luz noturna
-  (`hyprsunset`, ver `Config.nightLight`), Energia (`power-profiles-daemon`). O que nao existe some do painel.
+  (`hyprsunset`, ver `Config.nightLight`), Energia (TLP >= 1.9 com o servico `tlp-pd`:
+  `systemctl enable --now tlp-pd`; troca o perfil pelo `tlpctl`, sem root; nao convive com o
+  `power-profiles-daemon`; clique direito abre o `tlpui`, ver `Config.powerManager`).
+  O que nao existe some do painel.
 - `pacman-contrib` (`checkupdates`) e `paru` — badge de atualizacoes
 - `kitty`, `pavucontrol`, `hyprlock`, `cal` (util-linux), `hyprctl`
 - `uwsm` (opcional; usado no "Sair")
@@ -101,7 +104,7 @@ dispensa o grupo todo); expandido tem cabecalho com recolher e limpar o app.
 
 **Atalhos** (`menus/NotifStatusBar.qml`): Wi-Fi, Bluetooth, Nao perturbe, Mudo,
 Mic mudo, Cafeina, Luz noturna e Energia. Clique liga/desliga; clique direito
-abre o app de configuracao (Wi-Fi, Bluetooth, mixer). O toggle de Wi-Fi saiu do
+abre o app de configuracao (Wi-Fi, Bluetooth, mixer, tlpui). O toggle de Wi-Fi saiu do
 NetMenu. Hora/data/Wi-Fi/som/bateria nao se repetem aqui: ja estao na barra.
 
 **Midia**: so aparece enquanto algo *toca* (aba de navegador pausada nao conta).
