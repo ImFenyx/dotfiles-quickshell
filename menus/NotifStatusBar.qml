@@ -1,75 +1,85 @@
 import QtQuick
 import QtQuick.Layouts
+import Quickshell
 import qs.components
 import qs.services
 
-// "Status bar" do centro (vocabulario do Android/iOS/macOS): hora grande e data
-// a esquerda; indicadores de rede, som, bateria e nao perturbar a direita.
-RowLayout {
+// "Status bar" do centro: so atalhos. Hora, data, Wi-Fi, som e bateria ja
+// estao na barra, entao aqui ficam os interruptores (e o Wi-Fi saiu do NetMenu).
+// Clique liga/desliga; clique direito abre o app de configuracao quando ha um.
+// Os que dependem de hardware/programa (Bluetooth, luz noturna, energia,
+// microfone) somem quando nao existem.
+GridLayout {
   id: root
 
   Layout.fillWidth: true
-  spacing: 12
+  columns: 4
+  columnSpacing: 8
+  rowSpacing: 8
+  uniformCellWidths: true
 
-  ColumnLayout {
-    spacing: 0
-    Text {
-      color: Theme.text
-      font.family: Theme.uiFont
-      font.pixelSize: 36
-      font.weight: Font.DemiBold
-      text: Time.clockText
-    }
-    UiText {
-      color: Theme.subtext0
-      font.pointSize: 10
-      text: Time.longDate
-    }
+  NotifQuickTile {
+    icon: Wifi.on ? Icons.netWifi : Icons.wifiOff
+    label: "Wi-Fi"
+    active: Wifi.on
+    onClicked: Quickshell.execDetached(["nmcli", "radio", "wifi", Wifi.on ? "off" : "on"])
+    onSecondary: Quickshell.execDetached([Config.connectionEditor])
   }
-
-  Item {
-    Layout.fillWidth: true
+  NotifQuickTile {
+    visible: Bt.available
+    icon: Icons.bluetooth
+    label: "Bluetooth"
+    sub: Bt.deviceName
+    active: Bt.on
+    onClicked: Bt.toggle()
+    onSecondary: Quickshell.execDetached([Config.bluetoothManager])
   }
-
-  Rectangle {
-    Layout.alignment: Qt.AlignTop
-    implicitWidth: icons.implicitWidth + 24
-    implicitHeight: 30
-    radius: 15
-    color: Theme.surface0
-
-    RowLayout {
-      id: icons
-      anchors.centerIn: parent
-      spacing: 12
-
-      Glyph {
-        visible: Notifs.dnd
-        color: Theme.peach
-        text: Icons.bellSlash
-      }
-      Glyph {
-        color: Wifi.on ? Theme.text : Theme.overlay0
-        text: Wifi.on ? (Wifi.icon || Icons.netWifi) : Icons.wifiOff
-      }
-      Glyph {
-        color: Audio.muted ? Theme.overlay0 : Theme.text
-        text: Audio.muted ? Icons.volumeMuted : (Audio.sinkIcon || Icons.volumeDefault)
-      }
-      RowLayout {
-        visible: Battery.present
-        spacing: 5
-        Glyph {
-          color: Battery.percent <= 20 ? Theme.red : (Battery.charging ? Theme.green : Theme.text)
-          text: Battery.charging ? Icons.plug : Icons.level(Battery.percent, Icons.battery)
-        }
-        UiText {
-          color: Battery.percent <= 20 ? Theme.red : Theme.text
-          font.pointSize: 10
-          font.weight: Font.DemiBold
-          text: Battery.percent + "%"
-        }
-      }
+  NotifQuickTile {
+    icon: Notifs.dnd ? Icons.bellSlash : Icons.bell
+    label: "Não perturbe"
+    active: Notifs.dnd
+    onClicked: Notifs.toggleDnd()
+  }
+  NotifQuickTile {
+    icon: Audio.muted ? Icons.volumeMuted : Icons.volumeDefault
+    label: "Mudo"
+    active: Audio.muted
+    onClicked: {
+      if (Audio.sinkOk)
+        Audio.sink.audio.muted = !Audio.sink.audio.muted;
     }
+    onSecondary: Quickshell.execDetached([Config.mixer])
+  }
+  NotifQuickTile {
+    visible: Audio.sourceOk
+    icon: Icons.micOff
+    label: "Mic mudo"
+    active: Audio.sourceOk && Audio.source.audio.muted
+    onClicked: {
+      if (Audio.sourceOk)
+        Audio.source.audio.muted = !Audio.source.audio.muted;
+    }
+    onSecondary: Quickshell.execDetached([Config.mixer])
+  }
+  NotifQuickTile {
+    icon: Icons.coffee
+    label: "Cafeína"
+    active: Caffeine.on
+    onClicked: Caffeine.toggle()
+  }
+  NotifQuickTile {
+    visible: NightLight.available
+    icon: Icons.moon
+    label: "Luz noturna"
+    active: NightLight.on
+    onClicked: NightLight.toggle()
+  }
+  NotifQuickTile {
+    visible: Energy.available
+    icon: Energy.icon
+    label: "Energia"
+    sub: Energy.label
+    active: !Energy.balanced
+    onClicked: Energy.cycle()
   }
 }

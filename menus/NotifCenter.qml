@@ -6,9 +6,9 @@ import qs.services
 
 // Centro de notificacoes: aba colada no filete direito (PopupBase.fromRight),
 // aberta pelo sino. De cima para baixo:
-//   status bar (hora, data, indicadores) e atalhos rapidos
-//   lista de notificacoes (rola; "Limpar" apaga tudo)
-//   cartao de midia (so quando algo esta tocando)
+//   atalhos (Wi-Fi, Bluetooth, nao perturbe...)  = a "status bar"
+//   notificacoes agrupadas por app (prioridade > cronologia; rola; "Limpar")
+//   cartao de midia (so enquanto algo toca)
 // A altura acompanha o conteudo ate o fundo da tela.
 PopupBase {
   id: root
@@ -23,10 +23,17 @@ PopupBase {
   padX: 14
   padRight: Theme.edge + 14
   spacing: 10
+  // digitando uma resposta: o foco e do campo de texto (como na senha do NetMenu)
+  backdropFocus: !Notifs.list.some(n => n.replying)
+
+  // Midia so aparece tocando. Se voce pausar com o centro aberto ela fica ate
+  // fechar (senao o cartao sumiria debaixo do mouse e nao daria p/ retomar).
+  property bool mediaSticky: false
+  readonly property bool showMedia: Media.playing || mediaSticky
 
   // o que sobra para a lista: janela - topo - respiro do fundo (filete + dobra)
   // - molduras da aba - os outros blocos
-  readonly property real chrome: status.implicitHeight + tiles.implicitHeight + head.implicitHeight + (media.visible ? media.implicitHeight : 0) + spacing * (media.visible ? 4 : 3)
+  readonly property real chrome: status.implicitHeight + head.implicitHeight + (media.visible ? media.implicitHeight : 0) + spacing * (media.visible ? 3 : 2)
   readonly property real listMax: Math.max(120, root.height - topY - 24 - padTop - padBottom - chrome)
 
   function toggle() {
@@ -38,40 +45,24 @@ PopupBase {
 
   // abriu = viu: os toasts pendentes saem
   onOpenChanged: {
-    if (open)
+    if (open) {
       Notifs.hidePopups();
+      mediaSticky = Media.playing;
+    } else {
+      mediaSticky = false;
+    }
+  }
+
+  Connections {
+    target: Media
+    function onPlayingChanged() {
+      if (Media.playing)
+        root.mediaSticky = true;
+    }
   }
 
   NotifStatusBar {
     id: status
-  }
-
-  RowLayout {
-    id: tiles
-    Layout.fillWidth: true
-    spacing: 8
-
-    NotifQuickTile {
-      icon: Notifs.dnd ? Icons.bellSlash : Icons.bell
-      label: "Não perturbe"
-      active: Notifs.dnd
-      onClicked: Notifs.toggleDnd()
-    }
-    NotifQuickTile {
-      icon: Wifi.on ? Icons.netWifi : Icons.wifiOff
-      label: "Wi-Fi"
-      active: Wifi.on
-      onClicked: Quickshell.execDetached(["nmcli", "radio", "wifi", Wifi.on ? "off" : "on"])
-    }
-    NotifQuickTile {
-      icon: Audio.muted ? Icons.volumeMuted : Icons.volumeDefault
-      label: "Mudo"
-      active: Audio.muted
-      onClicked: {
-        if (Audio.sinkOk)
-          Audio.sink.audio.muted = !Audio.sink.audio.muted;
-      }
-    }
   }
 
   RowLayout {
@@ -111,7 +102,7 @@ PopupBase {
         UiText {
           color: Theme.subtext0
           font.pointSize: 9
-          text: "Limpar"
+          text: "Limpar tudo"
         }
       }
       MouseArea {
@@ -124,28 +115,26 @@ PopupBase {
     }
   }
 
-  // vazio
-  ColumnLayout {
+  // vazio (centralizado na largura do painel)
+  Item {
     visible: Notifs.total === 0
     Layout.fillWidth: true
     Layout.preferredHeight: 110
-    spacing: 8
-    Item {
-      Layout.fillHeight: true
-    }
-    Glyph {
-      Layout.alignment: Qt.AlignHCenter
-      color: Theme.overlay0
-      font.pointSize: 22
-      text: Notifs.dnd ? Icons.bellSlash : Icons.bell
-    }
-    UiText {
-      Layout.alignment: Qt.AlignHCenter
-      color: Theme.overlay0
-      text: Notifs.dnd ? "Não perturbe ligado" : "Nenhuma notificação"
-    }
-    Item {
-      Layout.fillHeight: true
+
+    Column {
+      anchors.centerIn: parent
+      spacing: 8
+      Glyph {
+        anchors.horizontalCenter: parent.horizontalCenter
+        color: Theme.overlay0
+        font.pointSize: 22
+        text: Notifs.dnd ? Icons.bellSlash : Icons.bell
+      }
+      UiText {
+        anchors.horizontalCenter: parent.horizontalCenter
+        color: Theme.overlay0
+        text: Notifs.dnd ? "Não perturbe ligado" : "Nenhuma notificação"
+      }
     }
   }
 
@@ -155,17 +144,17 @@ PopupBase {
     Layout.fillWidth: true
     Layout.preferredHeight: Math.min(contentHeight, root.listMax)
     clip: true
-    spacing: 8
+    spacing: 10
     cacheBuffer: 2000
     boundsBehavior: Flickable.StopAtBounds
 
     model: ScriptModel {
-      values: Notifs.list
+      values: Notifs.groups
     }
-    delegate: NotifCard {
+    delegate: NotifGroupView {
       required property var modelData
       width: list.width
-      item: modelData
+      group: modelData
     }
 
     add: Transition {
@@ -201,6 +190,6 @@ PopupBase {
 
   NotifMedia {
     id: media
-    visible: Media.has
+    visible: root.showMedia && Media.has
   }
 }

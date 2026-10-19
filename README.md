@@ -23,10 +23,11 @@ components/      blocos reutilizaveis
 services/        estado compartilhado (singletons)
   Audio (PipeWire), Wifi, Updates, Brightness, Battery,
   Notifs (daemon de notificacoes), Media (MPRIS), Time, Workspaces, Fullscreen
-  NotifItem = uma notificacao (criada pelo Notifs)
+  Bt, Caffeine, NightLight, Energy   (atalhos do centro)
+  NotifItem / NotifGroup = uma notificacao / um grupo por app (criados pelo Notifs)
 bar/             widgets da barra (Bar.qml compoe os outros)
 menus/           NetMenu, PowerMenu, TrayMenu (cascata: TrayMenuList, TrayFlyout + Genie, TrayEntryRow),
-                 NotifCenter (NotifStatusBar, NotifQuickTile, NotifMedia)
+                 NotifCenter (NotifStatusBar = atalhos, NotifQuickTile, NotifGroupView, NotifMedia)
 overlays/        Launcher, Osd, NotifToasts
 scripts/         helpers de shell (updates, frecency, wifi-*, netinfo)
 ```
@@ -50,6 +51,9 @@ Regras de bolso:
   notificacoes: **pare o swaync/dunst/mako** (tire o `exec-once` do Hyprland),
   senao eles seguram o nome `org.freedesktop.Notifications` e nada chega.
 - Midia no centro: qualquer player MPRIS (Spotify, mpv, navegador...). `playerctl` e opcional.
+- Som das notificacoes: `sound-theme-freedesktop` + `pipewire` (`pw-play`; ou `paplay`/`ffplay`/`canberra-gtk-play`)
+- Atalhos do centro: Bluetooth (BlueZ), Cafeina (`systemd-inhibit`; o `hypridle` respeita), Luz noturna
+  (`hyprsunset`, ver `Config.nightLight`), Energia (`power-profiles-daemon`). O que nao existe some do painel.
 - `pacman-contrib` (`checkupdates`) e `paru` — badge de atualizacoes
 - `kitty`, `pavucontrol`, `hyprlock`, `cal` (util-linux), `hyprctl`
 - `uwsm` (opcional; usado no "Sair")
@@ -83,29 +87,65 @@ ambos colados no filete direito da moldura:
 
 - **Toasts** (`overlays/NotifToasts.qml`): aba unica que desliza pela borda, no
   monitor focado. Hover pausa o tempo; clique no corpo roda a acao padrao do app;
-  criticas ficam ate dispensar. Somem quando o centro abre.
-- **Centro** (`menus/NotifCenter.qml`): abre no sino. Em cima, status bar (hora,
-  data, rede/som/bateria) e atalhos (Nao perturbe, Wi-Fi, Mudo); no meio, a lista
-  com "Limpar"; embaixo, o cartao de midia (so quando algo toca).
+  arrastar para a direita (ou o x) fecha; criticas ficam ate dispensar. Somem
+  quando o centro abre.
+- **Centro** (`menus/NotifCenter.qml`): abre no sino. Em cima os atalhos (a
+  "status bar"); no meio as notificacoes **agrupadas por app**; embaixo a midia.
 
-Sino: clique esquerdo abre o centro, direito liga o Nao perturbe (toasts param,
-criticas furam; o historico continua enchendo).
+Sino: clique esquerdo abre o centro, direito liga o Nao perturbe.
+
+**Grupos** (estilo macOS): um por app, ordenados por **prioridade** (urgencia
+critica > normal > baixa) e depois cronologia; dentro do grupo, a mesma regra.
+Recolhido mostra a principal com a pilha por tras (clique expande, arrastar
+dispensa o grupo todo); expandido tem cabecalho com recolher e limpar o app.
+
+**Atalhos** (`menus/NotifStatusBar.qml`): Wi-Fi, Bluetooth, Nao perturbe, Mudo,
+Mic mudo, Cafeina, Luz noturna e Energia. Clique liga/desliga; clique direito
+abre o app de configuracao (Wi-Fi, Bluetooth, mixer). O toggle de Wi-Fi saiu do
+NetMenu. Hora/data/Wi-Fi/som/bateria nao se repetem aqui: ja estao na barra.
+
+**Midia**: so aparece enquanto algo *toca* (aba de navegador pausada nao conta).
+Se voce pausar com o centro aberto ela fica ate fechar, p/ dar para retomar. O
+MPRIS nao diz se e musica ou video, entao o rotulo e uma heuristica em
+`Media.classify` (nome do app, depois a URL da faixa).
+
+### Padrao freedesktop (Desktop Notifications Specification)
+
+| item | situacao |
+|---|---|
+| capacidades anunciadas | `actions`, `action-icons`, `body`, `body-markup`, `body-hyperlinks`, `body-images`, `icon-static`, `persistence`, `inline-reply`, `sound`, `x-canonical-private-synchronous` |
+| `Notify` / `replaces_id` | atualiza o mesmo cartao, volta a aparecer e reinicia a hora |
+| `expire_timeout` | -1 = padrao (`Notifs.defaultTimeout`), 0 = fica ate dispensar, >0 respeitado (4 a 20 s). So o *toast* expira; o historico permanece (capacidade `persistence`) |
+| `CloseNotification` / `NotificationClosed` | fechar pelo app remove na hora; dispensar manda `dismissed`; transient que acaba manda `expired` |
+| acoes | `default` = clique no corpo; as demais viram botoes (ou so o icone, com `action-icons`) |
+| hints `urgency` | critica fura o Nao perturbe, fica ate dispensar e vai pro topo; baixa nao toca som |
+| hints `transient` | so toast: fora do historico, da contagem e dos grupos (em Nao perturbe some sem rastro) |
+| hints `resident` | depois de uma acao a notificacao continua |
+| hints `sound-file` / `sound-name` / `suppress-sound` | tocam via `scripts/notif-sound.sh`; sem hint usa `message-new-instant` (`dialog-warning` p/ critica). Desligue com `qs ipc call notifs sound` |
+| hints `image-data` / `image-path` / `desktop-entry` | icone: imagem do app > `app_icon` > icone do `.desktop` > inicial do app |
+| hints `x` / `y` | ignorados (posicao e da shell) |
+| hint `value` | barra de progresso no cartao (extensao comum: volume, brilho, download) |
+| hints `synchronous` / `x-canonical-private-synchronous` / `x-dunst-stack-tag` | a nova substitui a anterior do mesmo app |
+| corpo | `<b> <i> <u> <a href>` renderizados (links abrem no navegador); `<img>` so de arquivo local, vira miniatura; imagem remota nunca e carregada |
+| resposta inline | campo no centro (nao no toast: toast nao recebe teclado) |
 
 ```sh
 qs ipc call notifs toggle   # abre/fecha o centro (monitor focado)
 qs ipc call notifs dnd      # nao perturbe
+qs ipc call notifs sound    # liga/desliga o som das notificacoes
 qs ipc call notifs clear    # apaga tudo
 
 # testes
-notify-send -a Teste "Titulo" "Corpo da notificacao"
-notify-send -u critical "Critica" "Fica ate dispensar"
+notify-send -a Teste "Titulo" "Corpo com <b>negrito</b> e <a href=\"https://quickshell.org\">link</a>"
+notify-send -u critical "Critica" "Fica ate dispensar e vai pro topo"
+notify-send -u low -a Teste "Baixa" "Sem som"
+notify-send -e -a Teste "Transient" "Some sozinha e nao fica no centro"
+notify-send -h int:value:60 -a Teste "Progresso" "60%"
+notify-send -h string:sound-name:bell -a Teste "Som do tema" "sound-name=bell"
+notify-send -h string:x-canonical-private-synchronous:vol -a Teste "Volume" "a nova substitui a velha"
 notify-send -A abrir=Abrir -A depois=Depois "Com acoes" "Botoes do app"
-notify-send -i dialog-information -t 15000 "Com icone" "15 s na tela"
+for i in 1 2 3; do notify-send -a Chat "Mensagem $i" "agrupa por app"; done
 ```
-
-Midia: o MPRIS nao diz se e musica ou video, entao o rotulo (Musica/Video/Midia)
-e uma heuristica em `Media.classify` (nome do app, depois a URL da faixa). Com
-mais de um player aparece uma seta p/ trocar; o que esta tocando tem prioridade.
 
 ## Desempenho
 

@@ -297,14 +297,6 @@ PopupBase {
   }
   MenuRow {
     popup: root
-    icon: Wifi.on ? Icons.netWifi : Icons.wifiOff
-    label: "Alternar Wi-Fi"
-    checkable: true
-    checked: Wifi.on
-    onFired: Quickshell.execDetached(["nmcli", "radio", "wifi", Wifi.on ? "off" : "on"])
-  }
-  MenuRow {
-    popup: root
     icon: Icons.netGlobe
     label: "Alternar rede"
     checkable: true

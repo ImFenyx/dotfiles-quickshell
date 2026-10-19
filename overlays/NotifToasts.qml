@@ -35,6 +35,10 @@ PanelWindow {
       shown = live;
   }
 
+  // Altura do conteudo, congelada enquanto a aba sai: se o conteudo mudasse no
+  // meio do slide (item destruido, lista esvaziando) a aba encolheria vazia.
+  property real stackH: 0
+
   // 0 = aberto, 1 = fechado (mesmo spring do PopupBase)
   property real offsetScale: want ? 0 : 1
   Behavior on offsetScale {
@@ -67,10 +71,12 @@ PanelWindow {
     x: 0
     y: Theme.sideTabTop
     width: root.tabW
-    height: stack.implicitHeight + 2 * root.pad + 2 * root.ear
+    height: root.stackH + 2 * root.pad + 2 * root.ear
     clip: true
 
+    // so anima com a aba ja na tela (ao entrar ela nasce no tamanho certo)
     Behavior on height {
+      enabled: root.want && root.offsetScale < 0.3
       NumberAnimation {
         duration: 180
         easing.type: Easing.OutCubic
@@ -94,6 +100,11 @@ PanelWindow {
         y: root.ear + root.pad
         width: Theme.sideTabW - 2 * root.pad
         spacing: 8
+
+        onImplicitHeightChanged: {
+          if (root.want)
+            root.stackH = implicitHeight;
+        }
 
         add: Transition {
           NumberAnimation {
@@ -120,6 +131,7 @@ PanelWindow {
             width: stack.width
             item: modelData
             toast: true
+            onBodyClicked: modelData.hidePopup()
           }
         }
       }

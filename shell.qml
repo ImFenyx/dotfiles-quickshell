@@ -160,7 +160,7 @@ ShellRoot {
     }
   }
 
-  // qs ipc call notifs toggle | clear | dnd
+  // qs ipc call notifs toggle | clear | dnd | sound
   IpcHandler {
     target: "notifs"
     function toggle(): void {
@@ -172,6 +172,9 @@ ShellRoot {
     }
     function dnd(): void {
       Notifs.toggleDnd();
+    }
+    function sound(): void {
+      Notifs.toggleSound();
     }
   }
 
