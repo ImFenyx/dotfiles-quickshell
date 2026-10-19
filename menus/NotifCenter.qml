@@ -49,6 +49,7 @@ PopupBase {
       Notifs.hidePopups();
       mediaSticky = Media.playing;
       Energy.refresh();
+      NightLight.refresh();
     } else {
       mediaSticky = false;
     }
