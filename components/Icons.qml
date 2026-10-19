@@ -36,6 +36,17 @@ Singleton {
   readonly property string music: "\uf001"
   readonly property string video: "\uf03d"
   readonly property string mediaGeneric: "\uf144"
+  readonly property string chevronUp: "\uf106"
+  readonly property string send: "\uf1d8"
+  readonly property string micOff: "\uf131"
+
+  // atalhos do centro
+  readonly property string bluetooth: "\uf293"
+  readonly property string coffee: "\uf0f4"
+  readonly property string moon: "\uf186"
+  readonly property string bolt: "\uf0e7"
+  readonly property string leaf: "\uf06c"
+  readonly property string balance: "\uf24e"
 
   // launcher / menus
   readonly property string search: "\uf002"

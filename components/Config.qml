@@ -10,4 +10,6 @@ Singleton {
   readonly property string mixer: "pavucontrol"
   readonly property string locker: "hyprlock"
   readonly property string connectionEditor: "nm-connection-editor"
+  readonly property string bluetoothManager: "blueman-manager"
+  readonly property var nightLight: ["hyprsunset", "-t", "4000"]   // daemon: encerrar = desligar
 }
