@@ -72,6 +72,7 @@ GridLayout {
     visible: NightLight.available
     icon: Icons.moon
     label: "Luz noturna"
+    sub: NightLight.on ? NightLight.kelvin + "K" : ""
     active: NightLight.on
     onClicked: NightLight.toggle()
   }

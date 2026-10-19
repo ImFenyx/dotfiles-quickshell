@@ -53,7 +53,7 @@ Regras de bolso:
 - Midia no centro: qualquer player MPRIS (Spotify, mpv, navegador...). `playerctl` e opcional.
 - Som das notificacoes: `sound-theme-freedesktop` + `pipewire` (`pw-play`; ou `paplay`/`ffplay`/`canberra-gtk-play`)
 - Atalhos do centro: Bluetooth (BlueZ), Cafeina (`systemd-inhibit`; o `hypridle` respeita), Luz noturna
-  (`hyprsunset`, ver `Config.nightLight`), Energia (TLP >= 1.9 com o servico `tlp-pd`:
+  (`hyprsunset`, ver `Config.nightTemp`; usa o daemon que ja estiver rodando, ex.: servico do systemd, via `hyprctl hyprsunset`), Energia (TLP >= 1.9 com o servico `tlp-pd`:
   `systemctl enable --now tlp-pd`; troca o perfil pelo `tlpctl`, sem root; nao convive com o
   `power-profiles-daemon`; clique direito abre o `tlpui`, ver `Config.powerManager`).
   O que nao existe some do painel.

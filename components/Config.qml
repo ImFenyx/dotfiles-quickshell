@@ -12,5 +12,5 @@ Singleton {
   readonly property string connectionEditor: "nm-connection-editor"
   readonly property string bluetoothManager: "blueman-manager"
   readonly property string powerManager: "tlpui"
-  readonly property var nightLight: ["hyprsunset", "-t", "4000"]   // daemon: encerrar = desligar
+  readonly property int nightTemp: 4000                            // luz noturna (K); hyprsunset: 1000-20000
 }
