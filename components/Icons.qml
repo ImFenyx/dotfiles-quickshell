@@ -52,6 +52,7 @@ Singleton {
   readonly property string search: "\uf002"
   readonly property string calculator: "\uf1ec"
   readonly property string smile: "\uf118"
+  readonly property string kaomoji: "\uf075"
   readonly property string clipboard: "\uf0ea"
   readonly property string window: "\uf2d0"
   readonly property string image: "\uf03e"

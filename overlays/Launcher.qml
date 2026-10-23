@@ -5,11 +5,12 @@ import Quickshell.Hyprland
 import Quickshell.Io
 import Quickshell.Widgets
 import qs.components
+import qs.services
 
-// Launcher (substitui rofi drun, rofi-emoji e rofi-cliphist): dockado
+// Launcher (substitui o rofi: drun, emoji, kaomoji e cliphist): dockado
 // baixo-centro, fundido na borda, abre p/ cima. Busca multi-termo + frecency +
 // teclado/mouse. Modos pelo 1o caractere (ou direto pelo IPC):
-//   (nada) apps    = calculadora (qalc)    : emoji    # clipboard (cliphist)    @ janelas
+//   (nada) apps   = calculadora (qalc)   : emoji   ; kaomoji   # clipboard (cliphist)   @ janelas
 // Todo modo devolve itens {icon | glyph (+ nerd), title, sub, act}; Enter/clique roda act.
 PopupBase {
   id: root
@@ -32,6 +33,7 @@ PopupBase {
   readonly property var prefixes: ({
       "=": "calc",
       ":": "emoji",
+      ";": "kaomoji",
       "#": "clip",
       "@": "win"
     })
@@ -58,10 +60,13 @@ PopupBase {
     loadMode();     // reabrir no mesmo modo nao muda `mode`: recarrega aqui
   }
 
-  // dados do modo: emoji le o arquivo no 1o uso; clipboard rele a cada entrada
+  // dados do modo: emoji/kaomoji leem os arquivos no 1o uso; clipboard rele a cada entrada
   function loadMode() {
+    tonePick = null;
     if (mode === "emoji")
-      emojiWanted = true;
+      Emoji.wanted = true;
+    else if (mode === "kaomoji")
+      kaomojiWanted = true;
     else if (mode === "clip") {
       clipProc.running = false;
       clipProc.running = true;
@@ -245,61 +250,64 @@ PopupBase {
     }
   }
 
-  // ---- emoji (lista do rofi-emoji: emoji, grupo, subgrupo, nome, keywords) ----
-  property bool emojiWanted: false   // so le o arquivo (~600KB) no 1o uso
-  property var emojis: []
+  // ---- emoji (dados do Unicode em services/Emoji) ----
+  // Emoji com tons de pele abre o popup de tom (ultimo tom usado ja selecionado).
+  property var tonePick: null       // item com o popup de tons aberto
+  property int toneSel: 0
+
+  function emojiResults() {
+    return Emoji.search(tokens());
+  }
+  Connections {
+    target: Emoji
+    function onPicked(item) {
+      if (item.tones) {
+        root.toneSel = Emoji.tone;
+        root.tonePick = item;
+      } else {
+        root.insertText(item.e);
+      }
+    }
+  }
+  function pickTone(i) {
+    Emoji.setTone(i);
+    insertText(tonePick.tones[i]);
+  }
+
+  // como o rofi-emoji (modo insert): copia e digita na janela que volta a ter o
+  // foco. Serve p/ emoji e kaomoji (wtype digita em qualquer app; Ctrl+V falha no terminal).
+  function insertText(s) {
+    close();
+    Quickshell.execDetached(["sh", "-c", "wl-copy -- \"$1\"; sleep 0.15; wtype -- \"$1\"", "sh", s]);
+  }
+
+  // ---- kaomoji (lista propria: data/kaomoji.tsv = kaomoji, descricao, keywords) ----
+  property bool kaomojiWanted: false
+  property var kaomojis: []
 
   FileView {
-    path: root.emojiWanted ? "/usr/share/rofi-emoji/all_emojis.txt" : ""
-    printErrors: false
+    path: root.kaomojiWanted ? Quickshell.shellPath("data/kaomoji.tsv") : ""
     onLoaded: {
       const out = [];
       for (const l of text().split("\n")) {
         const f = l.split("\t");
-        if (f.length < 4)
+        if (f.length < 2 || f[0] === "")
           continue;
-        const e = f[0];
+        const k = f[0];
         out.push({
-          glyph: e,
-          title: f[3],
+          title: k,
           sub: f[1],
-          n: root.norm(f[3]),
-          h: root.norm(f[3] + " " + (f[4] || "")),
-          act: () => root.pickEmoji(e)
+          h: root.norm(f[1] + " " + (f[2] || "")),
+          act: () => root.insertText(k)
         });
       }
-      root.emojis = out;
+      root.kaomojis = out;
     }
   }
 
-  function emojiResults() {
+  function kaomojiResults() {
     const toks = tokens();
-    if (toks.length === 0)
-      return emojis.slice(0, 200);
-    const out = [];
-    for (const it of emojis) {
-      let s = 0;
-      for (const t of toks) {
-        const b = it.n.startsWith(t) ? 3 : it.n.includes(t) ? 2 : it.h.includes(t) ? 1 : 0;
-        if (b === 0) {
-          s = 0;
-          break;
-        }
-        s += b;
-      }
-      if (s > 0)
-        out.push({
-          it: it,
-          s: s
-        });
-    }
-    out.sort((a, b) => b.s - a.s);
-    return out.slice(0, 100).map(x => x.it);
-  }
-  // como o rofi-emoji (modo insert): copia e digita na janela que volta a ter o foco
-  function pickEmoji(e) {
-    close();
-    Quickshell.execDetached(["sh", "-c", "wl-copy -- \"$1\"; sleep 0.15; wtype -- \"$1\"", "sh", e]);
+    return kaomojis.filter(it => toks.every(t => it.h.includes(t)));
   }
 
   // ---- clipboard (cliphist: "id<TAB>preview", mais novo primeiro) ----
@@ -430,9 +438,9 @@ PopupBase {
     return out;
   }
 
-  property var results: mode === "calc" ? calcResults() : mode === "emoji" ? emojiResults() : mode === "clip" ? clipResults() : mode === "win" ? winResults() : appResults()
+  property var results: mode === "calc" ? calcResults() : mode === "emoji" ? emojiResults() : mode === "kaomoji" ? kaomojiResults() : mode === "clip" ? clipResults() : mode === "win" ? winResults() : appResults()
 
-  readonly property string emptyText: mode === "calc" ? "Digite uma conta (ex.: 2*3, 10 km to mi)" : mode === "emoji" ? (emojis.length > 0 ? "Nada encontrado" : "Carregando…") : mode === "clip" ? (clips.length > 0 ? "Nada encontrado" : "Clipboard vazio") : mode === "win" ? "Nenhuma janela" : (appsSeen ? "Nada encontrado" : "Procurando…")
+  readonly property string emptyText: mode === "calc" ? "Digite uma conta (ex.: 2*3, 10 km to mi)" : mode === "emoji" ? (Emoji.missing ? "Sem dados: instale unicode-emoji e unicode-cldr-annotations" : Emoji.ready ? "Nada encontrado" : "Carregando…") : mode === "kaomoji" ? "Nada encontrado" : mode === "clip" ? (clips.length > 0 ? "Nada encontrado" : "Clipboard vazio") : mode === "win" ? "Nenhuma janela" : (appsSeen ? "Nada encontrado" : "Procurando…")
 
   function moveSel(d) {
     if (results.length === 0)
@@ -517,6 +525,13 @@ PopupBase {
               textFormat: Text.PlainText
               text: row.modelData.sub || ""
             }
+          }
+          // emoji com tons de pele: Enter/clique abre o popup de tom
+          Glyph {
+            visible: !!row.modelData.tones
+            color: Theme.overlay0
+            font.pointSize: 10
+            text: Icons.chevronRight
           }
         }
         MouseArea {
@@ -615,6 +630,75 @@ PopupBase {
         color: Theme.surface1
       }
     }
+
+    // popup de tom de pele: setas/Enter ou mouse; Esc ou clique fora volta p/ a lista
+    MouseArea {
+      anchors.fill: parent
+      visible: root.tonePick !== null
+      hoverEnabled: true          // segura o hover da lista por baixo
+      onClicked: root.tonePick = null
+
+      Rectangle {
+        anchors.fill: parent
+        color: Theme.base
+        opacity: 0.7
+      }
+      Rectangle {
+        anchors.centerIn: parent
+        width: toneRow.implicitWidth + 28
+        height: toneRow.implicitHeight + toneTitle.implicitHeight + 34
+        radius: 14
+        color: Theme.surface0
+        border.width: 1
+        border.color: Theme.surface1
+        MouseArea {
+          anchors.fill: parent    // clique no cartao (fora das opcoes) nao fecha
+        }
+        UiText {
+          id: toneTitle
+          anchors.top: parent.top
+          anchors.topMargin: 12
+          anchors.horizontalCenter: parent.horizontalCenter
+          color: Theme.subtext0
+          font.pointSize: 10
+          textFormat: Text.PlainText
+          text: root.tonePick ? root.tonePick.title + "  ·  tom de pele" : ""
+        }
+        Row {
+          id: toneRow
+          anchors.bottom: parent.bottom
+          anchors.bottomMargin: 12
+          anchors.horizontalCenter: parent.horizontalCenter
+          spacing: 6
+          Repeater {
+            model: root.tonePick ? root.tonePick.tones : []
+            delegate: Rectangle {
+              id: toneCell
+              required property string modelData
+              required property int index
+              width: 52
+              height: 52
+              radius: 12
+              color: root.toneSel === index ? Theme.surface1 : "transparent"
+              border.width: 2
+              border.color: root.toneSel === index ? Theme.mauve : "transparent"
+              UiText {
+                anchors.centerIn: parent
+                font.pointSize: 22
+                text: toneCell.modelData
+              }
+              MouseArea {
+                anchors.fill: parent
+                hoverEnabled: true
+                cursorShape: Qt.PointingHandCursor
+                onEntered: root.toneSel = toneCell.index
+                onClicked: root.pickTone(toneCell.index)
+              }
+            }
+          }
+        }
+      }
+    }
   }
 
   Item {
@@ -629,9 +713,9 @@ PopupBase {
     }
   }
 
-  // atalhos do clipboard (como o cabecalho do rofi-cliphist)
+  // atalhos do modo (clipboard: como o cabecalho do rofi-cliphist; emoji: tom de pele)
   UiText {
-    visible: root.mode === "clip"
+    visible: root.mode === "clip" || root.mode === "emoji"
     Layout.fillWidth: true
     Layout.leftMargin: 4
     Layout.bottomMargin: 2
@@ -639,7 +723,7 @@ PopupBase {
     font.pointSize: 9
     font.weight: Font.Normal
     elide: Text.ElideRight
-    text: (root.imageGrid ? "Alt+t  texto" : "Alt+i  imagens") + "     Alt+d  apagar     Alt+p  apagar as de cima     Alt+n  apagar as de baixo"
+    text: root.mode === "emoji" ? (root.tonePick ? "← →  tom de pele     Enter  inserir     Esc  voltar" : "›  tem tom de pele: Enter ou clique abre a escolha") : (root.imageGrid ? "Alt+t  texto" : "Alt+i  imagens") + "     Alt+d  apagar     Alt+p  apagar as de cima     Alt+n  apagar as de baixo"
   }
 
   Rectangle {
@@ -654,7 +738,7 @@ PopupBase {
       spacing: 10
       Glyph {
         font.pointSize: 13
-        text: root.mode === "calc" ? Icons.calculator : root.mode === "emoji" ? Icons.smile : root.mode === "clip" ? Icons.clipboard : root.mode === "win" ? Icons.window : Icons.search
+        text: root.mode === "calc" ? Icons.calculator : root.mode === "emoji" ? Icons.smile : root.mode === "kaomoji" ? Icons.kaomoji : root.mode === "clip" ? Icons.clipboard : root.mode === "win" ? Icons.window : Icons.search
       }
       TextInput {
         id: searchInput
@@ -664,8 +748,24 @@ PopupBase {
         font.family: Theme.uiFont
         font.pointSize: 12
         focus: root.open
-        Keys.onEscapePressed: root.close()
+        Keys.onEscapePressed: {
+          if (root.tonePick)
+            root.tonePick = null;
+          else
+            root.close();
+        }
         Keys.onPressed: event => {
+          // popup de tom aberto: setas escolhem, Enter insere; digitar fecha (onTextChanged)
+          if (root.tonePick) {
+            if (event.key === Qt.Key_Left || event.key === Qt.Key_Right)
+              root.toneSel = (root.toneSel + (event.key === Qt.Key_Left ? 5 : 1)) % 6;
+            else if (event.key === Qt.Key_Enter || event.key === Qt.Key_Return)
+              root.pickTone(root.toneSel);
+            else if (event.key !== Qt.Key_Up && event.key !== Qt.Key_Down)
+              return;
+            event.accepted = true;
+            return;
+          }
           const r = root.results;
           const sel = Math.min(root.selectedIndex, r.length - 1);
           // atalhos do clipboard (paridade rofi-cliphist)
@@ -704,7 +804,10 @@ PopupBase {
             event.accepted = true;
           }
         }
-        onTextChanged: root.selectedIndex = 0
+        onTextChanged: {
+          root.selectedIndex = 0;
+          root.tonePick = null;
+        }
 
         // vazio: lembra os prefixos dos modos
         UiText {
@@ -713,7 +816,7 @@ PopupBase {
           color: Theme.overlay0
           font.pointSize: 11
           font.weight: Font.Normal
-          text: "Apps      =  calculadora      :  emoji      #  clipboard      @  janelas"
+          text: "Apps     =  calculadora     :  emoji     ;  kaomoji     #  clipboard     @  janelas"
         }
       }
     }

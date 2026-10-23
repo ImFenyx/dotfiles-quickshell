@@ -158,7 +158,7 @@ ShellRoot {
   }
 
   // Atalhos do Hyprland chamam:  qs ipc call <target> <funcao>
-  // qs ipc call launcher toggle | calc | emoji | clip | windows (abre ja no modo)
+  // qs ipc call launcher toggle | calc | emoji | kaomoji | clip | windows (abre ja no modo)
   IpcHandler {
     target: "launcher"
     function toggle(): void {
@@ -169,6 +169,9 @@ ShellRoot {
     }
     function emoji(): void {
       launcher.toggle(":");
+    }
+    function kaomoji(): void {
+      launcher.toggle(";");
     }
     function clip(): void {
       launcher.toggle("#");

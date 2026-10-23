@@ -24,12 +24,14 @@ services/        estado compartilhado (singletons)
   Audio (PipeWire), Wifi (Quickshell.Networking), Updates, Brightness, Battery,
   Notifs (daemon de notificacoes), Media (MPRIS), Time, Workspaces, Fullscreen
   Bt, Caffeine, NightLight, Energy   (atalhos do centro)
+  Emoji (dados do launcher)
   NotifItem / NotifGroup = uma notificacao / um grupo por app (criados pelo Notifs)
 bar/             widgets da barra (Bar.qml compoe os outros)
 menus/           NetMenu, PowerMenu, TrayMenu (cascata: TrayMenuList, TrayFlyout + Genie, TrayEntryRow),
                  NotifCenter (NotifStatusBar = atalhos, NotifQuickTile, NotifGroupView, NotifMedia)
 overlays/        Launcher, Osd, NotifToasts, Lock (tela de bloqueio)
 scripts/         helpers de shell (updates, frecency, netinfo, notif-sound, cliphist-thumbs, perf)
+data/            listas estaticas (kaomoji.tsv)
 ```
 
 Regras de bolso:
@@ -64,8 +66,9 @@ Regras de bolso:
   fallback (`Config.locker`)
 - `uwsm` (opcional; usado no "Sair")
 - Modos do launcher: `qalc` (libqalculate), `cliphist` + `wl-clipboard` (com
-  `wl-paste --watch cliphist store` rodando), `wtype` (digitar o emoji) e `rofi-emoji`
-  (so pela lista `/usr/share/rofi-emoji/all_emojis.txt`, nomes em ingles)
+  `wl-paste --watch cliphist store` rodando), `wtype` (digitar emoji/kaomoji),
+  `unicode-emoji` + `unicode-cldr-annotations` (lista oficial de emojis + nomes em pt/en;
+  atualizam com o pacman) e uma fonte de emoji colorida (ex.: `ttf-twemoji`)
 
 Os programas que a shell chama ficam em `components/Config.qml`.
 
@@ -97,11 +100,20 @@ Modo pelo 1o caractere da busca (o IPC ja abre com ele):
 |---|---|---|
 | (nada) | apps (ranking por campo + frecency) | abre |
 | `=` | calculadora (`qalc`: contas, unidades, moedas) | copia o resultado |
-| `:` | emoji | copia e digita na janela focada (como o rofi-emoji) |
+| `:` | emoji (`services/Emoji.qml`: Unicode oficial, busca em pt e en) | copia e digita na janela focada; com `›` abre o popup de tom de pele |
+| `;` | kaomoji (lista propria, `data/kaomoji.tsv`) | copia e digita na janela focada |
 | `#` | clipboard (`cliphist`, mais novo primeiro): abas texto e imagens | copia de volta |
 | `@` | janelas abertas | foca (troca de workspace se precisar) |
 
 Atalho que chama o mesmo modo ja aberto fecha o launcher.
+
+Emoji: a lista tem so o emoji base; os que tem tom de pele mostram `›` e o
+Enter/clique abre o popup (setas ou mouse, Enter insere, Esc volta), ja no
+ultimo tom usado (`~/.local/state/quickshell/emoji-tone`). Os arquivos do pacman
+sao vigiados: emoji novo do Unicode entra quando o pacote atualiza (precisa da
+fonte atualizada tambem, senao aparece como quadrado). Bandeiras e outras
+sequencias ficam com o nome em ingles (o pt delas so existe no `unicode-cldr`
+completo, ~235MB).
 
 Clipboard, como no rofi-cliphist: `Alt+t` texto, `Alt+i` imagens (grade de 3
 colunas com miniatura; setas andam na grade), `Alt+d` apaga a selecionada,
