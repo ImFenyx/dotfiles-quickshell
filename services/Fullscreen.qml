@@ -48,9 +48,9 @@ Singleton {
         else
           debounce.restart();
       } else if (n === "fullscreen") {
+        // "1" tambem vem ao maximizar e pode ser de outra janela: a consulta decide
         root.epoch++;
-        root.barHidden = event.data === "1";
-        root.remember(root.addr, root.barHidden);
+        debounce.restart();
       } else if (n === "closewindow") {
         delete root.cache[event.data];
       }
