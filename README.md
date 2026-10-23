@@ -25,14 +25,17 @@ services/        estado compartilhado (singletons)
   Audio (PipeWire), Wifi (Quickshell.Networking), Updates, Brightness, Battery,
   Notifs (daemon de notificacoes), Media (MPRIS), Time, Workspaces, Fullscreen
   Bt, Caffeine, NightLight, Energy   (atalhos do centro)
-  Emoji (dados do launcher), ShellState (estado que sobrevive a restart: state.json)
+  Emoji (dados do launcher), ShellState (estado que sobrevive a restart: state.json),
+  LockKeys (Caps/Num/Fn Lock), Wallpapers (seletor)
   NotifItem / NotifGroup = uma notificacao / um grupo por app (criados pelo Notifs)
 bar/             widgets da barra (Bar.qml compoe os outros)
 menus/           NetMenu, PowerMenu, AudioMenu (mixer; VolumeRow), BtMenu,
                  TrayMenu (cascata: TrayMenuList, TrayFlyout + Genie, TrayEntryRow),
                  NotifCenter (NotifStatusBar = atalhos, NotifQuickTile, NotifGroupView, NotifMedia)
-overlays/        Launcher, Osd, NotifToasts, Lock (tela de bloqueio), PolkitDialog (agente polkit)
-scripts/         helpers de shell (updates, frecency, netinfo, notif-sound, cliphist-thumbs, perf)
+overlays/        Launcher, Osd, NotifToasts, Lock (tela de bloqueio), PolkitDialog (agente polkit),
+                 WallpaperPicker
+scripts/         helpers de shell (updates, frecency, netinfo, notif-sound, cliphist-thumbs,
+                 wall-thumbs, wall-video, perf)
 data/            listas estaticas (kaomoji.tsv)
 ```
 
@@ -116,6 +119,29 @@ que nao consomem a tecla (`non_consuming`, no `release`, `locked`) chamam
 `quickshell:lockkeys`, que relê os LEDs em `/sys/class/leds/*::capslock|numlock`.
 O Fn Lock (Fn+Esc no IdeaPad) e do firmware e nao gera tecla: o `ideapad_laptop`
 avisa em `platform::fnlock/brightness_hw_changed`, vigiado por inotify.
+
+## Wallpaper
+
+`Super+Shift+W` abre o seletor (`overlays/WallpaperPicker.qml`): grade com as
+imagens e videos (selo ▶) de `Config.wallpaperDir`, busca pelo nome, setas
+navegam, Enter/clique aplica e fecha. O atual fica marcado e ja vem selecionado.
+Miniaturas 320x180 em `~/.cache/quickshell/wallthumbs`, geradas 1x por
+arquivo+mtime (`scripts/wall-thumbs.sh`: um `stat` p/ a pasta toda; video = um
+quadro de 1s pelo `ffmpeg`).
+
+- **Imagem**: `Config.wallpaperApply` (`awww img`, transicao `center`); o
+  `awww-daemon` (servico) restaura a ultima no boot.
+- **Video**: `Config.wallpaperVideoPlayer` (`mpvpaper` ou `gslapper`) via
+  `scripts/wall-video.sh` (loop, sem audio, cobrindo a tela; um player por tela,
+  na camada `bottom`, acima do awww) dentro da unidade transiente `qs-wallvideo`
+  (`systemd-run --user`): sobrevive a reload da shell. O video escolhido fica no
+  `ShellState` e volta quando a shell inicia. Aplicar uma imagem para o video
+  (`systemctl --user stop qs-wallvideo`).
+  - Sem pausa automatica (`-p`): em tiling as janelas cobrem o wallpaper e o
+    player congelava o video em segundos. O video roda sempre.
+  - CPU medida (1366x768, 60 fps): mpvpaper com VA-API (`hwdec=auto-safe`) ~28% de
+    1 nucleo; gslapper sem o `gst-plugin-va` decodifica na CPU, ~68%. Com o
+    `gst-plugin-va` instalado o GStreamer passa a usar o hardware sozinho.
 
 ## Launcher
 

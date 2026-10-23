@@ -137,6 +137,12 @@ ShellRoot {
     screen: root.focusedScreen
   }
 
+  // seletor de wallpaper (atalho "wallpaper") no monitor focado
+  WallpaperPicker {
+    id: wallpaperPicker
+    screen: root.focusedScreen
+  }
+
   // ---- single-instance (segue o foco): launcher + OSD + notificacoes ----
   Launcher {
     id: launcher
@@ -236,6 +242,11 @@ ShellRoot {
     name: "lock"
     description: "Bloquear a tela"
     onPressed: lock.lock()
+  }
+  GlobalShortcut {
+    name: "wallpaper"
+    description: "Seletor de wallpaper"
+    onPressed: wallpaperPicker.toggle()
   }
   // bind em Caps_Lock/Num_Lock sem consumir a tecla: so avisa p/ reler os LEDs.
   // O bind e `release = true`: o Hyprland manda o global como *released*, nao pressed.

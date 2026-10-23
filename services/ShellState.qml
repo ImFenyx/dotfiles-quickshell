@@ -7,13 +7,16 @@ import QtQuick
 // Estado de runtime que sobrevive a restart e reboot (modelo ii Persistent.qml):
 // ~/.local/state/quickshell/state.json via FileView + JsonAdapter. Mudou aqui ->
 // grava (debounce); mudou o arquivo -> relê; sem arquivo -> cria com os padroes.
-// So estado que o usuario escolheu (nao cache): DND, som, tom do emoji.
+// So estado que o usuario escolheu (nao cache): DND, som, tom do emoji, wallpaper em video.
 Singleton {
   id: root
 
   property alias dnd: adapter.dnd
   property alias sound: adapter.sound
   property alias emojiTone: adapter.emojiTone
+  property alias wallpaperVideo: adapter.wallpaperVideo
+  // o arquivo ja foi lido: antes disso os valores sao os padroes (quem restaura algo na partida espera)
+  readonly property bool ready: file.loaded
 
   FileView {
     id: file
@@ -31,6 +34,7 @@ Singleton {
       property bool dnd: false
       property bool sound: true
       property int emojiTone: 0       // 0 = padrao, 1..5 = tons de pele
+      property string wallpaperVideo: ""   // video em uso como wallpaper ("" = imagem do awww)
     }
   }
 
