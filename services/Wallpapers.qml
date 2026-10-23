@@ -12,6 +12,9 @@ import qs.components
 //   transiente do systemd (qs-wallvideo): sobrevive a reload da shell, fica
 //   salvo no ShellState e volta quando a shell inicia.
 // Aplicar um para o outro. Caminhos vao como argumento (nunca dentro do sh -c).
+// Na bateria o video pausa no quadro atual (se ShellState.wallpaperPauseOnBattery,
+// atalho "Pausar video" no centro) e retoma na tomada: pelo socket de controle
+// do player (wall-video.sh pause|resume), sem matar o processo.
 Singleton {
   id: root
 
@@ -19,6 +22,38 @@ Singleton {
   property string image: ""         // imagem do awww (awww query)
   readonly property string video: ShellState.wallpaperVideo
   readonly property string current: video !== "" ? video : image
+  readonly property bool pauseOnBattery: ShellState.wallpaperPauseOnBattery
+  readonly property bool paused: video !== "" && pauseOnBattery && Battery.onBattery
+  readonly property bool audio: ShellState.wallpaperVideoAudio   // atalho "Som do video"
+
+  // mpvpaper troca ao vivo (trilha aid pelo socket); gslapper nao tem comando de
+  // audio: reinicia o player (o video recomeca)
+  function toggleAudio() {
+    ShellState.wallpaperVideoAudio = !ShellState.wallpaperVideoAudio;
+    if (video === "")
+      return;
+    if (Config.wallpaperVideoPlayer === "mpvpaper")
+      Quickshell.execDetached(["sh", Quickshell.shellPath("scripts/wall-video.sh"), "audio", ShellState.wallpaperVideoAudio ? "on" : "off"]);
+    else
+      startVideo(video, true);
+  }
+
+  onPausedChanged: sendPause()
+  function sendPause() {
+    Quickshell.execDetached(["sh", Quickshell.shellPath("scripts/wall-video.sh"), paused ? "pause" : "resume"]);
+  }
+  function togglePauseOnBattery() {
+    ShellState.wallpaperPauseOnBattery = !ShellState.wallpaperPauseOnBattery;
+  }
+  // video novo comecando ja na bateria: o socket do player demora a aparecer
+  Timer {
+    id: pauseLater
+    interval: 2000
+    onTriggered: {
+      if (root.paused)
+        root.sendPause();
+    }
+  }
   readonly property bool loading: listProc.running
   readonly property string unit: "qs-wallvideo"
 
@@ -46,11 +81,12 @@ Singleton {
   }
 
   // replace: troca o que estiver tocando; senao (partida) so sobe se nao houver nada.
-  // Um player por tela ($0 = script, depois player, arquivo e as saidas).
+  // Um player por tela ($0 = script, depois player, arquivo, som 0|1 e as saidas).
   function startVideo(path, replace) {
     const pre = replace ? "systemctl --user stop " + unit + " 2>/dev/null; " : "systemctl --user is-active --quiet " + unit + " && exit 0; ";
     const run = "exec systemd-run --user --unit=" + unit + " --collect --quiet sh \"$0\" \"$@\"";
-    Quickshell.execDetached(["sh", "-c", pre + run, Quickshell.shellPath("scripts/wall-video.sh"), Config.wallpaperVideoPlayer, path].concat(Quickshell.screens.map(s => s.name)));
+    Quickshell.execDetached(["sh", "-c", pre + run, Quickshell.shellPath("scripts/wall-video.sh"), Config.wallpaperVideoPlayer, path, audio ? "1" : "0"].concat(Quickshell.screens.map(s => s.name)));
+    pauseLater.restart();
   }
 
   // partida: o video salvo volta (espera o state.json ser lido)

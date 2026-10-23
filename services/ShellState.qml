@@ -15,6 +15,8 @@ Singleton {
   property alias sound: adapter.sound
   property alias emojiTone: adapter.emojiTone
   property alias wallpaperVideo: adapter.wallpaperVideo
+  property alias wallpaperPauseOnBattery: adapter.wallpaperPauseOnBattery
+  property alias wallpaperVideoAudio: adapter.wallpaperVideoAudio
   // o arquivo ja foi lido: antes disso os valores sao os padroes (quem restaura algo na partida espera)
   readonly property bool ready: file.loaded
 
@@ -35,6 +37,8 @@ Singleton {
       property bool sound: true
       property int emojiTone: 0       // 0 = padrao, 1..5 = tons de pele
       property string wallpaperVideo: ""   // video em uso como wallpaper ("" = imagem do awww)
+      property bool wallpaperPauseOnBattery: true   // atalho "Pausar video" no centro
+      property bool wallpaperVideoAudio: false      // atalho "Som do video" no centro
     }
   }
 

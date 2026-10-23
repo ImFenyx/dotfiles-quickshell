@@ -139,9 +139,18 @@ quadro de 1s pelo `ffmpeg`).
   (`systemctl --user stop qs-wallvideo`).
   - Sem pausa automatica (`-p`): em tiling as janelas cobrem o wallpaper e o
     player congelava o video em segundos. O video roda sempre.
-  - CPU medida (1366x768, 60 fps): mpvpaper com VA-API (`hwdec=auto-safe`) ~28% de
-    1 nucleo; gslapper sem o `gst-plugin-va` decodifica na CPU, ~68%. Com o
-    `gst-plugin-va` instalado o GStreamer passa a usar o hardware sozinho.
+  - CPU medida (1366x768, 60 fps): mpvpaper com VA-API (`hwdec=auto-safe`) ~25% de
+    1 nucleo; gslapper ~73%, mesmo com o `gst-plugin-va` (decodifica na GPU mas
+    copia cada quadro p/ a CPU e converte la: o caminho sem copia e so NVIDIA).
+  - **Pausa na bateria**: atalho "Pausar video" no centro (so aparece com video;
+    aceso = pausa na bateria, guardado no `ShellState`). Pausa no quadro atual pelo
+    socket de controle de cada player (`wall-video.sh pause|resume`, via `socat`) e
+    retoma na tomada; pausado gasta ~0,3% de CPU.
+  - **Som**: atalho "Som do video" no centro (so com video; desligado por padrao,
+    guardado no `ShellState`). Toca so no player da 1a tela (sem som duplicado com
+    2 monitores). mpvpaper troca ao vivo (trilha `aid` pelo socket,
+    `wall-video.sh audio on|off`); gslapper nao tem comando de audio, entao o
+    player reinicia. O volume fica no mixer, como qualquer app.
 
 ## Launcher
 

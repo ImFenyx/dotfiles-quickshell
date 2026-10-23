@@ -89,4 +89,22 @@ GridLayout {
     onClicked: Energy.cycle()
     onSecondary: Quickshell.execDetached([Config.powerManager])
   }
+  // so com video de wallpaper: aceso = pausa na bateria (retoma na tomada)
+  NotifQuickTile {
+    visible: Wallpapers.video !== ""
+    icon: Icons.pause
+    label: "Pausar vídeo"
+    sub: !Wallpapers.pauseOnBattery ? "desligado" : (Wallpapers.paused ? "pausado agora" : "na bateria")
+    active: Wallpapers.pauseOnBattery
+    onClicked: Wallpapers.togglePauseOnBattery()
+  }
+  // so com video de wallpaper: som do video (o volume fica no mixer, como app)
+  NotifQuickTile {
+    visible: Wallpapers.video !== ""
+    icon: Wallpapers.audio ? Icons.volumeDefault : Icons.volumeMuted
+    label: "Som do vídeo"
+    sub: Wallpapers.audio ? "ligado" : "mudo"
+    active: Wallpapers.audio
+    onClicked: Wallpapers.toggleAudio()
+  }
 }
