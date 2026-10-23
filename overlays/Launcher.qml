@@ -59,9 +59,13 @@ PopupBase {
     const hay = [];
     for (const a of apps) {
       sn[a.id] = a.name.toLowerCase();
+      const n = norm(a.name);
       hay.push({
         e: a,
-        h: norm(entryText(a))
+        h: norm(entryText(a)),
+        n: n,
+        w: n.split(/[\s._-]+/),
+        k: norm((a.genericName || "") + " " + (a.keywords || []).join(" "))
       });
     }
     sortName = sn;
@@ -87,12 +91,31 @@ PopupBase {
     });
     const out = [];
     for (const it of appHay) {
-      if (alts.every(v => v.some(x => it.h.includes(x))))
-        out.push(it.e);
+      const s = rank(it, alts);
+      if (s >= 0)
+        out.push({
+          e: it.e,
+          s: s
+        });
     }
-    // frecency, depois ordem alfabetica
-    out.sort((a, b) => ((freq[b.id] || 0) - (freq[a.id] || 0)) || ((sortName[a.id] < sortName[b.id]) ? -1 : 1));
-    return out;
+    out.sort((a, b) => (b.s - a.s) || ((sortName[a.e.id] < sortName[b.e.id]) ? -1 : 1));
+    return out.map(x => x.e);
+  }
+  // pontua por campo (modelo noctalia app_provider): prefixo do nome > prefixo de
+  // palavra > nome > generico/keywords > resto. -1 = algum termo nao casa.
+  // Com busca o uso so desempata (teto 20); sem busca ordena pelo uso.
+  function rank(it, alts) {
+    let s = 0;
+    for (const v of alts) {
+      let b = -1;
+      for (const t of v)
+        b = Math.max(b, it.n.startsWith(t) ? 100 : it.w.some(w => w.startsWith(t)) ? 80 : it.n.includes(t) ? 60 : it.k.includes(t) ? 40 : it.h.includes(t) ? 15 : -1);
+      if (b < 0)
+        return -1;
+      s += b;
+    }
+    const f = freq[it.e.id] || 0;
+    return s + (alts.length > 0 ? Math.min(f, 20) : f);
   }
   property var results: filtered()
 
@@ -133,7 +156,7 @@ PopupBase {
       onStreamFinished: {
         const m = {};
         for (const l of text.trim().split("\n")) {
-          const p = l.split(" ");
+          const p = l.split("\t");
           if (p.length >= 2 && p[0] !== "")
             m[p[0]] = parseInt(p[1], 10) || 0;
         }
@@ -152,7 +175,10 @@ PopupBase {
       id: resultsList
       anchors.fill: parent
       clip: true
-      model: root.results
+      // ScriptModel reaproveita os delegates por identidade (array puro recriava a cada tecla)
+      model: ScriptModel {
+        values: root.results
+      }
       spacing: 2
       delegate: Item {
         id: app
