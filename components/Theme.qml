@@ -40,6 +40,12 @@ Singleton {
   readonly property int sideTabTop: topH + gap / 2   // y onde a concordancia comeca, abaixo do scoop da barra
   readonly property int sideTabW: 380                // largura do corpo (sem o filete)
 
+  // workspaces da barra: icone de app e teto da faixa. 360 ~ a faixa antiga no pior
+  // caso (10 workspaces + special); em 1366px sobram ~40px ate o bloco direito
+  // (SSID de 5 letras, volume 100%). SSID/tray maiores comem essa folga: baixe aqui
+  readonly property int wsIcon: 16
+  readonly property int wsStripMax: 360
+
   // ---- animacao ----
   // Duracoes nomeadas (ms). Springs repetidos sao componentes: SpringPanel
   // (popups/toasts deslizando) e SpringPill (largura de pill/barra do OSD).

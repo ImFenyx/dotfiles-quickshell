@@ -120,6 +120,25 @@ que nao consomem a tecla (`non_consuming`, no `release`, `locked`) chamam
 O Fn Lock (Fn+Esc no IdeaPad) e do firmware e nao gera tecla: o `ideapad_laptop`
 avisa em `platform::fnlock/brightness_hw_changed`, vigiado por inotify.
 
+## Workspaces
+
+`bar/WorkspaceStrip.qml`: numero + icones dos apps abertos em cada workspace (um
+por app, na ordem das janelas), ate `Config.wsIcons` (3); passou disso, `+N`.
+Vazio = so o numero; special = o glifo. Ativo: mauve e mais largo (spring).
+
+- Icone: `.desktop` do appId (`DesktopEntries.heuristicLookup`) > nome no tema
+  (`Quickshell.iconPath`); sem icone = inicial do app.
+- Largura: teto `Theme.wsStripMax` (360px ~ a faixa antiga no pior caso, 10
+  workspaces + special). Icone e `+N` ocupam um slot fixo (16 + 3px), entao a conta
+  e exata. Sem espaco, os outros workspaces perdem icones antes do ativo (3, 2, 1, 0
+  nos outros; depois o ativo). Medido em 1366px: 3 workspaces com 4+ apps = 348px
+  (tudo); 4 = 340px (1 icone + `+N` nos outros); 5-7 = icones so no ativo; 10 +
+  special = so numeros (382px, igual a antes). Folga ate o bloco direito (SSID de 5
+  letras, volume 100%): ~40px com a faixa em 360px, ~28px no pior caso antigo;
+  SSID/tray maiores comem essa folga (baixe `Theme.wsStripMax`).
+- Reativo: `HyprlandWorkspace.toplevels` + `wayland.appId` (eventos do Hyprland,
+  sem processo nem polling).
+
 ## Wallpaper
 
 `Super+Shift+W` abre o seletor (`overlays/WallpaperPicker.qml`): grade com as

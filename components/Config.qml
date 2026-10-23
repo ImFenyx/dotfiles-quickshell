@@ -19,6 +19,7 @@ Singleton {
   // teclas vao ate 150: -l 1.5 no keybindings.lua; o teto vale p/ elas e p/ o mixer)
   readonly property int volumeGuardStep: 10
   readonly property int volumeGuardMax: 0
+  readonly property int wsIcons: 3                                 // icones de app por workspace na barra (o resto vira +N)
   // seletor de wallpaper (Super+Shift+W): pasta e comando de aplicar (o caminho vai no fim)
   readonly property string wallpaperDir: "/mnt/dados/wallpapers"
   readonly property var wallpaperApply: ["awww", "img", "--transition-type", "center", "--transition-duration", "1.2", "--transition-fps", "60"]
