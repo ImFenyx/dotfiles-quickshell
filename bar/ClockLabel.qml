@@ -9,6 +9,7 @@ UiText {
 
   property var tip: null
   property string calText: ""
+  property string calDay: ""       // dia do ultimo cal (so muda 1x por dia)
 
   color: Theme.mauve
   font.bold: true
@@ -27,10 +28,13 @@ UiText {
     tipWindow: root.tip
     mono: true
     tipText: root.calText === "" ? Time.longDate : root.calText
-    // relê o cal a cada hover (so aqui; nao mais a cada 30min)
+    // relê o cal no hover, so se o dia virou
     onTipRequested: {
-      calProc.running = false;
-      calProc.running = true;
+      const d = Time.date.toDateString();
+      if (d !== root.calDay) {
+        root.calDay = d;
+        calProc.running = true;
+      }
     }
   }
 }

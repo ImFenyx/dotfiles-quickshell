@@ -16,6 +16,11 @@ MouseArea {
 
   hoverEnabled: true
 
+  // dado relido no tipRequested chega depois do show(): atualiza o tip aberto
+  onTipTextChanged: {
+    if (containsMouse && tipWindow && tipText !== "")
+      tipWindow.tipText = tipText;
+  }
   onEntered: {
     root.tipRequested();
     if (root.tipWindow && root.tipText !== "")
