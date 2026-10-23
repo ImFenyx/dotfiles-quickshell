@@ -28,6 +28,8 @@ Singleton {
   property bool sound: true
   // toast sem timeout proprio (expireTimeout < 0)
   property int defaultTimeout: 6000
+  // teto do historico: cada item segura o Notification (e o image-data) do servidor
+  property int maxHistory: 100
 
   property var groupMap: ({})
   property real lastSound: 0
@@ -165,6 +167,13 @@ Singleton {
 
     list = [item, ...list];
     regroup();
+
+    // passou do teto: as mais antigas nao criticas expiram (list = mais nova primeiro)
+    const over = history.length - maxHistory;
+    if (over > 0) {
+      for (const o of history.filter(n => n.urgency !== 2).slice(-over))
+        o.expireNow();
+    }
 
     if (quiet) {
       // transient em "nao perturbe" some sem rastro; as demais vao pro historico

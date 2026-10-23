@@ -123,7 +123,7 @@ MPRIS nao diz se e musica ou video, entao o rotulo e uma heuristica em
 |---|---|
 | capacidades anunciadas | `actions`, `action-icons`, `body`, `body-markup`, `body-hyperlinks`, `body-images`, `icon-static`, `persistence`, `inline-reply`, `sound`, `x-canonical-private-synchronous` |
 | `Notify` / `replaces_id` | atualiza o mesmo cartao, volta a aparecer e reinicia a hora |
-| `expire_timeout` | -1 = padrao (`Notifs.defaultTimeout`), 0 = fica ate dispensar, >0 respeitado (4 a 20 s). So o *toast* expira; o historico permanece (capacidade `persistence`) |
+| `expire_timeout` | -1 = padrao (`Notifs.defaultTimeout`), 0 = fica ate dispensar, >0 respeitado (4 a 20 s). So o *toast* expira; o historico permanece (capacidade `persistence`), com teto de `Notifs.maxHistory` (100): acima disso as mais antigas nao criticas expiram |
 | `CloseNotification` / `NotificationClosed` | fechar pelo app remove na hora; dispensar manda `dismissed`; transient que acaba manda `expired` |
 | acoes | `default` = clique no corpo; as demais viram botoes (ou so o icone, com `action-icons`) |
 | hints `urgency` | critica fura o Nao perturbe, fica ate dispensar e vai pro topo; baixa nao toca som |
