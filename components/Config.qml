@@ -13,4 +13,5 @@ Singleton {
   readonly property string bluetoothManager: "blueman-manager"
   readonly property string powerManager: "tlpui"
   readonly property int nightTemp: 4000                            // luz noturna (K); hyprsunset: 1000-20000
+  readonly property var batteryWarn: [20, 10, 5]                   // % que avisam ao descer na bateria; <= 10 = critica
 }

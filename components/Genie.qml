@@ -23,7 +23,7 @@ Item {
   property real originY: 0
   property int dir: 1              // +1: abre p/ direita (origem a esquerda); -1: oposto
   property real originHeight: 32   // altura do pescoco na origem (altura da linha do pai)
-  property int slices: 48          // mais fatias = borda do funil mais lisa
+  property int slices: 24          // mais fatias = borda do funil mais lisa (e 1 render da arvore por fatia por quadro)
   property real lag: 0.55          // 0 = sem funil; maior = pescoco mais comprido
   // true = as fatias re-renderizam o conteudo a cada quadro (use enquanto ele
   // ainda pode mudar, ex.: abrindo, com o menu do app carregando). false = o

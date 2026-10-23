@@ -32,6 +32,7 @@ PanelWindow {
     return Qt.point(p.x - sx, p.y - sy + 18);
   }
   function show(t, p, mono) {
+    hideDelay.stop();
     tipText = t;
     const lp = toLocal(p);
     tipX = lp.x;
@@ -44,8 +45,15 @@ PanelWindow {
     tipX = lp.x;
     tipY = lp.y;
   }
+  // atraso: cruzar o vao entre dois widgets nao desmapeia/remapeia a janela
+  // fullscreen (buffer da tela inteira)
   function hide() {
-    tipOpen = false;
+    hideDelay.restart();
+  }
+  Timer {
+    id: hideDelay
+    interval: 80
+    onTriggered: root.tipOpen = false
   }
 
   Rectangle {

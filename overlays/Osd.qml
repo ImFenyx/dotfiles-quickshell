@@ -50,9 +50,17 @@ PopupBase {
       text: root.glyph
     }
     UiText {
+      id: pctText
+      // largura fixa (a de "100%"): o painel nao muda em 9->10% (cada mudanca re-tessela o fundo)
+      Layout.minimumWidth: pctMetrics.advanceWidth
       color: root.boosted ? Theme.red : Theme.text
       font.weight: Font.DemiBold
       text: root.muted ? "Mudo" : root.vol + "%"
+      TextMetrics {
+        id: pctMetrics
+        font: pctText.font
+        text: "100%"
+      }
     }
     Rectangle {
       Layout.preferredWidth: 300

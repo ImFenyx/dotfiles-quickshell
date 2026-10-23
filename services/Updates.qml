@@ -44,12 +44,10 @@ Singleton {
   }
 
   // Estreia instantanea: le o cache do ultimo poll antes do primeiro check.
-  Process {
-    command: ["sh", "-c", "cat \"${XDG_STATE_HOME:-$HOME/.local/state}/quickshell/updates-cache\" 2>/dev/null"]
-    running: true
-    stdout: StdioCollector {
-      onStreamFinished: root.parse(text)
-    }
+  FileView {
+    path: (Quickshell.env("XDG_STATE_HOME") || Quickshell.env("HOME") + "/.local/state") + "/quickshell/updates-cache"
+    printErrors: false     // sem cache no 1o boot: normal
+    onLoaded: root.parse(text())
   }
 
   // 30min na tomada, 2h na bateria (menos rede/CPU acordando o notebook).

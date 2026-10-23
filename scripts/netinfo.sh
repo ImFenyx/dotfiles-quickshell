@@ -6,10 +6,11 @@ if [ -z "$iface" ]; then
   notify-send -h boolean:transient:true "Conexão" "Sem conexão ativa"
   exit 1
 fi
-name=$(nmcli -g GENERAL.CONNECTION device show "$iface" 2>/dev/null)
-ip4=$(nmcli -g IP4.ADDRESS device show "$iface" 2>/dev/null | head -n1)
-gw=$(nmcli -g IP4.GATEWAY device show "$iface" 2>/dev/null)
-dns=$(nmcli -g IP4.DNS device show "$iface" 2>/dev/null | tr '\n' ' ')
+# um nmcli so: -g com varios campos sai um por linha (multivalor vem "a | b")
+{ read -r name; read -r ip4; read -r gw; read -r dns; } <<EOF
+$(nmcli -e no -g GENERAL.CONNECTION,IP4.ADDRESS,IP4.GATEWAY,IP4.DNS device show "$iface" 2>/dev/null)
+EOF
+ip4=${ip4%% | *}
 notify-send -h boolean:transient:true "Conexão: ${name:-$iface}" "Interface: $iface
 IP: ${ip4:--}
 Gateway: ${gw:--}

@@ -98,6 +98,10 @@ ambos colados no filete direito da moldura:
 
 Sino: clique esquerdo abre o centro, direito liga o Nao perturbe.
 
+**Bateria baixa** (`services/Battery.qml`): na bateria, um aviso por limite de
+`Config.batteryWarn` (20/10/5%) ao descer; <= 10% e critica (fura o Nao perturbe
+e fica ate dispensar). Ligar o carregador zera.
+
 **Grupos** (estilo macOS): um por app, ordenados por **prioridade** (urgencia
 critica > normal > baixa) e depois cronologia; dentro do grupo, a mesma regra.
 Recolhido mostra a principal com a pilha por tras (clique expande, arrastar
@@ -171,22 +175,24 @@ Contagem de processos em idle, pelas constantes do codigo (nao medida):
 | fonte | antes | depois |
 |---|---|---|
 | Wi-Fi (refresh a cada 30s) | 5 processos x 120/h = ~600/h | 0 (D-Bus, sem `nmcli monitor` residente) |
-| Brilho (poll a cada 30s) | ~5 processos x 120/h = ~600/h | 5 x 12/h = ~60/h |
+| Brilho (poll a cada 30s) | ~5 processos x 120/h = ~600/h | 0 (FileView + inotify no sysfs; 1 sh na partida) |
 | Updates | 2 checagens/h | 2/h na tomada, 0,5/h na bateria (com nice 19) |
 | Fullscreen | 1 hyprctl por troca de foco | so quando o estado da janela nao e conhecido |
 
-- **Eventos em vez de polling**: Wi-Fi (D-Bus, ao vivo) e Fullscreen reagem a
-  eventos; o poll do brilho e so rede de seguranca e o hover na pill relê o dado.
-  O scanner de Wi-Fi so liga com o NetMenu aberto (ou conectando).
-- **Superficies menores**: tooltip e OSD deixaram de ser janelas de tela cheia
-  (cada tooltip mapeava ~8MB de buffer e danificava a tela inteira). Popups
-  interativos continuam em tela cheia de proposito: o backdrop evita que o
-  clique que fecha o menu atravesse e reabra pelo botao da barra.
-- **Genie**: fatias capturam o conteudo uma vez ao fechar.
+- **Eventos em vez de polling**: Wi-Fi (D-Bus), brilho (inotify) e Fullscreen
+  reagem a eventos, ao vivo. O scanner de Wi-Fi so liga com o NetMenu aberto (ou
+  conectando).
+- **Janelas de tela cheia**: tooltip e OSD chegaram a ter janela do tamanho do
+  conteudo (2b5c4b9), mas voltaram a tela cheia (438f2be, a3db0b7): o reconfigure
+  do layer-shell engasgava a barra do OSD e o tooltip seguindo o mouse. O tooltip
+  espera 80ms antes de sumir, p/ cruzar o vao entre widgets sem remapear; o OSD
+  tem largura fixa (nao re-tessela o fundo em 9->10%). Popups interativos sao tela
+  cheia de proposito: o backdrop evita que o clique que fecha o menu atravesse e
+  reabra pelo botao da barra.
+- **Genie**: 24 fatias; capturam o conteudo uma vez ao fechar.
 - **Special workspace**: estado por evento (`activespecial`), sem processo.
 
-Mudancas de comportamento: brilho externo aparece em ate 5 min (ou no hover);
-na bateria os updates sao checados a cada 2h.
+Mudanca de comportamento: na bateria os updates sao checados a cada 2h.
 
 ### Experimentos de ambiente (nao aplicados: dependem do seu hardware)
 

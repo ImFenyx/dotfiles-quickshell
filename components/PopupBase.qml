@@ -69,11 +69,6 @@ PanelWindow {
   function shapePath(w, h) {
     const r = 16, f = 8, k = bendK;
     const bx = w - f;
-    if (pill) {
-      // pill de verdade: radius = meia-altura (cantos totalmente redondos)
-      const pr = Math.min(w, h) / 2;
-      return `M${pr},0 L${w - pr},0 Q${w},0 ${w},${pr} L${w},${h - pr} Q${w},${h} ${w - pr},${h} L${pr},${h} Q0,${h} 0,${h - pr} L0,${pr} Q0,0 ${pr},0 Z`;
-    }
     if (fromBottom)
       return `M0,${h} L${w},${h} C${w - 2},${h} ${bx},${h - k * 0.25} ${bx},${h - k} L${bx},${r} Q${bx},0 ${bx - r},0 L${f + r},0 Q${f},0 ${f},${r} L${f},${h - k} C${f},${h - k * 0.25} 2,${h} 0,${h} Z`;
     return `M0,0 L${w},0 C${w - 2},0 ${bx},${k * 0.25} ${bx},${k} L${bx},${h - r} Q${bx},${h} ${bx - r},${h} L${f + r},${h} Q${f},${h} ${f},${h - r} L${f},${k} C${f},${k * 0.25} 2,0 0,0 Z`;
@@ -141,7 +136,7 @@ PanelWindow {
       Shape {
         id: bgShape
         anchors.fill: parent
-        visible: !root.fromRight
+        visible: !root.fromRight && !root.pill
         preferredRendererType: Shape.CurveRenderer
         asynchronous: root.asyncShape
         ShapePath {
@@ -152,6 +147,14 @@ PanelWindow {
             path: root.shapePath(bgShape.width, bgShape.height)
           }
         }
+      }
+
+      // pill solta: circulo de verdade (o Q do path era parabola, ~1px fora)
+      Rectangle {
+        anchors.fill: parent
+        visible: root.pill
+        radius: height / 2
+        color: root.menuBg
       }
 
       EdgeTab {
