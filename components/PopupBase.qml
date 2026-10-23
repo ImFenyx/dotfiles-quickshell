@@ -82,6 +82,11 @@ PanelWindow {
   implicitWidth: 0
   implicitHeight: 0
   WlrLayershell.layer: WlrLayer.Overlay
+  // teclado (Esc, campos de texto): com interatividade None o foco depende do
+  // focus grab ganhar a corrida com o 1o commit, e um app do tray pode roubar o
+  // teclado ao abrir o menu dele (OnDemand nao bastou). Exclusive enquanto aberto:
+  // o popup e modal (backdrop), entao segurar o teclado e o comportamento certo.
+  WlrLayershell.keyboardFocus: (interactive && open) ? WlrKeyboardFocus.Exclusive : WlrKeyboardFocus.None
   exclusionMode: ExclusionMode.Ignore
   mask: (interactive && open) ? fullMask : emptyMask
   color: "transparent"
@@ -98,8 +103,23 @@ PanelWindow {
     height: root.height
   }
 
+  // Focus grab so depois de mapear: com a camada Exclusive o Hyprland, ao mapear,
+  // derruba um grab que ainda nao contem a superficie -> onCleared fechava o menu
+  // na hora ("abre e fecha"). 50ms = alguns quadros depois do 1o commit.
+  property bool grabArmed: false
+  onOpenChanged: {
+    grabArmed = false;
+    if (open)
+      grabDelay.restart();
+  }
+  Timer {
+    id: grabDelay
+    interval: 50
+    onTriggered: root.grabArmed = root.open
+  }
+
   HyprlandFocusGrab {
-    active: root.interactive && root.open
+    active: root.interactive && root.open && root.grabArmed
     windows: [QsWindow.window]
     onCleared: root.close()
   }
