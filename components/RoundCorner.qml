@@ -34,7 +34,7 @@ Item {
       strokeWidth: root.borderWidth
       strokeColor: root.borderColor
       fillColor: root.color
-      pathHints: ShapePath.PathSolid & ShapePath.PathNonIntersecting
+      pathHints: ShapePath.PathSolid | ShapePath.PathNonIntersecting
 
       // canto interno (topo, lado da tela)
       startX: root.isLeft ? 0 : root.implicitSize

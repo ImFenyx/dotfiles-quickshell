@@ -32,7 +32,7 @@ PanelWindow {
       strokeWidth: 0
       strokeColor: "transparent"
       fillColor: root.bg
-      pathHints: ShapePath.PathSolid & ShapePath.PathNonIntersecting
+      pathHints: ShapePath.PathSolid | ShapePath.PathNonIntersecting
 
       startX: 0
       startY: root.topH
