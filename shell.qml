@@ -208,4 +208,12 @@ ShellRoot {
       Audio.showMic();
     }
   }
+
+  // qs ipc call time sync: after_sleep_cmd do hypridle (relogio parado apos suspend)
+  IpcHandler {
+    target: "time"
+    function sync(): void {
+      Time.sync();
+    }
+  }
 }
