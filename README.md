@@ -21,7 +21,7 @@ components/      blocos reutilizaveis
   MenuRow.qml      linha de menu
   EdgeFrame / EdgeExclusions / RoundCorner
 services/        estado compartilhado (singletons)
-  Audio (PipeWire), Wifi, Updates, Brightness, Battery,
+  Audio (PipeWire), Wifi (Quickshell.Networking), Updates, Brightness, Battery,
   Notifs (daemon de notificacoes), Media (MPRIS), Time, Workspaces, Fullscreen
   Bt, Caffeine, NightLight, Energy   (atalhos do centro)
   NotifItem / NotifGroup = uma notificacao / um grupo por app (criados pelo Notifs)
@@ -29,7 +29,7 @@ bar/             widgets da barra (Bar.qml compoe os outros)
 menus/           NetMenu, PowerMenu, TrayMenu (cascata: TrayMenuList, TrayFlyout + Genie, TrayEntryRow),
                  NotifCenter (NotifStatusBar = atalhos, NotifQuickTile, NotifGroupView, NotifMedia)
 overlays/        Launcher, Osd, NotifToasts
-scripts/         helpers de shell (updates, frecency, wifi-*, netinfo)
+scripts/         helpers de shell (updates, frecency, netinfo, notif-sound, perf)
 ```
 
 Regras de bolso:
@@ -43,10 +43,11 @@ Regras de bolso:
 
 ## Dependencias
 
-- Hyprland e Quickshell (com os modulos Hyprland, PipeWire, UPower e SystemTray)
+- Hyprland e Quickshell (com os modulos Hyprland, PipeWire, UPower, SystemTray, Networking e Bluetooth)
 - Fontes: Rubik, JetBrainsMono Nerd Font (Propo)
 - Tema de icones: MacTahoe-purple-dark (`//@ pragma IconTheme` no `shell.qml`)
-- NetworkManager (`nmcli`, `nm-connection-editor`)
+- NetworkManager: Wi-Fi pelo D-Bus (Quickshell.Networking); `nmcli` so p/ "Alternar rede" e
+  `scripts/netinfo.sh`; `nm-connection-editor`
 - `libnotify` (`notify-send`, so para testar). A propria shell e o daemon de
   notificacoes: **pare o swaync/dunst/mako** (tire o `exec-once` do Hyprland),
   senao eles seguram o nome `org.freedesktop.Notifications` e nada chega.
@@ -169,14 +170,14 @@ Contagem de processos em idle, pelas constantes do codigo (nao medida):
 
 | fonte | antes | depois |
 |---|---|---|
-| Wi-Fi (refresh a cada 30s) | 5 processos x 120/h = ~600/h | 2 x 12/h = ~24/h |
+| Wi-Fi (refresh a cada 30s) | 5 processos x 120/h = ~600/h | 0 (D-Bus, sem `nmcli monitor` residente) |
 | Brilho (poll a cada 30s) | ~5 processos x 120/h = ~600/h | 5 x 12/h = ~60/h |
 | Updates | 2 checagens/h | 2/h na tomada, 0,5/h na bateria (com nice 19) |
 | Fullscreen | 1 hyprctl por troca de foco | so quando o estado da janela nao e conhecido |
 
-- **Eventos em vez de polling**: Wi-Fi e Fullscreen reagem a eventos; os polls
-  que sobraram sao so rede de seguranca. Hover na pill de Wi-Fi/brilho relê o
-  dado na hora, entao o numero mostrado continua fresco.
+- **Eventos em vez de polling**: Wi-Fi (D-Bus, ao vivo) e Fullscreen reagem a
+  eventos; o poll do brilho e so rede de seguranca e o hover na pill relê o dado.
+  O scanner de Wi-Fi so liga com o NetMenu aberto (ou conectando).
 - **Superficies menores**: tooltip e OSD deixaram de ser janelas de tela cheia
   (cada tooltip mapeava ~8MB de buffer e danificava a tela inteira). Popups
   interativos continuam em tela cheia de proposito: o backdrop evita que o
@@ -184,9 +185,8 @@ Contagem de processos em idle, pelas constantes do codigo (nao medida):
 - **Genie**: fatias capturam o conteudo uma vez ao fechar.
 - **Special workspace**: estado por evento (`activespecial`), sem processo.
 
-Mudancas de comportamento: o tooltip nao acompanha mais o mouse
-(`TipArea.follow: true` restaura); brilho e Wi-Fi externos aparecem em ate 5 min
-(ou no hover); na bateria os updates sao checados a cada 2h.
+Mudancas de comportamento: brilho externo aparece em ate 5 min (ou no hover);
+na bateria os updates sao checados a cada 2h.
 
 ### Experimentos de ambiente (nao aplicados: dependem do seu hardware)
 

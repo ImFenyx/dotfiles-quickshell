@@ -2,34 +2,25 @@ import QtQuick
 import QtQuick.Layouts
 import Quickshell
 import Quickshell.Io
+import Quickshell.Networking
 import qs.components
 import qs.services
 
 // Menu interativo da rede: abre no clique, fecha no clique fora.
-// Opaco, com acoes em scripts/ + toggles nmcli.
+// Wi-Fi pelo services/Wifi (Quickshell.Networking); o resto via nmcli/scripts.
 PopupBase {
   id: root
 
   panelWidth: 270
   panelX: root.width - panelWidth - 8
   // cede foco p/ senha quando aberta (senao digitacao falha)
-  backdropFocus: pwSSID === ""
+  backdropFocus: pwNet === null
 
   property bool netOn: true
   property bool netsExpanded: false
-  property bool netsScanning: false
-  property bool hasScanned: false
-  property var wifiNets: []
-  property string pwSSID: ""
-  property string forgetArmed: ""
-  property string rescanArg: ""
+  property var pwNet: null           // rede pedindo senha
+  property var forgetArmed: null     // rede salva com "esquecer?" armado
 
-  function runScan(mode) {
-    rescanArg = mode;
-    netsScanning = true;
-    scanProc.running = false;
-    scanProc.running = true;
-  }
   function toggle() {
     if (open) {
       close();
@@ -37,60 +28,15 @@ PopupBase {
       open = true;
       stateProc.running = false;
       stateProc.running = true;
-      runScan("");
     }
   }
   // close() vem do PopupBase; o reset de estado fica aqui
   onOpenChanged: {
+    Wifi.scan = open;
     if (!open) {
       netsExpanded = false;
-      pwSSID = "";
-      forgetArmed = "";
-      wifiNets = [];
-      hasScanned = false;
-    }
-  }
-
-  Process {
-    id: scanProc
-    command: ["sh", Quickshell.shellPath("scripts/wifi-scan.sh"), root.rescanArg]
-    stdout: StdioCollector {
-      onStreamFinished: {
-        const lines = text.trim().split("\n").filter(l => l.length > 0);
-        root.netsScanning = false;
-        root.hasScanned = true;
-        if (lines.length === 0)
-          return;
-        root.wifiNets = lines.map(l => {
-          const q = l.split("|");
-          return {
-            ssid: q[0] || "",
-            sig: parseInt(q[1], 10) || 0,
-            sec: q[2] || "",
-            inuse: q[3] === "1",
-            saved: q[4] === "1"
-          };
-        }).filter(n => n.ssid !== "");
-      }
-    }
-  }
-
-  // Conexao com senha: a senha vai por stdin (nunca por argv, que e legivel em
-  // /proc/*/cmdline). O Process vive na janela, entao sobrevive ao fechar o menu.
-  function connectWithPassword(ssid, password) {
-    connectProc.ssid = ssid;
-    connectProc.password = password;
-    connectProc.running = true;
-  }
-  Process {
-    id: connectProc
-    property string ssid: ""
-    property string password: ""
-    stdinEnabled: true
-    command: ["sh", Quickshell.shellPath("scripts/wifi-connect.sh"), ssid, "--stdin"]
-    onStarted: {
-      write(password + "\n");
-      password = "";
+      pwNet = null;
+      forgetArmed = null;
     }
   }
 
@@ -108,7 +54,7 @@ PopupBase {
     Layout.bottomMargin: 6
     font.weight: Font.DemiBold
     elide: Text.ElideRight
-    text: Wifi.strength === "" ? Wifi.name : Wifi.name + " \u00b7 " + Wifi.strength
+    text: Wifi.strength === "" ? Wifi.name : Wifi.name + " · " + Wifi.strength
   }
 
   MenuRow {
@@ -125,28 +71,22 @@ PopupBase {
     Layout.fillWidth: true
     spacing: 2
 
+    // a lista e ao vivo (scanner ligado enquanto o menu esta aberto)
     MenuRow {
-      visible: root.netsScanning
+      visible: Wifi.top.length === 0
       popup: root
       icon: Icons.netScan
       label: "Procurando…"
       keepOpen: true
     }
-    MenuRow {
-      visible: !root.netsScanning && root.hasScanned && root.wifiNets.length === 0
-      popup: root
-      icon: Icons.netNone
-      label: "Nenhuma rede encontrada"
-      keepOpen: true
-    }
 
     Repeater {
-      model: root.wifiNets
+      model: Wifi.top
       delegate: Item {
         id: net
         required property var modelData
-        property bool secured: modelData.sec !== "" && modelData.sec !== "--"
-        property bool armed: root.forgetArmed === modelData.ssid
+        property bool secured: modelData.security !== WifiSecurityType.Open && modelData.security !== WifiSecurityType.Owe
+        property bool armed: root.forgetArmed === modelData
 
         Layout.fillWidth: true
         implicitHeight: 32
@@ -162,7 +102,7 @@ PopupBase {
           anchors.rightMargin: 6
           spacing: 8
           Glyph {
-            text: Icons.level(net.modelData.sig, Icons.wifi)
+            text: Icons.level(net.modelData.signalStrength * 100, Icons.wifi)
           }
           Item {
             Layout.fillWidth: true
@@ -170,9 +110,10 @@ PopupBase {
             UiText {
               anchors.verticalCenter: parent.verticalCenter
               width: parent.width
-              color: net.modelData.inuse ? Theme.green : Theme.text
+              color: net.modelData.connected ? Theme.green : Theme.text
               elide: Text.ElideRight
-              text: net.armed ? "Esquecer " + net.modelData.ssid + "?" : net.modelData.ssid
+              textFormat: Text.PlainText
+              text: net.armed ? "Esquecer " + net.modelData.name + "?" : net.modelData.name
             }
             MouseArea {
               id: ssidArea
@@ -181,16 +122,17 @@ PopupBase {
               cursorShape: Qt.PointingHandCursor
               onClicked: {
                 const m = net.modelData;
-                if (m.inuse) {
+                if (m.connected) {
                   root.close();
                   return;
                 }
-                if (m.saved) {
-                  Quickshell.execDetached(["sh", Quickshell.shellPath("scripts/wifi-connect.sh"), m.ssid]);
+                // salva ou aberta: conecta direto; senao pede a senha
+                if (m.known || !net.secured) {
+                  Wifi.connect(m);
                   root.close();
                   return;
                 }
-                root.pwSSID = m.ssid;
+                root.pwNet = m;
               }
             }
           }
@@ -212,16 +154,15 @@ PopupBase {
               cursorShape: Qt.PointingHandCursor
               onClicked: {
                 const m = net.modelData;
-                if (!m.saved) {
-                  root.pwSSID = m.ssid;
+                if (!m.known) {
+                  root.pwNet = m;
                   return;
                 }
-                if (root.forgetArmed === m.ssid) {
-                  Quickshell.execDetached(["sh", Quickshell.shellPath("scripts/wifi-forget.sh"), m.ssid]);
-                  root.forgetArmed = "";
+                if (root.forgetArmed === m) {
+                  m.forget();
                   root.close();
                 } else {
-                  root.forgetArmed = m.ssid;
+                  root.forgetArmed = m;
                 }
               }
             }
@@ -231,7 +172,7 @@ PopupBase {
     }
 
     Item {
-      visible: root.pwSSID !== ""
+      visible: root.pwNet !== null
       Layout.fillWidth: true
       implicitHeight: 32
       Rectangle {
@@ -249,14 +190,13 @@ PopupBase {
         font.family: Theme.uiFont
         font.pointSize: 11
         echoMode: TextInput.Password
-        focus: root.pwSSID !== ""
+        focus: root.pwNet !== null
         Keys.onEscapePressed: root.close()
         onAccepted: {
           if (text === "")
             return;
-          root.connectWithPassword(root.pwSSID, text);
+          Wifi.connect(root.pwNet, text);
           text = "";
-          root.pwSSID = "";
           root.close();
         }
       }
@@ -268,25 +208,18 @@ PopupBase {
         verticalAlignment: Text.AlignVCenter
         color: Theme.overlay0
         elide: Text.ElideRight
-        text: "Senha p/ " + root.pwSSID + "… (Enter conecta)"
+        textFormat: Text.PlainText
+        text: root.pwNet ? "Senha p/ " + root.pwNet.name + "… (Enter conecta)" : ""
       }
-    }
-
-    MenuRow {
-      visible: !root.netsScanning
-      popup: root
-      icon: Icons.netScan
-      label: "Procurar novamente"
-      keepOpen: true
-      onFired: root.runScan("--rescan")
     }
   }
 
   MenuRow {
+    visible: Wifi.active !== null
     popup: root
     icon: Icons.netDisconnect
     label: "Desconectar"
-    onFired: Quickshell.execDetached(["sh", Quickshell.shellPath("scripts/wifi-disconnect.sh")])
+    onFired: Wifi.disconnect()
   }
   Rectangle {
     Layout.fillWidth: true

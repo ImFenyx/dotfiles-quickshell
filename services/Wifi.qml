@@ -1,104 +1,67 @@
 pragma Singleton
 
 import Quickshell
-import Quickshell.Io
+import Quickshell.Networking
 import QtQuick
 import qs.components
 
-// Estado do Wi-Fi para a barra. Event-driven (nmcli monitor, com respawn e
-// debounce) + fallback de 30s. Antes o monitor nunca voltava se morresse e o
-// rádio so era relido a cada 30s.
+// Wi-Fi nativo (Quickshell.Networking = D-Bus do NetworkManager): sem nmcli e
+// sem processo residente; estado e sinal ao vivo, senha direto pelo D-Bus.
+// A lista de redes so enche com o scanner ligado (o NetMenu liga via `scan`
+// enquanto aberto); fora disso so a conectada aparece, o que basta p/ a barra.
 Singleton {
   id: root
 
-  property bool on: true
-  property string name: "--"
-  property string strength: ""       // "72%" ou "" (nao da p/ chamar de "signal": palavra reservada)
-  property string icon: ""
+  readonly property var dev: Networking.devices.values.find(d => d.type === DeviceType.Wifi) ?? null
+  readonly property bool on: Networking.wifiEnabled
+  readonly property var networks: dev ? dev.networks.values : []
+  readonly property var active: networks.find(n => n.connected) ?? null
+  readonly property int sig: active ? Math.round(active.signalStrength * 100) : -1   // signalStrength: 0..1
 
-  onOnChanged: refresh()
+  // sem dev = backend ainda carregando (partida): "--", nao "off"
+  readonly property string name: !dev ? "--" : (!on ? "off" : (active ? active.name : "--"))
+  readonly property string strength: sig < 0 ? "" : sig + "%"   // "72%" ou ""
+  readonly property string icon: sig < 0 ? "" : Icons.level(sig, Icons.wifi)
+  // menu: conectada primeiro, depois sinal (oculta = sem nome, fora)
+  readonly property var top: networks.filter(n => n.name !== "").sort((a, b) => (b.connected - a.connected) || (b.signalStrength - a.signalStrength)).slice(0, 8)
 
-  function refresh() {
-    connProc.running = true;
-    radioProc.running = true;
+  property bool scan: false     // NetMenu aberto
+  property var pending: null    // rede sendo conectada: mantem o scanner e avisa se falhar
+
+  function toggle() {
+    Networking.wifiEnabled = !Networking.wifiEnabled;
+  }
+  // psk omitido = perfil salvo ou rede aberta
+  function connect(n, psk) {
+    pending = n;
+    if (psk === undefined)
+      n.connect();
+    else
+      n.connectWithPsk(psk);
+  }
+  function disconnect() {
+    if (dev)
+      dev.disconnect();
   }
 
-  // Sem "sh -c ... | grep | head": 1 processo em vez de 4. O nmcli -t escapa ':'
-  // e '\\' dentro dos campos (SSID com ':' vem como "a\\:b"), por isso o parse.
-  function parseConn(text) {
-    for (const line of text.split("\n")) {
-      const m = line.match(/^\*:((?:\\.|[^:\\])*):(\d+)/);
-      if (m)
-        return {
-          ssid: m[1].replace(/\\(.)/g, "$1"),
-          sig: parseInt(m[2], 10)
-        };
+  // scanner so enquanto alguem precisa da lista (desligado de novo = economia)
+  Binding {
+    target: root.dev
+    property: "scannerEnabled"
+    value: true
+    when: root.dev !== null && (root.scan || root.pending !== null)
+  }
+
+  Connections {
+    target: root.pending
+    function onConnectionFailed(reason) {
+      const why = reason === ConnectionFailReason.NoSecrets ? "senha incorreta ou ausente" : ConnectionFailReason.toString(reason);
+      Quickshell.execDetached(["notify-send", "-h", "boolean:transient:true", "Wi-Fi", "Falha ao conectar a " + root.pending.name + "\n" + why]);
+      root.pending = null;
     }
-    return null;
-  }
-
-  Process {
-    id: connProc
-    command: ["nmcli", "-t", "-f", "IN-USE,SSID,SIGNAL", "dev", "wifi", "list", "--rescan", "no"]
-    // StdioCollector (e nao SplitParser): dispara mesmo com saida vazia,
-    // senao ao desconectar o SSID antigo ficava preso na pill.
-    stdout: StdioCollector {
-      onStreamFinished: {
-        const c = root.parseConn(text);
-        if (!root.on || !c) {
-          root.name = root.on ? "--" : "off";
-          root.strength = "";
-          root.icon = "";
-          return;
-        }
-        root.name = c.ssid || "--";
-        root.strength = isNaN(c.sig) ? "" : c.sig + "%";
-        root.icon = isNaN(c.sig) ? "" : Icons.level(c.sig, Icons.wifi);
-      }
+    function onConnectedChanged() {
+      if (root.pending && root.pending.connected)
+        root.pending = null;
     }
-    stderr: StdioCollector {}
-  }
-
-  Process {
-    id: radioProc
-    command: ["nmcli", "radio", "wifi"]
-    stdout: SplitParser {
-      onRead: data => {
-        root.on = data.trim() === "enabled";
-      }
-    }
-  }
-
-  // nmcli monitor cospe varias linhas por evento: debounce.
-  Timer {
-    id: debounce
-    interval: 250
-    onTriggered: root.refresh()
-  }
-  Process {
-    id: monitor
-    command: ["nmcli", "monitor"]
-    running: true
-    stdout: SplitParser {
-      onRead: debounce.restart()
-    }
-    // se o monitor morrer (NetworkManager reiniciou), volta em 3s
-    onExited: respawn.start()
-  }
-  Timer {
-    id: respawn
-    interval: 3000
-    onTriggered: monitor.running = true
-  }
-
-  // Fallback caso algum evento escape. O nmcli monitor ja cobre tudo; 30s aqui
-  // acordava a CPU e abria 3 processos 120x/hora sem necessidade. Alem disso o
-  // hover no SSID releh na hora (WifiStatus -> Wifi.refresh).
-  Timer {
-    interval: 300000
-    repeat: true
-    running: true
-    triggeredOnStart: true
-    onTriggered: root.refresh()
   }
 }

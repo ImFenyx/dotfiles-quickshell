@@ -23,7 +23,7 @@ GridLayout {
     icon: Wifi.on ? Icons.netWifi : Icons.wifiOff
     label: "Wi-Fi"
     active: Wifi.on
-    onClicked: Quickshell.execDetached(["nmcli", "radio", "wifi", Wifi.on ? "off" : "on"])
+    onClicked: Wifi.toggle()
     onSecondary: Quickshell.execDetached([Config.connectionEditor])
   }
   NotifQuickTile {
