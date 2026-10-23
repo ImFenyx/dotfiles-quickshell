@@ -29,7 +29,7 @@ bar/             widgets da barra (Bar.qml compoe os outros)
 menus/           NetMenu, PowerMenu, TrayMenu (cascata: TrayMenuList, TrayFlyout + Genie, TrayEntryRow),
                  NotifCenter (NotifStatusBar = atalhos, NotifQuickTile, NotifGroupView, NotifMedia)
 overlays/        Launcher, Osd, NotifToasts, Lock (tela de bloqueio)
-scripts/         helpers de shell (updates, frecency, netinfo, notif-sound, perf)
+scripts/         helpers de shell (updates, frecency, netinfo, notif-sound, cliphist-thumbs, perf)
 ```
 
 Regras de bolso:
@@ -63,6 +63,9 @@ Regras de bolso:
 - `hyprlock` instalado: o lock nativo usa o PAM dele (`/etc/pam.d/hyprlock`) e ele e o
   fallback (`Config.locker`)
 - `uwsm` (opcional; usado no "Sair")
+- Modos do launcher: `qalc` (libqalculate), `cliphist` + `wl-clipboard` (com
+  `wl-paste --watch cliphist store` rodando), `wtype` (digitar o emoji) e `rofi-emoji`
+  (so pela lista `/usr/share/rofi-emoji/all_emojis.txt`, nomes em ingles)
 
 Os programas que a shell chama ficam em `components/Config.qml`.
 
@@ -79,12 +82,33 @@ qs log                     # erros e warnings da instancia
 Atalhos do Hyprland (IPC):
 
 ```sh
-qs ipc call launcher toggle
+qs ipc call launcher toggle  # apps; tambem: calc | emoji | clip | windows
 qs ipc call osd showBright   # depois de mudar o brilho
 qs ipc call osd showMic      # depois de mutar/desmutar o mic
 ```
 
 O OSD de volume aparece sozinho (PipeWire).
+
+## Launcher
+
+Modo pelo 1o caractere da busca (o IPC ja abre com ele):
+
+| prefixo | modo | Enter |
+|---|---|---|
+| (nada) | apps (ranking por campo + frecency) | abre |
+| `=` | calculadora (`qalc`: contas, unidades, moedas) | copia o resultado |
+| `:` | emoji | copia e digita na janela focada (como o rofi-emoji) |
+| `#` | clipboard (`cliphist`, mais novo primeiro): abas texto e imagens | copia de volta |
+| `@` | janelas abertas | foca (troca de workspace se precisar) |
+
+Atalho que chama o mesmo modo ja aberto fecha o launcher.
+
+Clipboard, como no rofi-cliphist: `Alt+t` texto, `Alt+i` imagens (grade de 3
+colunas com miniatura; setas andam na grade), `Alt+d` apaga a selecionada,
+`Alt+p` / `Alt+n` apagam todas acima / abaixo dela (na aba e busca atuais). As
+miniaturas sao decodificadas 1x por id (`scripts/cliphist-thumbs.sh`) em
+`~/.cache/quickshell/cliphist/` (modo 700; o mesmo conteudo do db do cliphist) e
+somem do cache quando saem do historico.
 
 ## Tela de bloqueio
 

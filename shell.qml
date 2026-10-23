@@ -158,10 +158,23 @@ ShellRoot {
   }
 
   // Atalhos do Hyprland chamam:  qs ipc call <target> <funcao>
+  // qs ipc call launcher toggle | calc | emoji | clip | windows (abre ja no modo)
   IpcHandler {
     target: "launcher"
     function toggle(): void {
-      launcher.toggle();
+      launcher.toggle("");
+    }
+    function calc(): void {
+      launcher.toggle("=");
+    }
+    function emoji(): void {
+      launcher.toggle(":");
+    }
+    function clip(): void {
+      launcher.toggle("#");
+    }
+    function windows(): void {
+      launcher.toggle("@");
     }
   }
 

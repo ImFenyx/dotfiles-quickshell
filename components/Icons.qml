@@ -50,6 +50,11 @@ Singleton {
 
   // launcher / menus
   readonly property string search: "\uf002"
+  readonly property string calculator: "\uf1ec"
+  readonly property string smile: "\uf118"
+  readonly property string clipboard: "\uf0ea"
+  readonly property string window: "\uf2d0"
+  readonly property string image: "\uf03e"
   readonly property string check: "\uf00c"
   readonly property string chevronRight: "\uf105"
   readonly property string chevronDown: "\uf107"
