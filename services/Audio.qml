@@ -27,6 +27,32 @@ Singleton {
   readonly property string micText: sourceOk ? Math.round(source.audio.volume * 100) + "%" : ""
   readonly property bool micVisible: micText !== ""
 
+  // ---- mixer (menus/AudioMenu) ----
+  // dispositivos de saida/entrada e apps tocando (streams de saida; os de captura,
+  // tipo um app gravando o mic, ficam de fora). Quem mostra rastreia os nos.
+  readonly property var sinks: Pipewire.nodes.values.filter(n => n.audio && n.isSink && !n.isStream)
+  readonly property var sources: Pipewire.nodes.values.filter(n => n.audio && !n.isSink && !n.isStream)
+  readonly property var streams: Pipewire.nodes.values.filter(n => n.audio && n.isSink && n.isStream)
+  property bool osdSuppressed: false   // mixer aberto: o slider ja mostra o volume
+
+  function setSink(n) {
+    Pipewire.preferredDefaultAudioSink = n;
+  }
+  function setSource(n) {
+    Pipewire.preferredDefaultAudioSource = n;
+  }
+  function deviceName(n) {
+    return n.description || n.nickname || n.name;
+  }
+  function appName(n) {
+    const p = n.properties || {};
+    return p["application.name"] || n.description || n.name;
+  }
+  function appIcon(n) {
+    const p = n.properties || {};
+    return Quickshell.iconPath(p["application.icon-name"] || p["application.process.binary"] || "", "audio-x-generic");
+  }
+
   // ---- OSD ----
   signal sinkShown(int pct, bool muted, string icon)
   signal sourceShown(int pct, bool muted, string icon)
@@ -44,7 +70,7 @@ Singleton {
   // Le direto de sink.audio (nao dos bindings acima: dentro do handler eles
   // ainda podem estar com o valor antigo).
   function noteSink() {
-    if (!sinkPrimed || !sinkOk)
+    if (!sinkPrimed || !sinkOk || osdSuppressed)
       return;
     const v = Math.round(sink.audio.volume * 100);
     const m = sink.audio.muted;

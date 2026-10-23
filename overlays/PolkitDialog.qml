@@ -75,7 +75,7 @@ PopupBase {
         id: appIcon
         anchors.fill: parent
         source: root.flow && root.flow.iconName !== "" ? Quickshell.iconPath(root.flow.iconName, true) : ""
-        visible: source !== ""
+        visible: source !== "" && status === Image.Ready
       }
       Glyph {
         anchors.centerIn: parent

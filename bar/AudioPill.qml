@@ -4,7 +4,8 @@ import Quickshell
 import qs.components
 import qs.services
 
-// Pill unica sink + mic (formato do waybar). Clique abre o mixer.
+// Pill unica sink + mic (formato do waybar). Clique abre o mixer (AudioMenu,
+// coordenado pelo shell.qml via Bar.audioMenuRequested).
 Pill {
   id: root
 
@@ -15,7 +16,6 @@ Pill {
   tipWindow: root.tip
   tipText: "Saída " + Audio.sinkText + (Audio.micVisible ? " \u00b7 Entrada " + Audio.micText : "")
   clickable: true
-  onClicked: Quickshell.execDetached([Config.mixer])
 
   PillText {
     text: Audio.sinkText

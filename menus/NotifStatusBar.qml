@@ -19,6 +19,10 @@ GridLayout {
   rowSpacing: 8
   uniformCellWidths: true
 
+  // clique direito em Mudo/Mic mudo/Bluetooth: abre o menu da shell (NotifCenter repassa)
+  signal audioRequested
+  signal bluetoothRequested
+
   NotifQuickTile {
     icon: Wifi.on ? Icons.netWifi : Icons.wifiOff
     label: "Wi-Fi"
@@ -33,7 +37,7 @@ GridLayout {
     sub: Bt.deviceName
     active: Bt.on
     onClicked: Bt.toggle()
-    onSecondary: Quickshell.execDetached([Config.bluetoothManager])
+    onSecondary: root.bluetoothRequested()
   }
   NotifQuickTile {
     icon: Notifs.dnd ? Icons.bellSlash : Icons.bell
@@ -49,7 +53,7 @@ GridLayout {
       if (Audio.sinkOk)
         Audio.sink.audio.muted = !Audio.sink.audio.muted;
     }
-    onSecondary: Quickshell.execDetached([Config.mixer])
+    onSecondary: root.audioRequested()
   }
   NotifQuickTile {
     visible: Audio.sourceOk
@@ -60,7 +64,7 @@ GridLayout {
       if (Audio.sourceOk)
         Audio.source.audio.muted = !Audio.source.audio.muted;
     }
-    onSecondary: Quickshell.execDetached([Config.mixer])
+    onSecondary: root.audioRequested()
   }
   NotifQuickTile {
     icon: Icons.coffee

@@ -36,6 +36,10 @@ PopupBase {
   readonly property real chrome: status.implicitHeight + head.implicitHeight + (media.visible ? media.implicitHeight : 0) + spacing * (media.visible ? 3 : 2)
   readonly property real listMax: Math.max(120, root.height - topY - 24 - padTop - padBottom - chrome)
 
+  // clique direito nos atalhos: quem abre o menu (e fecha o centro) e o shell.qml
+  signal audioRequested
+  signal bluetoothRequested
+
   function toggle() {
     if (open)
       close();
@@ -65,6 +69,8 @@ PopupBase {
 
   NotifStatusBar {
     id: status
+    onAudioRequested: root.audioRequested()
+    onBluetoothRequested: root.bluetoothRequested()
   }
 
   RowLayout {

@@ -19,6 +19,7 @@ components/      blocos reutilizaveis
   PopupBase.qml    base de todo popup (menus, launcher, OSD, centro); `floating` = camada p/ paineis extras;
                    `fromRight` = aba no filete direito
   MenuRow.qml      linha de menu
+  Slider.qml       slider proprio (sem QtQuick.Controls); SpringPanel / SpringPill
   EdgeFrame / EdgeExclusions / RoundCorner
 services/        estado compartilhado (singletons)
   Audio (PipeWire), Wifi (Quickshell.Networking), Updates, Brightness, Battery,
@@ -27,7 +28,8 @@ services/        estado compartilhado (singletons)
   Emoji (dados do launcher), ShellState (estado que sobrevive a restart: state.json)
   NotifItem / NotifGroup = uma notificacao / um grupo por app (criados pelo Notifs)
 bar/             widgets da barra (Bar.qml compoe os outros)
-menus/           NetMenu, PowerMenu, TrayMenu (cascata: TrayMenuList, TrayFlyout + Genie, TrayEntryRow),
+menus/           NetMenu, PowerMenu, AudioMenu (mixer; VolumeRow), BtMenu,
+                 TrayMenu (cascata: TrayMenuList, TrayFlyout + Genie, TrayEntryRow),
                  NotifCenter (NotifStatusBar = atalhos, NotifQuickTile, NotifGroupView, NotifMedia)
 overlays/        Launcher, Osd, NotifToasts, Lock (tela de bloqueio), PolkitDialog (agente polkit)
 scripts/         helpers de shell (updates, frecency, netinfo, notif-sound, cliphist-thumbs, perf)
@@ -180,8 +182,21 @@ dispensa o grupo todo); expandido tem cabecalho com recolher e limpar o app.
 
 **Atalhos** (`menus/NotifStatusBar.qml`): Wi-Fi, Bluetooth, Nao perturbe, Mudo,
 Mic mudo, Cafeina, Luz noturna e Energia. Clique liga/desliga; clique direito
-abre o app de configuracao (Wi-Fi, Bluetooth, mixer, tlpui). O toggle de Wi-Fi saiu do
-NetMenu. Hora/data/Wi-Fi/som/bateria nao se repetem aqui: ja estao na barra.
+abre o detalhe: Mudo/Mic mudo -> mixer (`AudioMenu`), Bluetooth -> `BtMenu` (o
+centro fecha e o menu desce da barra); Wi-Fi -> nm-connection-editor, Energia ->
+tlpui. O toggle de Wi-Fi saiu do NetMenu. Hora/data/Wi-Fi/som/bateria nao se
+repetem aqui: ja estao na barra.
+
+**Mixer** (`menus/AudioMenu.qml`, clique na pill de audio): volume e mudo de saida e
+entrada (clique no icone = mudo; roda do mouse no slider), escolha do dispositivo
+padrao e volume de cada app tocando. OSD de volume calado com o mixer aberto.
+pavucontrol no rodape p/ perfis e portas.
+
+**Bluetooth** (`menus/BtMenu.qml`): liga/desliga, lista (conectados > pareados >
+novos; os que so anunciam o endereco ficam de fora), clique conecta/desconecta ou
+pareia e conecta, X esquece (2 cliques), bateria quando o dispositivo informa.
+Procura so com o menu aberto. A 0.3.2 nao registra agente BlueZ: dispositivo que
+pede PIN/confirmacao precisa de um agente externo (blueman-applet, `bluetoothctl`).
 
 **Midia**: so aparece enquanto algo *toca* (aba de navegador pausada nao conta).
 Se voce pausar com o centro aberto ela fica ate fechar, p/ dar para retomar. O

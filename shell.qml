@@ -41,6 +41,16 @@ ShellRoot {
 
   // monitor do sino que abriu o centro (null = o focado, p.ex. via IPC)
   property var centerScreen: null
+  // monitor de onde o mixer/Bluetooth foi aberto (barra ou centro)
+  property var menuScreen: null
+
+  // atalho do centro (clique direito em Mudo/Mic/Bluetooth): o centro fecha e o
+  // menu desce da barra do mesmo monitor
+  function openFromCenter(menu) {
+    root.menuScreen = root.centerScreen ?? root.focusedScreen;
+    notifCenter.close();
+    menu.open = true;
+  }
 
   // ---- per-screen: barra + moldura + tooltip + menus + exclusoes ----
   Variants {
@@ -54,7 +64,7 @@ ShellRoot {
         function closeMenusExcept(keep) {
           hoverTip.hide();
           notifCenter.close();
-          for (const m of [netMenu, trayMenu, powerMenu]) {
+          for (const m of [netMenu, trayMenu, powerMenu, audioMenu, btMenu]) {
             if (m !== keep)
               m.close();
           }
@@ -79,6 +89,11 @@ ShellRoot {
             scr.closeMenusExcept(null);
             root.centerScreen = scr.modelData;
             notifCenter.toggle();
+          }
+          onAudioMenuRequested: {
+            scr.closeMenusExcept(audioMenu);
+            root.menuScreen = scr.modelData;
+            audioMenu.toggle();
           }
         }
 
@@ -136,6 +151,18 @@ ShellRoot {
   NotifCenter {
     id: notifCenter
     screen: root.centerScreen ?? root.focusedScreen
+    onAudioRequested: root.openFromCenter(audioMenu)
+    onBluetoothRequested: root.openFromCenter(btMenu)
+  }
+
+  // mixer e Bluetooth: instancia unica, no monitor de onde foram abertos
+  AudioMenu {
+    id: audioMenu
+    screen: root.menuScreen ?? root.focusedScreen
+  }
+  BtMenu {
+    id: btMenu
+    screen: root.menuScreen ?? root.focusedScreen
   }
 
   // com o centro aberto os toasts somem (ele ja mostra tudo)

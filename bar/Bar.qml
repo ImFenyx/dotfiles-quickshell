@@ -18,6 +18,7 @@ PanelWindow {
   signal netMenuRequested
   signal powerMenuRequested
   signal notifCenterRequested
+  signal audioMenuRequested
 
   anchors.top: true
   anchors.left: true
@@ -130,6 +131,7 @@ PanelWindow {
         WorkspaceStrip {}
         AudioPill {
           tip: root.tip
+          onClicked: root.audioMenuRequested()
         }
         BacklightPill {
           tip: root.tip
