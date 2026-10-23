@@ -188,6 +188,18 @@ ShellRoot {
       osd.show(pct, false, icon);
     }
   }
+  // Caps/Num/Fn Lock -> OSD no modo tecla
+  Connections {
+    target: LockKeys
+    function onToggled(key, on) {
+      if (key === "caps")
+        osd.showKey(Icons.capsLock, "Caps Lock", on);
+      else if (key === "num")
+        osd.showKey(Icons.numLock, "Num Lock", on);
+      else
+        osd.showKey(Icons.fnLock, "Fn Lock", on);
+    }
+  }
 
   // Atalhos do Hyprland: hl.dsp.global("quickshell:<name>") no keybindings.lua.
   // Sem processo por tecla (o exec de `qs ipc call` abria um) e da acesso ao
@@ -224,6 +236,13 @@ ShellRoot {
     name: "lock"
     description: "Bloquear a tela"
     onPressed: lock.lock()
+  }
+  // bind em Caps_Lock/Num_Lock sem consumir a tecla: so avisa p/ reler os LEDs.
+  // O bind e `release = true`: o Hyprland manda o global como *released*, nao pressed.
+  GlobalShortcut {
+    name: "lockkeys"
+    description: "OSD de Caps/Num Lock"
+    onReleased: LockKeys.check()
   }
 
   // Scripts chamam:  qs ipc call <target> <funcao>

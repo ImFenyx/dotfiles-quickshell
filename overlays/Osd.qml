@@ -6,7 +6,8 @@ import qs.services
 // OSD fundido na barra (centro, como NetMenu/TrayMenu): slide por altura, sem fade.
 // Linha unica compacta: glyph nerd font + % + barra longa. Sem imagens.
 // Uma instancia so serve volume, mic e brilho (antes eram 3 janelas, cada uma
-// com seu proprio monitor de fullscreen).
+// com seu proprio monitor de fullscreen) e, no modo tecla (showKey), Caps/Num/Fn
+// Lock: glifo aceso/apagado + "ativado/desativado", sem %/barra.
 PopupBase {
   id: root
 
@@ -26,19 +27,29 @@ PopupBase {
   property int vol: 0
   property bool muted: false
   property string glyph: ""
+  property string label: ""        // modo tecla ("Caps Lock"...); "" = volume/brilho
+  property bool lit: false
   readonly property bool boosted: !muted && vol > 100
 
   function show(v, m, g) {
+    label = "";
     vol = v;
     muted = m;
     glyph = g;
     open = true;
     hideTimer.restart();
   }
+  function showKey(g, l, on) {
+    glyph = g;
+    label = l;
+    lit = on;
+    open = true;
+    hideTimer.restart();
+  }
 
   Timer {
     id: hideTimer
-    interval: 650
+    interval: root.label !== "" ? 1000 : 650   // texto pede um pouco mais de tempo p/ ler
     repeat: false
     onTriggered: root.close()
   }
@@ -47,10 +58,17 @@ PopupBase {
     spacing: 10
     Glyph {
       font.weight: Font.DemiBold
+      color: root.label !== "" && !root.lit ? Theme.overlay0 : Theme.mauve
       text: root.glyph
     }
     UiText {
+      visible: root.label !== ""
+      font.weight: Font.DemiBold
+      text: root.label + (root.lit ? " ativado" : " desativado")
+    }
+    UiText {
       id: pctText
+      visible: root.label === ""
       // largura fixa (a de "100%"): o painel nao muda em 9->10% (cada mudanca re-tessela o fundo)
       Layout.minimumWidth: pctMetrics.advanceWidth
       color: root.boosted ? Theme.red : Theme.text
@@ -63,6 +81,7 @@ PopupBase {
       }
     }
     Rectangle {
+      visible: root.label === ""
       Layout.preferredWidth: 300
       Layout.preferredHeight: 10
       Layout.alignment: Qt.AlignVCenter

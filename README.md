@@ -111,6 +111,12 @@ qs ipc call osd showMic      # depois de mutar/desmutar o mic
 
 O OSD de volume aparece sozinho (PipeWire).
 
+OSD de Caps/Num/Fn Lock (`services/LockKeys.qml`): binds em `Caps_Lock`/`Num_Lock`
+que nao consomem a tecla (`non_consuming`, no `release`, `locked`) chamam
+`quickshell:lockkeys`, que relê os LEDs em `/sys/class/leds/*::capslock|numlock`.
+O Fn Lock (Fn+Esc no IdeaPad) e do firmware e nao gera tecla: o `ideapad_laptop`
+avisa em `platform::fnlock/brightness_hw_changed`, vigiado por inotify.
+
 ## Launcher
 
 Modo pelo 1o caractere da busca (o IPC ja abre com ele):

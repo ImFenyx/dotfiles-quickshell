@@ -12,6 +12,11 @@ Singleton {
   readonly property var wifi: ["\u{F091F}", "\u{F0922}", "\u{F0925}", "\u{F0928}"]
   readonly property var battery: ["\uf244", "\uf243", "\uf242", "\uf241", "\uf240"]
 
+  // OSD de teclas de trava (Material Design do Nerd Font, conferidos desenhando)
+  readonly property string capsLock: "\u{F0632}"
+  readonly property string numLock: "\u{F03A0}"
+  readonly property string fnLock: "\u{F0295}"
+
   // barra
   readonly property string volumeMuted: "\uf026"
   readonly property string volumeDefault: "\uf028"
