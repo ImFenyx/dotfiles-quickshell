@@ -73,12 +73,9 @@ PopupBase {
         height: parent.height
         radius: 5
         color: root.boosted ? Theme.red : Theme.blue
-        // overshoot com cauda (igual pills 9/3.5): passa do ponto e assenta depois da tecla
+        // overshoot com cauda (o mesmo spring das pills): passa do ponto e assenta depois da tecla
         Behavior on width {
-          SpringAnimation {
-            spring: 9
-            damping: 3.5
-          }
+          SpringPill {}
         }
       }
     }

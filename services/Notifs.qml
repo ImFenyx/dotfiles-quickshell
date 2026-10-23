@@ -24,8 +24,9 @@ Singleton {
   readonly property string count: total > 0 ? String(total) : ""
 
   // nao perturbar: sem toast e sem som (criticas furam). O historico continua enchendo.
-  property bool dnd: false
-  property bool sound: true
+  // Os dois ficam no ShellState (sobrevivem a restart).
+  readonly property bool dnd: ShellState.dnd
+  readonly property bool sound: ShellState.sound
   // toast sem timeout proprio (expireTimeout < 0)
   property int defaultTimeout: 6000
   // teto do historico: cada item segura o Notification (e o image-data) do servidor
@@ -35,13 +36,13 @@ Singleton {
   property real lastSound: 0
 
   function toggleDnd() {
-    dnd = !dnd;
+    ShellState.dnd = !ShellState.dnd;
     if (dnd)
       hidePopups();
   }
 
   function toggleSound() {
-    sound = !sound;
+    ShellState.sound = !ShellState.sound;
   }
 
   function hidePopups() {

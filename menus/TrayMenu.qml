@@ -98,8 +98,9 @@ PopupBase {
     onSubmenuDismissed: root.closeSubmenusFrom(0)
   }
 
+  // os paineis (e o menu do app em cada um) so existem com o menu visivel
   floating: Repeater {
-    model: root.maxFly
+    model: root.visible ? root.maxFly : 0
     delegate: TrayFlyout {
       id: fly
       required property int index

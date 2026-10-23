@@ -63,7 +63,7 @@ Item {
   Behavior on y {
     enabled: fly.progress > 0.999
     NumberAnimation {
-      duration: 120
+      duration: Theme.animFast
       easing.type: Easing.OutCubic
     }
   }

@@ -22,6 +22,7 @@ Pill {
   // Cada ponto ativo 360ms exclusivo, periodo 1080ms. Sem Animation =
   // sem risco de fases iguais. So roda enquanto carrega.
   Timer {
+    id: wave
     interval: 120
     running: Updates.loading
     repeat: true
@@ -38,10 +39,10 @@ Pill {
         property int ph: (root.tick + parent.modelData) % 9
         anchors.horizontalCenter: parent.horizontalCenter
         y: 5 - 5 * (ph < 3 ? Math.sin(Math.PI * ph / 3) : 0)
-        // interpola entre ticks (120ms): movimento fluido, sem salto
+        // interpola entre ticks (= intervalo do timer): movimento fluido, sem salto
         Behavior on y {
           NumberAnimation {
-            duration: 120
+            duration: wave.interval
           }
         }
         color: Theme.base

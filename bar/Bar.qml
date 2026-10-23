@@ -94,7 +94,7 @@ PanelWindow {
       // bloco secundario: Number barato (spring fica so nas pills e no workspace ativo)
       Behavior on width {
         NumberAnimation {
-          duration: 150
+          duration: Theme.animNormal
           easing.type: Easing.OutCubic
         }
       }
@@ -145,7 +145,7 @@ PanelWindow {
       anchors.verticalCenter: parent.verticalCenter
       Behavior on width {
         NumberAnimation {
-          duration: 150
+          duration: Theme.animNormal
           easing.type: Easing.OutCubic
         }
       }

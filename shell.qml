@@ -157,7 +157,44 @@ ShellRoot {
     }
   }
 
-  // Atalhos do Hyprland chamam:  qs ipc call <target> <funcao>
+  // Atalhos do Hyprland: hl.dsp.global("quickshell:<name>") no keybindings.lua.
+  // Sem processo por tecla (o exec de `qs ipc call` abria um) e da acesso ao
+  // soltar a tecla (onReleased). O IPC abaixo fica p/ scripts e hypridle.
+  GlobalShortcut {
+    name: "launcher"
+    description: "Launcher: apps"
+    onPressed: launcher.toggle("")
+  }
+  GlobalShortcut {
+    name: "clipboard"
+    description: "Launcher: clipboard"
+    onPressed: launcher.toggle("#")
+  }
+  GlobalShortcut {
+    name: "emoji"
+    description: "Launcher: emoji"
+    onPressed: launcher.toggle(":")
+  }
+  GlobalShortcut {
+    name: "kaomoji"
+    description: "Launcher: kaomoji"
+    onPressed: launcher.toggle(";")
+  }
+  GlobalShortcut {
+    name: "notifs"
+    description: "Centro de notificacoes"
+    onPressed: {
+      root.centerScreen = null;
+      notifCenter.toggle();
+    }
+  }
+  GlobalShortcut {
+    name: "lock"
+    description: "Bloquear a tela"
+    onPressed: lock.lock()
+  }
+
+  // Scripts chamam:  qs ipc call <target> <funcao>
   // qs ipc call launcher toggle | calc | emoji | kaomoji | clip | windows (abre ja no modo)
   IpcHandler {
     target: "launcher"

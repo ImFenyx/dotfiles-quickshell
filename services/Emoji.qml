@@ -19,7 +19,7 @@ Singleton {
 
   property bool wanted: false       // so le os arquivos no 1o uso
   property var items: []            // {e, glyph, title, sub, n, m, h, tones, act}
-  property int tone: 0              // ultimo tom escolhido (0 = padrao), salvo em disco
+  readonly property int tone: ShellState.emojiTone   // ultimo tom escolhido (0 = padrao); persiste no ShellState
   readonly property bool ready: items.length > 0
   property bool missing: false      // sem emoji-test.txt (pacote unicode-emoji nao instalado)
 
@@ -29,8 +29,7 @@ Singleton {
   readonly property var toneMarks: ["\u{1F3FB}", "\u{1F3FC}", "\u{1F3FD}", "\u{1F3FE}", "\u{1F3FF}"]
 
   function setTone(t) {
-    tone = t;
-    toneFile.setText(String(t));
+    ShellState.emojiTone = t;
   }
 
   // sem dicionario: "musica" casa "música" (mesma regra do launcher)
@@ -178,11 +177,5 @@ Singleton {
     watchChanges: true
     onFileChanged: reload()
     onLoaded: rebuildLater.restart()
-  }
-  FileView {
-    id: toneFile
-    path: (Quickshell.env("XDG_STATE_HOME") || Quickshell.env("HOME") + "/.local/state") + "/quickshell/emoji-tone"
-    printErrors: false
-    onLoaded: root.tone = Math.max(0, Math.min(5, parseInt(text(), 10) || 0))
   }
 }

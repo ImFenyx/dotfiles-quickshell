@@ -35,7 +35,7 @@ Item {
 
     Behavior on color {
       ColorAnimation {
-        duration: 120
+        duration: Theme.animFast
       }
     }
 
@@ -60,7 +60,7 @@ Item {
       target: card
       property: "x"
       to: 0
-      duration: 200
+      duration: Theme.animMove
       easing.type: Easing.OutCubic
     }
     SequentialAnimation {
@@ -69,7 +69,7 @@ Item {
         target: card
         property: "x"
         to: root.width
-        duration: 150
+        duration: Theme.animNormal
         easing.type: Easing.InCubic
       }
       ScriptAction {
@@ -157,7 +157,7 @@ Item {
             color: closeArea.containsMouse ? Theme.surface0 : "transparent"
             Behavior on opacity {
               NumberAnimation {
-                duration: 120
+                duration: Theme.animFast
               }
             }
             Glyph {

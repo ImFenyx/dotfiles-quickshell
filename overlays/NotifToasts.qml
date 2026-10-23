@@ -42,11 +42,7 @@ PanelWindow {
   // 0 = aberto, 1 = fechado (mesmo spring do PopupBase)
   property real offsetScale: want ? 0 : 1
   Behavior on offsetScale {
-    SpringAnimation {
-      spring: 6
-      damping: 0.8
-      epsilon: 0.001
-    }
+    SpringPanel {}
   }
 
   anchors.top: true
@@ -78,7 +74,7 @@ PanelWindow {
     Behavior on height {
       enabled: root.want && root.offsetScale < 0.3
       NumberAnimation {
-        duration: 180
+        duration: Theme.animMove
         easing.type: Easing.OutCubic
       }
     }
@@ -111,13 +107,13 @@ PanelWindow {
             property: "opacity"
             from: 0
             to: 1
-            duration: 160
+            duration: Theme.animNormal
           }
         }
         move: Transition {
           NumberAnimation {
             property: "y"
-            duration: 180
+            duration: Theme.animMove
             easing.type: Easing.OutCubic
           }
         }

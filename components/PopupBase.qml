@@ -54,11 +54,7 @@ PanelWindow {
   // 0 = aberto, 1 = fechado. close direto: o spring resolve o colapso.
   property real offsetScale: open ? 0 : 1
   Behavior on offsetScale {
-    SpringAnimation {
-      spring: 6
-      damping: 0.8
-      epsilon: 0.001
-    }
+    SpringPanel {}
   }
 
   function close() {

@@ -24,7 +24,7 @@ services/        estado compartilhado (singletons)
   Audio (PipeWire), Wifi (Quickshell.Networking), Updates, Brightness, Battery,
   Notifs (daemon de notificacoes), Media (MPRIS), Time, Workspaces, Fullscreen
   Bt, Caffeine, NightLight, Energy   (atalhos do centro)
-  Emoji (dados do launcher)
+  Emoji (dados do launcher), ShellState (estado que sobrevive a restart: state.json)
   NotifItem / NotifGroup = uma notificacao / um grupo por app (criados pelo Notifs)
 bar/             widgets da barra (Bar.qml compoe os outros)
 menus/           NetMenu, PowerMenu, TrayMenu (cascata: TrayMenuList, TrayFlyout + Genie, TrayEntryRow),
@@ -42,6 +42,19 @@ Regras de bolso:
 - widget novo que abre popup -> use `PopupBase`; ele cuida de janela, mascara,
   foco, Esc, click-fora e animacao
 - estado que mais de um widget le -> um singleton em `services/`
+- estado que o usuario escolhe e deve sobreviver a restart/reboot (DND, som, tom do
+  emoji...) -> propriedade no `JsonAdapter` de `services/ShellState.qml`
+  (`~/.local/state/quickshell/state.json`; grava sozinho, relê se o arquivo mudar).
+  Nao chame um singleton de `State`: colide com o `State` do QtQuick
+- atalho de teclado novo -> `GlobalShortcut { name: "x" }` no `shell.qml` + bind
+  `hl.dsp.global("quickshell:x")` com `description` (sem processo por tecla; tem
+  onReleased). `IpcHandler` so p/ scripts (hypridle, etc.)
+- animacao -> `Theme.animFast` / `animNormal` / `animMove`; slide de painel =
+  `SpringPanel {}`, largura que muda = `SpringPill {}`. Numero solto so se for
+  especifico (ex.: Genie)
+- conteudo pesado de popup (listas com imagem, submenus, previas) -> modelo vazio
+  com a janela invisivel (`values: root.visible ? ... : []`); o `visible` do
+  PopupBase so cai depois da animacao de saida
 
 ## Dependencias
 

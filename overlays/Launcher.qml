@@ -460,9 +460,10 @@ PopupBase {
       anchors.fill: parent
       visible: !root.imageGrid
       clip: true
-      // ScriptModel reaproveita os delegates por identidade (array puro recriava a cada tecla)
+      // ScriptModel reaproveita os delegates por identidade (array puro recriava a cada tecla).
+      // Fechado (fim da animacao de saida), os delegates saem.
       model: ScriptModel {
-        values: root.imageGrid ? [] : root.results
+        values: root.visible && !root.imageGrid ? root.results : []
       }
       spacing: 2
       delegate: Item {
@@ -554,7 +555,7 @@ PopupBase {
       cellWidth: width / 3
       cellHeight: 144
       model: ScriptModel {
-        values: root.imageGrid ? root.results : []
+        values: root.visible && root.imageGrid ? root.results : []
       }
       delegate: Item {
         id: cell

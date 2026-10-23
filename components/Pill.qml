@@ -24,15 +24,11 @@ Rectangle {
   implicitWidth: row.implicitWidth + hpad
 
   Behavior on implicitWidth {
-    SpringAnimation {
-      spring: 9
-      damping: 3.5
-      epsilon: 0.5
-    }
+    SpringPill {}
   }
   Behavior on color {
     ColorAnimation {
-      duration: 150
+      duration: Theme.animNormal
     }
   }
 

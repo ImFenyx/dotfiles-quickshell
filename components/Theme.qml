@@ -39,4 +39,11 @@ Singleton {
   // aba colada no filete direito (toasts + centro de notificacoes)
   readonly property int sideTabTop: topH + gap / 2   // y onde a concordancia comeca, abaixo do scoop da barra
   readonly property int sideTabW: 380                // largura do corpo (sem o filete)
+
+  // ---- animacao ----
+  // Duracoes nomeadas (ms). Springs repetidos sao componentes: SpringPanel
+  // (popups/toasts deslizando) e SpringPill (largura de pill/barra do OSD).
+  readonly property int animFast: 120      // hover: cor e opacidade; seguir a linha do submenu
+  readonly property int animNormal: 150    // fade de entrada/saida, cor de pill/atalho, largura dos blocos da barra
+  readonly property int animMove: 180      // altura, deslocamento de lista, volta do swipe
 }

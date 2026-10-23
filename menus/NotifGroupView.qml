@@ -22,7 +22,7 @@ Item {
 
   Behavior on implicitHeight {
     NumberAnimation {
-      duration: 180
+      duration: Theme.animMove
       easing.type: Easing.OutCubic
     }
   }
@@ -163,7 +163,7 @@ Item {
             property: "opacity"
             from: 0
             to: 1
-            duration: 160
+            duration: Theme.animNormal
           }
         }
 

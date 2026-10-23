@@ -150,8 +150,9 @@ PopupBase {
     cacheBuffer: 2000
     boundsBehavior: Flickable.StopAtBounds
 
+    // cartoes (com icones e imagens) so existem com o centro visivel; reabrir anima a entrada
     model: ScriptModel {
-      values: Notifs.groups
+      values: root.visible ? Notifs.groups : []
     }
     delegate: NotifGroupView {
       required property var modelData
@@ -164,7 +165,7 @@ PopupBase {
         property: "opacity"
         from: 0
         to: 1
-        duration: 160
+        duration: Theme.animNormal
       }
     }
     remove: Transition {
@@ -172,19 +173,19 @@ PopupBase {
         NumberAnimation {
           property: "opacity"
           to: 0
-          duration: 140
+          duration: Theme.animNormal
         }
         NumberAnimation {
           property: "x"
           to: list.width / 2
-          duration: 140
+          duration: Theme.animNormal
         }
       }
     }
     displaced: Transition {
       NumberAnimation {
         property: "y"
-        duration: 180
+        duration: Theme.animMove
         easing.type: Easing.OutCubic
       }
     }
