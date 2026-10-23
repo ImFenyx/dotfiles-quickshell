@@ -146,6 +146,7 @@ Item {
             color: Theme.subtext0
             font.pointSize: 9
             elide: Text.ElideRight
+            textFormat: Text.PlainText
             text: root.item.appName + "  \u00b7  " + root.item.ago
           }
           Rectangle {
@@ -182,6 +183,8 @@ Item {
           wrapMode: Text.Wrap
           maximumLineCount: 2
           elide: Text.ElideRight
+          // spec: titulo e texto puro. AutoText viraria StyledText e um <img> remoto (titulo de site via navegador) seria baixado
+          textFormat: Text.PlainText
           text: root.item.summary
         }
         UiText {

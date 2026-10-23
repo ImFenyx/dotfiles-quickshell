@@ -181,17 +181,22 @@ QtObject {
       dismiss();
   }
 
+  // closed: o servidor ja fechou; fechar de novo loga "Cannot close destroyed notification"
   function expireNow() {
-    try {
-      notification.expire();
-    } catch (e) {}
+    if (!closed) {
+      try {
+        notification.expire();
+      } catch (e) {}
+    }
     Notifs.drop(root);
   }
 
   function dismiss() {
-    try {
-      notification.dismiss();
-    } catch (e) {}
+    if (!closed) {
+      try {
+        notification.dismiss();
+      } catch (e) {}
+    }
     // garante a remocao mesmo que o servidor nao emita closed
     Notifs.drop(root);
   }

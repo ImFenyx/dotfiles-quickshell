@@ -67,6 +67,7 @@ Item {
         font.weight: Font.DemiBold
         elide: Text.ElideRight
         Layout.maximumWidth: 180
+        textFormat: Text.PlainText
         text: root.group.appName
       }
       Rectangle {
@@ -167,15 +168,14 @@ Item {
         }
 
         Repeater {
+          // recolhido: so o primeiro cartao existe (os outros nao ficam instanciados ocultos)
           model: ScriptModel {
-            values: root.group.items
+            values: root.open ? root.group.items : root.group.items.slice(0, 1)
           }
           delegate: NotifCard {
-            required property int index
             required property var modelData
             width: cards.width
             item: modelData
-            visible: root.open || index === 0
             // pilha recolhida: o swipe leva o grupo todo
             autoDismiss: root.open
             onSwiped: {
