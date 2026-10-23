@@ -28,7 +28,7 @@ services/        estado compartilhado (singletons)
 bar/             widgets da barra (Bar.qml compoe os outros)
 menus/           NetMenu, PowerMenu, TrayMenu (cascata: TrayMenuList, TrayFlyout + Genie, TrayEntryRow),
                  NotifCenter (NotifStatusBar = atalhos, NotifQuickTile, NotifGroupView, NotifMedia)
-overlays/        Launcher, Osd, NotifToasts
+overlays/        Launcher, Osd, NotifToasts, Lock (tela de bloqueio)
 scripts/         helpers de shell (updates, frecency, netinfo, notif-sound, perf)
 ```
 
@@ -59,7 +59,9 @@ Regras de bolso:
   `power-profiles-daemon`; clique direito abre o `tlpui`, ver `Config.powerManager`).
   O que nao existe some do painel.
 - `pacman-contrib` (`checkupdates`) e `paru` — badge de atualizacoes
-- `kitty`, `pavucontrol`, `hyprlock`, `cal` (util-linux), `hyprctl`
+- `kitty`, `pavucontrol`, `cal` (util-linux), `hyprctl`
+- `hyprlock` instalado: o lock nativo usa o PAM dele (`/etc/pam.d/hyprlock`) e ele e o
+  fallback (`Config.locker`)
 - `uwsm` (opcional; usado no "Sair")
 
 Os programas que a shell chama ficam em `components/Config.qml`.
@@ -83,6 +85,22 @@ qs ipc call osd showMic      # depois de mutar/desmutar o mic
 ```
 
 O OSD de volume aparece sozinho (PipeWire).
+
+## Tela de bloqueio
+
+`overlays/Lock.qml` (ext-session-lock + PAM), no lugar do hyprlock. Uma superficie
+por monitor com a tela borrada, relogio e senha; avisos do PAM (faillock: 3 erros
+travam a conta por 10 min) aparecem embaixo do campo.
+
+```sh
+qs ipc call lock lock        # cadeado da barra, SUPER+O e lock_cmd do hypridle
+qs ipc call lock isLocked
+```
+
+Reload da shell com a tela travada mantem o lock. Se o processo morrer travado,
+o Hyprland segura a tela (`misc.allow_session_lock_restore = true` deixa outro lock
+assumir): de um TTY, reinicie o quickshell e rode `qs ipc call lock lock`, ou rode
+`hyprlock` apontando para a sessao (`WAYLAND_DISPLAY`), e volte ao TTY do Hyprland.
 
 ## Notificacoes
 

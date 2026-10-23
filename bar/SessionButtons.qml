@@ -19,7 +19,7 @@ RowLayout {
     MouseArea {
       anchors.fill: parent
       cursorShape: Qt.PointingHandCursor
-      onClicked: Quickshell.execDetached([Config.locker])
+      onClicked: Quickshell.execDetached(Config.locker)
     }
   }
   Glyph {

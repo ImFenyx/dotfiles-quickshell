@@ -112,6 +112,11 @@ ShellRoot {
     }
   }
 
+  // tela de bloqueio: uma superficie por monitor (IPC "lock")
+  Lock {
+    id: lock
+  }
+
   // ---- single-instance (segue o foco): launcher + OSD + notificacoes ----
   Launcher {
     id: launcher

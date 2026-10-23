@@ -8,7 +8,7 @@ Singleton {
   readonly property var terminal: ["kitty", "-e"]   // prefixo p/ rodar um comando em terminal
   readonly property var updater: terminal.concat(["paru"])
   readonly property string mixer: "pavucontrol"
-  readonly property string locker: "hyprlock"
+  readonly property var locker: ["qs", "ipc", "call", "lock", "lock"]   // overlays/Lock; fallback: ["hyprlock"]
   readonly property string connectionEditor: "nm-connection-editor"
   readonly property string bluetoothManager: "blueman-manager"
   readonly property string powerManager: "tlpui"
