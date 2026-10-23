@@ -13,7 +13,7 @@ Singleton {
   readonly property bool available: adapter !== null
   readonly property bool on: available && adapter.enabled
   // dispositivos conectados, de todos os adaptadores
-  readonly property var connected: Bluetooth.devices.values
+  readonly property var connected: Bluetooth.devices.values.filter(d => d.connected)
   readonly property string deviceName: {
     if (!on || connected.length === 0)
       return "";
