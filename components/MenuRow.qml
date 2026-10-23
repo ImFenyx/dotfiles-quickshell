@@ -18,7 +18,7 @@ Item {
   property color labelColor: Theme.text
 
   Layout.fillWidth: true
-  implicitHeight: 32
+  implicitHeight: Math.max(32, lines.implicitHeight + 14)   // rotulo com \n cresce (aviso do PowerMenu)
 
   Rectangle {
     anchors.fill: parent
@@ -35,11 +35,22 @@ Item {
       color: row.armed ? Theme.base : Theme.mauve
       text: row.icon
     }
-    UiText {
+    // uma linha por \n, cada uma com o seu elide (Text com \n nao elide)
+    ColumnLayout {
+      id: lines
       Layout.fillWidth: true
-      color: row.armed ? Theme.base : row.labelColor
-      elide: Text.ElideRight
-      text: row.label
+      spacing: 0
+      Repeater {
+        model: row.label.split("\n")
+        UiText {
+          required property string modelData
+          Layout.fillWidth: true
+          color: row.armed ? Theme.base : row.labelColor
+          elide: Text.ElideRight
+          textFormat: Text.PlainText   // nome de dispositivo/app vem de fora
+          text: modelData
+        }
+      }
     }
     Rectangle {
       visible: row.checkable

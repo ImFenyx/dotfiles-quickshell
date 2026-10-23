@@ -35,7 +35,7 @@ menus/           NetMenu, PowerMenu, AudioMenu (mixer; VolumeRow), BtMenu,
 overlays/        Launcher, Osd, NotifToasts, Lock (tela de bloqueio), PolkitDialog (agente polkit),
                  WallpaperPicker
 scripts/         helpers de shell (updates, frecency, netinfo, notif-sound, cliphist-thumbs,
-                 wall-thumbs, wall-video, perf)
+                 wall-thumbs, wall-video, power-check, perf)
 data/            listas estaticas (kaomoji.tsv)
 ```
 
@@ -197,6 +197,32 @@ Reload da shell com a tela travada mantem o lock. Se o processo morrer travado,
 o Hyprland segura a tela (`misc.allow_session_lock_restore = true` deixa outro lock
 assumir): de um TTY, reinicie o quickshell e rode `qs ipc call lock lock`, ou rode
 `hyprlock` apontando para a sessao (`WAYLAND_DISPLAY`), e volte ao TTY do Hyprland.
+
+## Energia
+
+`menus/PowerMenu.qml`: 2 cliques (o 1o arma, o 2o executa). Ao armar qualquer acao
+roda `scripts/power-check.sh` (uma vez, sem polling; ~50ms) e, se houver algo que
+se perderia, a linha armada mostra o aviso no lugar do "Confirmar ...?": o mais
+importante em cima (com `(+N)` se houver mais) e "Desligar mesmo assim?" embaixo.
+So avisa, nao bloqueia. Em ordem de importancia:
+
+| aviso | como detecta | por que |
+|---|---|---|
+| pacman rodando | `/var/lib/pacman/db.lck` existe | so existe durante uma transacao (qualquer front do libalpm); `pacman -Q` e o `checkupdates` (dbpath proprio) nao pegam o lock |
+| paru / yay rodando | `pgrep -ax`, menos consultas (`-Q...`) | o `paru -Qua` do badge de updates nao conta |
+| makepkg rodando | `pgrep -x makepkg` | build do AUR |
+| X bloqueia | `systemd-inhibit --list`, modo `block` em `shutdown`/`sleep` | o padrao do systemd p/ "nao desligue agora" (gravar disco, atualizar); ignorar pede senha (polkit `*-ignore-inhibit`). Os `delay` (navegador, NetworkManager, hypridle) nao contam |
+| N downloads em andamento | `*.part`, `*.crdownload`, `*.download` mexidos nos ultimos 2 min na pasta de downloads (`xdg-user-dir DOWNLOAD`, senao `~/Downloads`; so o 1o nivel) | `.part` esquecido de download que falhou nao conta |
+
+Dormir checa igual: suspender nao mata nada, mas derruba a rede (download do
+navegador ou do pacman falha) e deixa uma transacao do pacman congelada no meio,
+dependendo da bateria aguentar ate voltar. Sair tambem: fecha o terminal e o
+navegador junto.
+
+```sh
+sh scripts/power-check.sh                                # sem saida = nada pendente
+PACMAN_LOCK=/tmp/x.lck sh scripts/power-check.sh         # lock alternativo (teste)
+```
 
 ## Notificacoes
 
