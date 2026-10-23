@@ -22,7 +22,7 @@ components/      blocos reutilizaveis
   Slider.qml       slider proprio (sem QtQuick.Controls); SpringPanel / SpringPill
   EdgeFrame / EdgeExclusions / RoundCorner
 services/        estado compartilhado (singletons)
-  Audio (PipeWire), Wifi (Quickshell.Networking), Updates, Brightness, Battery,
+  Audio (PipeWire; protecao de volume), Wifi (Quickshell.Networking), Updates, Brightness, Battery,
   Notifs (daemon de notificacoes), Media (MPRIS), Time, Workspaces, Fullscreen
   Bt, Caffeine, NightLight, Energy   (atalhos do centro)
   Emoji (dados do launcher), ShellState (estado que sobrevive a restart: state.json),
@@ -257,7 +257,31 @@ repetem aqui: ja estao na barra.
 **Mixer** (`menus/AudioMenu.qml`, clique na pill de audio): volume e mudo de saida e
 entrada (clique no icone = mudo; roda do mouse no slider), escolha do dispositivo
 padrao e volume de cada app tocando. OSD de volume calado com o mixer aberto.
-pavucontrol no rodape p/ perfis e portas.
+No rodape a protecao de volume e o pavucontrol (perfis e portas).
+
+**Protecao de volume** (`services/Audio.qml`; liga/desliga no rodape do mixer,
+ligada por padrao, guardada no `ShellState`): so na saida padrao. O PipeWire nao
+diz quem mudou o volume, entao a regra e pelo tamanho do passo:
+
+- subiu mais que `Config.volumeGuardStep` (10%) de uma vez -> volta ao nivel
+  anterior. Vale p/ app, `pactl`/`pavucontrol`, porta nova (fone no P2 com volume
+  salvo mais alto), dispositivo novo e troca de padrao: o nivel anterior e o do
+  que saiu (fone BT que chega em 100% com a caixa em 30% fica em 30%)
+- teto `Config.volumeGuardMax` (%; 0 = sem teto, o padrao): vale p/ tudo, teclas e
+  mixer inclusive (as teclas sobem ate 150%: `-l 1.5` no `keybindings.lua`)
+- descer e mudo nunca sao mexidos
+- o que e seu passa: as teclas (`wpctl ... 5%+`) sobem 5% por vez, abaixo do passo;
+  slider e roda do mixer vao por `Audio.setVolume`, que aceita salto por 500 ms
+- aviso: toast curto "Volume limitado" (transient e baixa urgencia: sem som e fora
+  do historico; no Nao perturbe some), no maximo um a cada 3 s. O OSD ja mostra o
+  valor corrigido
+
+Limites: clique longe no slider do pavucontrol (ou de outro programa) conta como de
+fora e volta (arrastar passa: sao passos pequenos); app que sobe aos poucos (ate
+10% por mudanca) passa, o teto cobre isso; volume por app (streams) nao e vigiado
+(o slider dentro do app e seu); na partida da shell o volume atual vira a
+referencia. Para testar, com nada tocando e o volume baixo:
+`wpctl set-volume @DEFAULT_AUDIO_SINK@ 0.9` (volta na hora e avisa).
 
 **Bluetooth** (`menus/BtMenu.qml`): liga/desliga, lista (conectados > pareados >
 novos; os que so anunciam o endereco ficam de fora), clique conecta/desconecta ou

@@ -2,6 +2,7 @@ import QtQuick
 import QtQuick.Layouts
 import Quickshell.Widgets
 import qs.components
+import qs.services
 
 // Volume de um no do PipeWire (dispositivo ou app): icone (clique = mudo) +
 // slider + %. Quem usa mantem o no rastreado (PwObjectTracker).
@@ -52,7 +53,7 @@ RowLayout {
     muted: root.muted
     onMoved: v => {
       if (root.ok)
-        root.node.audio.volume = v;
+        Audio.setVolume(root.node, v);
     }
   }
   UiText {

@@ -68,6 +68,7 @@ Singleton {
   readonly property string arrowDown: "\u{F0140}"
   readonly property string padlock: "\u{F033E}"
   readonly property string wifiOff: "\u{F092E}"
+  readonly property string shield: "\uf132"
 
   // powermenu
   readonly property string shutdown: "\u{F0425}"

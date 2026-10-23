@@ -7,7 +7,8 @@ import qs.services
 
 // Mixer: desce da barra (clique na pill de audio ou clique direito em Mudo/Mic no
 // centro). Volume e mudo de saida e entrada, escolha do dispositivo padrao e volume
-// por app tocando. O pavucontrol fica no rodape p/ o resto (perfis, portas...).
+// por app tocando. No rodape a protecao de volume (services/Audio) e o pavucontrol
+// p/ o resto (perfis, portas...).
 PopupBase {
   id: root
 
@@ -120,6 +121,15 @@ PopupBase {
     Layout.bottomMargin: 2
     height: 1
     color: Theme.surface1
+  }
+  MenuRow {
+    popup: root
+    keepOpen: true
+    checkable: true
+    checked: Audio.guard
+    icon: Icons.shield
+    label: "Proteção de volume"
+    onFired: Audio.toggleGuard()
   }
   MenuRow {
     popup: root
