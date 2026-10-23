@@ -117,6 +117,11 @@ ShellRoot {
     id: lock
   }
 
+  // agente polkit (pedidos de senha do sistema) no monitor focado
+  PolkitDialog {
+    screen: root.focusedScreen
+  }
+
   // ---- single-instance (segue o foco): launcher + OSD + notificacoes ----
   Launcher {
     id: launcher

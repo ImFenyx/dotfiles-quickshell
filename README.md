@@ -29,7 +29,7 @@ services/        estado compartilhado (singletons)
 bar/             widgets da barra (Bar.qml compoe os outros)
 menus/           NetMenu, PowerMenu, TrayMenu (cascata: TrayMenuList, TrayFlyout + Genie, TrayEntryRow),
                  NotifCenter (NotifStatusBar = atalhos, NotifQuickTile, NotifGroupView, NotifMedia)
-overlays/        Launcher, Osd, NotifToasts, Lock (tela de bloqueio)
+overlays/        Launcher, Osd, NotifToasts, Lock (tela de bloqueio), PolkitDialog (agente polkit)
 scripts/         helpers de shell (updates, frecency, netinfo, notif-sound, cliphist-thumbs, perf)
 data/            listas estaticas (kaomoji.tsv)
 ```
@@ -77,6 +77,10 @@ Regras de bolso:
 - `kitty`, `pavucontrol`, `cal` (util-linux), `hyprctl`
 - `hyprlock` instalado: o lock nativo usa o PAM dele (`/etc/pam.d/hyprlock`) e ele e o
   fallback (`Config.locker`)
+- polkit: a propria shell e o agente (`overlays/PolkitDialog.qml`). So um agente registra
+  por sessao: desative os outros (`systemctl --user disable --now hyprpolkitagent`) e
+  reinicie a shell (`systemctl --user restart quickshell`); "An authentication agent
+  already exists" no `qs log` = outro agente ainda rodando
 - `uwsm` (opcional; usado no "Sair")
 - Modos do launcher: `qalc` (libqalculate), `cliphist` + `wl-clipboard` (com
   `wl-paste --watch cliphist store` rodando), `wtype` (digitar emoji/kaomoji),
