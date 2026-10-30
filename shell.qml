@@ -165,6 +165,12 @@ ShellRoot {
     screen: root.focusedScreen
   }
 
+  // captura e gravacao (atalhos "capture", "capture-screen", "record"; Print)
+  Capture {
+    id: capture
+    screen: root.focusedScreen
+  }
+
   // tela de sessao (atalho "session", SUPER+CTRL+P; botao de energia da barra)
   Session {
     id: session
@@ -313,6 +319,21 @@ ShellRoot {
     name: "network"
     description: "Rede"
     onPressed: root.panelRequested("network")
+  }
+  GlobalShortcut {
+    name: "capture"
+    description: "Captura: escolher regiao, janela ou tela"
+    onPressed: capture.start("shot")
+  }
+  GlobalShortcut {
+    name: "capture-screen"
+    description: "Captura: tela inteira na hora"
+    onPressed: capture.quick()
+  }
+  GlobalShortcut {
+    name: "record"
+    description: "Gravar tela (de novo, para)"
+    onPressed: Recorder.recording ? Recorder.stop() : capture.start("record")
   }
   GlobalShortcut {
     name: "session"

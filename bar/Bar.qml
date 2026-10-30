@@ -130,6 +130,9 @@ PanelWindow {
         id: rightRow
         anchors.centerIn: parent
         spacing: 10
+        RecordIndicator {
+          tip: root.tip
+        }
         WifiStatus {
           tip: root.tip
           onClicked: root.netMenuRequested()
