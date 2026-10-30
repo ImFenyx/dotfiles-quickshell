@@ -10,6 +10,7 @@ import Quickshell.Wayland
 // Click-through.
 PanelWindow {
   id: root
+  WlrLayershell.namespace: "quickshell:frame"
   anchors.top: true
   anchors.bottom: true
   anchors.left: true

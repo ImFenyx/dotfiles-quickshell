@@ -11,6 +11,7 @@ import qs.services
 // depois), Esc sai. O atual fica marcado e ja vem selecionado.
 PopupBase {
   id: root
+  layerName: "wallpaper"
 
   panelWidth: 760
   padTop: Theme.space.lg

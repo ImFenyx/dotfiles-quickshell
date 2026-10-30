@@ -12,6 +12,7 @@ import qs.services
 // a propria aba. Fica desmapeada quando nao ha toast.
 PanelWindow {
   id: root
+  WlrLayershell.namespace: "quickshell:toasts"
 
   property bool suppress: false          // centro aberto: toasts somem
 

@@ -8,8 +8,8 @@ import QtQuick.Shapes
 // entao a altura util do conteudo e height - 2 * ear.
 //
 // Geometria (x cresce para a direita; a borda da tela e x = width):
-//   [ corpo ......... ][ filete ]   o filete (`edge`) sobrepoe o da EdgeFrame,
-//                                   mesma cor opaca = sem emenda.
+//   [ corpo ......... ][ filete ]   o filete (`edge`) e da EdgeFrame: a aba so encaixa
+//                                   nele (com vidro, sobrepor escurece a faixa).
 Shape {
   id: root
 
@@ -28,13 +28,9 @@ Shape {
     strokeColor: "transparent"
     fillColor: root.color
 
-    // topo, sobre o filete
-    startX: root.width
+    // borda interna do filete
+    startX: root.bx
     startY: 0
-    PathLine {
-      x: root.bx
-      y: 0
-    }
     // orelha superior: do filete para o topo do corpo
     PathArc {
       x: root.bx - root.ear
@@ -78,13 +74,9 @@ Shape {
       radiusX: root.ear
       radiusY: root.ear
     }
-    // base, sobre o filete, e fecha
+    // sobe pela borda interna do filete e fecha
     PathLine {
-      x: root.width
-      y: root.height
-    }
-    PathLine {
-      x: root.width
+      x: root.bx
       y: 0
     }
   }

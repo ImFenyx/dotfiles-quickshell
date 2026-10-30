@@ -52,8 +52,14 @@ PanelWindow {
   property int padX: Theme.space.sm
   property int padRight: padX          // fromRight: some o filete aqui (edge + respiro)
   property color menuBg: Theme.surface
-  // aba de encaixe na barra/filete: arco do mesmo raio dos cantos da moldura
-  readonly property real flare: (fromRight || pill) ? 0 : Theme.frameR
+  property string layerName: "menu"    // namespace quickshell:<layerName> (regras do Hyprland)
+  // Abas de encaixe na barra/filete: arco do raio dos cantos da moldura. Lado colado
+  // no filete (dock): sem aba e com canto convexo de raio frameR, que completa o canto
+  // interno da moldura (mesmo centro) sem sobrepor a moldura.
+  readonly property bool dockLeft: !fromRight && !pill && panelX <= Theme.edge + 0.5
+  readonly property bool dockRight: !fromRight && !pill && panelX + panelWidth >= width - Theme.edge - 0.5
+  readonly property real flareL: (fromRight || pill || dockLeft) ? 0 : Theme.frameR
+  readonly property real flareR: (fromRight || pill || dockRight) ? 0 : Theme.frameR
 
   // 0 = aberto, 1 = fechado. close direto: o spring resolve o colapso.
   property real offsetScale: open ? 0 : 1
@@ -65,14 +71,20 @@ PanelWindow {
     open = false;
   }
 
-  // Fundo: topo (ou base) reto com abas de encaixe concavas nas laterais (raio
-  // frameR) + cantos do corpo (shape.popup), tudo em arco circular. w inclui as abas.
+  // Fundo, tudo em arco circular: lado encaixado = aba concava (flare); lado colado no
+  // filete = canto convexo de raio frameR; base = cantos shape.popup. w inclui as abas.
+  // fromBottom = o mesmo desenho espelhado (y -> h - y, sentido dos arcos invertido).
   function shapePath(w, h) {
-    const r = Theme.shape.popup, f = Math.min(flare, Math.max(0, h - r));
-    const bx = w - f;
-    if (fromBottom)
-      return `M0,${h} L${w},${h} A${f},${f} 0 0 1 ${bx},${h - f} L${bx},${r} A${r},${r} 0 0 0 ${bx - r},0 L${f + r},0 A${r},${r} 0 0 0 ${f},${r} L${f},${h - f} A${f},${f} 0 0 1 0,${h} Z`;
-    return `M0,0 L${w},0 A${f},${f} 0 0 0 ${bx},${f} L${bx},${h - r} A${r},${r} 0 0 1 ${bx - r},${h} L${f + r},${h} A${r},${r} 0 0 1 ${f},${h - r} L${f},${f} A${f},${f} 0 0 0 0,0 Z`;
+    const r = Theme.shape.popup, lim = Math.max(0, h - r);
+    const R = Math.min(Theme.frameR, lim), fl = Math.min(flareL, lim), fr = Math.min(flareR, lim);
+    const bl = fl, br = w - fr;   // bordas do corpo
+    const Y = y => fromBottom ? h - y : y;
+    const s = v => fromBottom ? 1 - v : v;
+    let p = fl > 0 ? `M0,${Y(0)}` : `M0,${Y(R)} A${R},${R} 0 0 ${s(1)} ${R},${Y(0)}`;
+    p += fr > 0 ? ` L${w},${Y(0)} A${fr},${fr} 0 0 ${s(0)} ${br},${Y(fr)}` : ` L${w - R},${Y(0)} A${R},${R} 0 0 ${s(1)} ${w},${Y(R)}`;
+    p += ` L${br},${Y(h - r)} A${r},${r} 0 0 ${s(1)} ${br - r},${Y(h)} L${bl + r},${Y(h)} A${r},${r} 0 0 ${s(1)} ${bl},${Y(h - r)}`;
+    p += fl > 0 ? ` L${bl},${Y(fl)} A${fl},${fl} 0 0 ${s(0)} 0,${Y(0)} Z` : ` L0,${Y(R)} Z`;
+    return p;
   }
 
   anchors.top: true
@@ -83,6 +95,7 @@ PanelWindow {
   implicitWidth: 0
   implicitHeight: 0
   WlrLayershell.layer: WlrLayer.Overlay
+  WlrLayershell.namespace: "quickshell:" + layerName
   // teclado (Esc, campos de texto): com interatividade None o foco depende do
   // focus grab ganhar a corrida com o 1o commit, e um app do tray pode roubar o
   // teclado ao abrir o menu dele (OnDemand nao bastou). Exclusive enquanto aberto:
@@ -141,11 +154,12 @@ PanelWindow {
   }
 
   Item {
-    width: root.panelWidth + 2 * root.flare
+    width: root.panelWidth + root.flareL + root.flareR
     height: root.panelHeight
     clip: true
-    x: root.panelX - root.flare
-    y: root.fromBottom ? root.height - height + root.tuck : root.topY - root.tuck
+    x: root.panelX - root.flareL
+    // fromBottom: para no topo do filete de baixo (a moldura continua por baixo)
+    y: root.fromBottom ? root.height - Theme.edge - height + root.tuck : root.topY - root.tuck
     visible: root.offsetScale < 1
 
     Item {
@@ -190,8 +204,8 @@ PanelWindow {
         anchors.left: parent.left
         anchors.right: parent.right
         anchors.topMargin: root.padTop
-        anchors.leftMargin: root.padX + root.flare
-        anchors.rightMargin: root.padRight + root.flare
+        anchors.leftMargin: root.padX + root.flareL
+        anchors.rightMargin: root.padRight + root.flareR
         spacing: 2
       }
     }

@@ -10,6 +10,7 @@ import qs.services
 // Lock: glifo aceso/apagado + "ativado/desativado", sem %/barra.
 PopupBase {
   id: root
+  layerName: "osd"
 
   interactive: false       // click-through
   // Janela compacta (2b5c4b9) engasgava a barra de progresso: a largura do

@@ -12,6 +12,7 @@ import qs.services
 // A altura acompanha o conteudo ate o fundo da tela.
 PopupBase {
   id: root
+  layerName: "notifs"
 
   fromRight: true
   topY: Theme.sideTabTop

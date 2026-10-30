@@ -9,6 +9,7 @@ import Quickshell.Wayland
 // origem da tela (HDMI fica em x=-1920).
 PanelWindow {
   id: root
+  WlrLayershell.namespace: "quickshell:tooltip"
 
   anchors.top: true
   anchors.bottom: true

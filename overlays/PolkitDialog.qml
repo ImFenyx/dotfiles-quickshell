@@ -11,6 +11,7 @@ import qs.components
 // Cancelar ou clique fora cancelam o pedido (nao so escondem).
 PopupBase {
   id: root
+  layerName: "polkit"
 
   panelWidth: 420
   padTop: Theme.space.xl

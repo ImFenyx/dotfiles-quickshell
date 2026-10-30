@@ -14,12 +14,13 @@ import qs.services
 // Todo modo devolve itens {icon | glyph (+ nerd), title, sub, act}; Enter/clique roda act.
 PopupBase {
   id: root
+  layerName: "launcher"
 
   fromBottom: true
   tuck: 1                 // mesma cor da borda = sem hairline
   panelWidth: 600
   padTop: Theme.space.lg
-  padBottom: Theme.edge + Theme.space.sm
+  padBottom: Theme.space.lg
   padX: Theme.space.lg
   // k=18: moldura EdgeFrame (8px, mesma cor) esconde a base do scoop;
   // sobram ~10px visiveis = paridade com os menus.

@@ -1,5 +1,6 @@
 import QtQuick
 import Quickshell
+import Quickshell.Wayland
 
 // Zonas de exclusao invisiveis (modelo caelestia Exclusions.qml): janelas
 // 1x1 com mascara vazia que so reservam espaco para o tiling. O visual
@@ -16,6 +17,7 @@ Scope {
     delegate: Component {
       PanelWindow {
         required property string modelData
+        WlrLayershell.namespace: "quickshell:exclusion"
         screen: root.screen
         anchors.left: modelData === "left"
         anchors.right: modelData === "right"

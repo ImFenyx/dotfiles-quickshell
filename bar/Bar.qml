@@ -1,6 +1,7 @@
 import QtQuick
 import QtQuick.Layouts
 import Quickshell
+import Quickshell.Wayland
 import qs.components
 
 // Barra colada no topo. Os cantos que descem para as laterais sao da EdgeFrame
@@ -10,6 +11,7 @@ import qs.components
 // menus saem como sinais — quem coordena os menus e o shell.qml.
 PanelWindow {
   id: root
+  WlrLayershell.namespace: "quickshell:bar"
 
   required property var tip   // TipWindow desta tela
 
