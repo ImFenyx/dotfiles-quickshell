@@ -248,6 +248,32 @@ ShellRoot {
     description: "Seletor de wallpaper"
     onPressed: wallpaperPicker.toggle()
   }
+  // Sistema (SUPER+ALT no Hyprland): alterna e mostra no OSD, como o Fn Lock
+  GlobalShortcut {
+    name: "dnd"
+    description: "Nao perturbe"
+    onPressed: {
+      Notifs.toggleDnd();
+      osd.showKey(Notifs.dnd ? Icons.bellSlash : Icons.bell, "Não perturbe", Notifs.dnd);
+    }
+  }
+  GlobalShortcut {
+    name: "caffeine"
+    description: "Cafeina"
+    onPressed: {
+      Caffeine.toggle();
+      osd.showKey(Icons.coffee, "Cafeína", Caffeine.on);
+    }
+  }
+  GlobalShortcut {
+    name: "nightlight"
+    description: "Luz noturna"
+    onPressed: {
+      const next = !NightLight.on; // o hyprsunset responde assincrono
+      NightLight.toggle();
+      osd.showKey(Icons.moon, "Luz noturna", next);
+    }
+  }
   // bind em Caps_Lock/Num_Lock sem consumir a tecla: so avisa p/ reler os LEDs.
   // O bind e `release = true`: o Hyprland manda o global como *released*, nao pressed.
   GlobalShortcut {
