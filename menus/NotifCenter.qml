@@ -81,12 +81,12 @@ PopupBase {
 
     UiText {
       font.pixelSize: Theme.type.body_l
-      font.weight: Font.DemiBold
+      font.weight: Font.Bold
       text: "Notificações"
     }
     UiText {
       visible: Notifs.total > 0
-      color: Theme.onSurfaceVariant
+      color: Theme.fgSurfaceVariant
       text: Notifs.total
     }
     Item {
@@ -103,12 +103,12 @@ PopupBase {
         anchors.centerIn: parent
         spacing: 6
         Glyph {
-          color: Theme.onSurfaceVariant
+          color: Theme.fgSurfaceVariant
           font.pixelSize: Theme.icon.xs
           text: Icons.trash
         }
         UiText {
-          color: Theme.onSurfaceVariant
+          color: Theme.fgSurfaceVariant
           font.pixelSize: Theme.type.label_m
           text: "Limpar tudo"
         }

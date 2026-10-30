@@ -43,7 +43,7 @@ PopupBase {
     Layout.bottomMargin: 6
     UiText {
       Layout.fillWidth: true
-      font.weight: Font.DemiBold
+      font.weight: Font.Bold
       text: "Bluetooth"
     }
     Rectangle {
@@ -62,7 +62,7 @@ PopupBase {
         radius: 8
         anchors.verticalCenter: parent.verticalCenter
         x: Bt.on ? parent.width - width - 3 : 3
-        color: Bt.on ? Theme.onPrimary : Theme.onSurfaceVariant
+        color: Bt.on ? Theme.fgPrimary : Theme.fgSurfaceVariant
         Behavior on x {
           NumberAnimation {
             duration: Theme.animNormal
@@ -141,7 +141,7 @@ PopupBase {
           spacing: 0
           UiText {
             Layout.fillWidth: true
-            color: dev.armed ? Theme.error : (dev.modelData.connected ? Theme.success : Theme.onSurface)
+            color: dev.armed ? Theme.error : (dev.modelData.connected ? Theme.success : Theme.fgSurface)
             elide: Text.ElideRight
             textFormat: Text.PlainText
             text: dev.armed ? "Esquecer " + Bt.label(dev.modelData) + "?" : Bt.label(dev.modelData)

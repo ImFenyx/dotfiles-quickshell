@@ -57,13 +57,13 @@ PopupBase {
   RowLayout {
     spacing: 10
     Glyph {
-      font.weight: Font.DemiBold
+      font.weight: Font.Bold
       color: root.label !== "" && !root.lit ? Theme.outline : Theme.primary
       text: root.glyph
     }
     UiText {
       visible: root.label !== ""
-      font.weight: Font.DemiBold
+      font.weight: Font.Bold
       text: root.label + (root.lit ? " ativado" : " desativado")
     }
     UiText {
@@ -71,8 +71,8 @@ PopupBase {
       visible: root.label === ""
       // largura fixa (a de "100%"): o painel nao muda em 9->10% (cada mudanca re-tessela o fundo)
       Layout.minimumWidth: pctMetrics.advanceWidth
-      color: root.boosted ? Theme.error : Theme.onSurface
-      font.weight: Font.DemiBold
+      color: root.boosted ? Theme.error : Theme.fgSurface
+      font.weight: Font.Bold
       text: root.muted ? "Mudo" : root.vol + "%"
       TextMetrics {
         id: pctMetrics

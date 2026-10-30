@@ -15,7 +15,7 @@ Item {
   property bool keepOpen: false
   property bool armed: false          // estado "confirmar?" (vermelho)
   property string arrow: ""
-  property color labelColor: Theme.onSurface
+  property color labelColor: Theme.fgSurface
 
   Layout.fillWidth: true
   implicitHeight: Math.max(32, lines.implicitHeight + 14)   // rotulo com \n cresce (aviso do PowerMenu)
@@ -32,7 +32,7 @@ Item {
     spacing: 8
     Glyph {
       visible: row.icon !== ""
-      color: row.armed ? Theme.onPrimary : Theme.primary
+      color: row.armed ? Theme.fgPrimary : Theme.primary
       text: row.icon
     }
     // uma linha por \n, cada uma com o seu elide (Text com \n nao elide)
@@ -45,7 +45,7 @@ Item {
         UiText {
           required property string modelData
           Layout.fillWidth: true
-          color: row.armed ? Theme.onPrimary : row.labelColor
+          color: row.armed ? Theme.fgPrimary : row.labelColor
           elide: Text.ElideRight
           textFormat: Text.PlainText   // nome de dispositivo/app vem de fora
           text: modelData
@@ -65,7 +65,7 @@ Item {
         width: 8
         height: 8
         radius: 4
-        color: Theme.onPrimary
+        color: Theme.fgPrimary
         visible: row.checked
       }
     }

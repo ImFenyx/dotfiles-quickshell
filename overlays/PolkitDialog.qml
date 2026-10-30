@@ -89,7 +89,7 @@ PopupBase {
       spacing: 0
       UiText {
         font.pixelSize: Theme.type.body_l
-        font.weight: Font.DemiBold
+        font.weight: Font.Bold
         text: "Autenticação necessária"
       }
       UiText {
@@ -106,7 +106,7 @@ PopupBase {
 
   UiText {
     Layout.fillWidth: true
-    color: Theme.onSurfaceVariant
+    color: Theme.fgSurfaceVariant
     font.pixelSize: Theme.type.body_m
     wrapMode: Text.Wrap
     textFormat: Text.PlainText
@@ -136,7 +136,7 @@ PopupBase {
       anchors.leftMargin: 40
       anchors.rightMargin: 16
       verticalAlignment: TextInput.AlignVCenter
-      color: Theme.onSurface
+      color: Theme.fgSurface
       font.family: Theme.uiFont
       font.pixelSize: Theme.type.body_l
       echoMode: root.flow && root.flow.responseVisible ? TextInput.Normal : TextInput.Password
@@ -167,7 +167,7 @@ PopupBase {
   UiText {
     Layout.fillWidth: true
     visible: text !== ""
-    color: root.error !== "" || (root.flow && root.flow.supplementaryIsError) ? Theme.error : Theme.onSurfaceVariant
+    color: root.error !== "" || (root.flow && root.flow.supplementaryIsError) ? Theme.error : Theme.fgSurfaceVariant
     font.pixelSize: Theme.type.label_m
     wrapMode: Text.Wrap
     textFormat: Text.PlainText
@@ -203,9 +203,9 @@ PopupBase {
         UiText {
           id: btnLabel
           anchors.centerIn: parent
-          color: btn.modelData.main ? Theme.onPrimary : Theme.onSurface
+          color: btn.modelData.main ? Theme.fgPrimary : Theme.fgSurface
           font.pixelSize: Theme.type.body_m
-          font.weight: Font.DemiBold
+          font.weight: Font.Bold
           text: btn.modelData.label
         }
         MouseArea {

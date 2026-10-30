@@ -14,7 +14,7 @@ RowLayout {
   Glyph {
     color: Theme.secondary
     font.pixelSize: Theme.icon.s
-    font.weight: Font.DemiBold
+    font.weight: Font.Bold
     text: Icons.lock
     MouseArea {
       anchors.fill: parent
@@ -25,7 +25,7 @@ RowLayout {
   Glyph {
     color: Theme.error
     font.pixelSize: Theme.icon.s
-    font.weight: Font.DemiBold
+    font.weight: Font.Bold
     text: Icons.power
     MouseArea {
       anchors.fill: parent

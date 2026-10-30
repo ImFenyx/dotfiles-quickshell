@@ -13,8 +13,8 @@ RowLayout {
   spacing: 5
 
   UiText {
-    color: Wifi.on ? Theme.onSurface : Theme.outline
-    font.weight: Font.DemiBold
+    color: Wifi.on ? Theme.fgSurface : Theme.outline
+    font.weight: Font.Bold
     text: Wifi.name
 
     TipArea {
@@ -30,7 +30,7 @@ RowLayout {
   }
   Glyph {
     visible: Wifi.icon !== ""
-    color: Wifi.on ? Theme.onSurface : Theme.outline
+    color: Wifi.on ? Theme.fgSurface : Theme.outline
     text: Wifi.icon
   }
 }

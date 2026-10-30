@@ -80,7 +80,7 @@ Rectangle {
           }
           UiText {
             Layout.fillWidth: true
-            color: Theme.onSurfaceVariant
+            color: Theme.fgSurfaceVariant
             font.pixelSize: Theme.type.label_m
             elide: Text.ElideRight
             text: Media.kindLabel + (Media.player !== "" ? "  \u00b7  " + Media.player : "")
@@ -88,14 +88,14 @@ Rectangle {
         }
         UiText {
           Layout.fillWidth: true
-          font.weight: Font.DemiBold
+          font.weight: Font.Bold
           elide: Text.ElideRight
           text: Media.title !== "" ? Media.title : "Sem título"
         }
         UiText {
           Layout.fillWidth: true
           visible: Media.artist !== ""
-          color: Theme.onSurfaceVariant
+          color: Theme.fgSurfaceVariant
           font.pixelSize: Theme.type.body_m
           elide: Text.ElideRight
           text: Media.artist
@@ -113,7 +113,7 @@ Rectangle {
         Glyph {
           anchors.centerIn: parent
           font.pixelSize: Theme.icon.s
-          color: Theme.onSurfaceVariant
+          color: Theme.fgSurfaceVariant
           text: Icons.chevronRight
         }
         MouseArea {
@@ -158,7 +158,7 @@ Rectangle {
       RowLayout {
         Layout.fillWidth: true
         UiText {
-          color: Theme.onSurfaceVariant
+          color: Theme.fgSurfaceVariant
           font.pixelSize: Theme.type.label_m
           text: root.fmt(Media.position)
         }
@@ -166,7 +166,7 @@ Rectangle {
           Layout.fillWidth: true
         }
         UiText {
-          color: Theme.onSurfaceVariant
+          color: Theme.fgSurfaceVariant
           font.pixelSize: Theme.type.label_m
           text: root.fmt(Media.length)
         }
@@ -185,7 +185,7 @@ Rectangle {
         color: prevArea.containsMouse ? Theme.surfaceContainerHighest : "transparent"
         Glyph {
           anchors.centerIn: parent
-          color: Theme.onSurface
+          color: Theme.fgSurface
           text: Icons.prev
         }
         MouseArea {
@@ -205,7 +205,7 @@ Rectangle {
         color: playArea.containsMouse ? Theme.secondary : Theme.primary
         Glyph {
           anchors.centerIn: parent
-          color: Theme.onPrimary
+          color: Theme.fgPrimary
           font.pixelSize: Theme.icon.m
           text: Media.playing ? Icons.pause : Icons.play
         }
@@ -226,7 +226,7 @@ Rectangle {
         color: nextArea.containsMouse ? Theme.surfaceContainerHighest : "transparent"
         Glyph {
           anchors.centerIn: parent
-          color: Theme.onSurface
+          color: Theme.fgSurface
           text: Icons.next
         }
         MouseArea {

@@ -105,12 +105,12 @@ Scope {
         UiText {
           Layout.alignment: Qt.AlignHCenter
           font.pointSize: 64
-          font.weight: Font.DemiBold
+          font.weight: Font.Bold
           text: Time.clockText
         }
         UiText {
           Layout.alignment: Qt.AlignHCenter
-          color: Theme.onSurfaceVariant
+          color: Theme.fgSurfaceVariant
           font.pixelSize: Theme.type.body_l
           text: Time.longDate
         }
@@ -138,7 +138,7 @@ Scope {
             anchors.leftMargin: 44
             anchors.rightMargin: 18
             verticalAlignment: TextInput.AlignVCenter
-            color: Theme.onSurface
+            color: Theme.fgSurface
             font.family: Theme.uiFont
             font.pixelSize: Theme.type.body_l
             echoMode: TextInput.Password

@@ -45,10 +45,10 @@ Pill {
             duration: wave.interval
           }
         }
-        color: Theme.onPrimary
+        color: Theme.fgPrimary
         font.family: Theme.uiFont
         font.pixelSize: Theme.type.body_m
-        font.weight: Font.DemiBold
+        font.weight: Font.Bold
         text: "\u2022"
       }
     }

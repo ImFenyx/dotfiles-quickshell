@@ -107,9 +107,9 @@ Pill {
           // respiro antes dos icones: so encolhe as margens (a largura e fixa)
           Layout.rightMargin: ws.shown.length > 0 ? 2 : 0
           text: ws.isSpecial ? Icons.workspaceSpecial : ws.wsName
-          color: ws.isActive ? Theme.onPrimary : Theme.onSurface
+          color: ws.isActive ? Theme.fgPrimary : Theme.fgSurface
           font.family: ws.isSpecial ? Theme.iconFont : Theme.uiFont
-          font.weight: ws.isActive ? Font.DemiBold : Font.Medium
+          font.weight: ws.isActive ? Font.Bold : Font.DemiBold
         }
         Repeater {
           // ScriptModel reaproveita os icones que continuam (sem recarregar a cada janela)
@@ -142,9 +142,9 @@ Pill {
               anchors.centerIn: parent
               visible: img.status === Image.Null || img.status === Image.Error
               text: ((app.entry ? app.entry.name : app.modelData) || "?").charAt(0).toUpperCase()
-              color: ws.isActive ? Theme.onPrimary : Theme.onSurface
+              color: ws.isActive ? Theme.fgPrimary : Theme.fgSurface
               font.pixelSize: Theme.type.label_m
-              font.weight: Font.DemiBold
+              font.weight: Font.Bold
             }
           }
         }
@@ -153,9 +153,9 @@ Pill {
           Layout.preferredWidth: Theme.wsIcon
           horizontalAlignment: Text.AlignHCenter
           text: "+" + (ws.apps.length - ws.shown.length)
-          color: ws.isActive ? Theme.onPrimary : Theme.onSurface
+          color: ws.isActive ? Theme.fgPrimary : Theme.fgSurface
           font.pixelSize: Theme.type.label_s
-          font.weight: Font.DemiBold
+          font.weight: Font.Bold
         }
       }
 

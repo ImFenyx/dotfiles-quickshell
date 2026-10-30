@@ -12,14 +12,15 @@ Singleton {
   id: root
 
   // ---- cores (papeis M3) ----
+  // on_<papel> do M3 vira fg<Papel>: em QML, propriedade "onX" e lida como handler de sinal e chega vazia.
   readonly property color primary: role("primary")
-  readonly property color onPrimary: role("on_primary")
+  readonly property color fgPrimary: role("on_primary")
   readonly property color primaryContainer: role("primary_container")
-  readonly property color onPrimaryContainer: role("on_primary_container")
+  readonly property color fgPrimaryContainer: role("on_primary_container")
   readonly property color secondary: role("secondary")
   readonly property color tertiary: role("tertiary")
   readonly property color error: role("error")
-  readonly property color onError: role("on_error")
+  readonly property color fgError: role("on_error")
   readonly property color success: role("success")
   readonly property color warning: role("warning")
   readonly property color info: role("info")
@@ -27,8 +28,8 @@ Singleton {
   readonly property color surfaceContainer: role("surface_container")
   readonly property color surfaceContainerHigh: role("surface_container_high")
   readonly property color surfaceContainerHighest: role("surface_container_highest")
-  readonly property color onSurface: role("on_surface")
-  readonly property color onSurfaceVariant: role("on_surface_variant")
+  readonly property color fgSurface: role("on_surface")
+  readonly property color fgSurfaceVariant: role("on_surface_variant")
   readonly property color outline: role("outline")
   readonly property color outlineVariant: role("outline_variant")
   readonly property bool dark: colors.mode !== "light"

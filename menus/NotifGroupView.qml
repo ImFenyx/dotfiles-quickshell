@@ -58,13 +58,13 @@ Item {
           visible: root.group.icon === ""
           color: Theme.primary
           font.pixelSize: Theme.type.label_m
-          font.weight: Font.DemiBold
+          font.weight: Font.Bold
           text: root.group.appName.length > 0 ? root.group.appName.charAt(0).toUpperCase() : "?"
         }
       }
       UiText {
         font.pixelSize: Theme.type.body_m
-        font.weight: Font.DemiBold
+        font.weight: Font.Bold
         elide: Text.ElideRight
         Layout.maximumWidth: 180
         textFormat: Text.PlainText
@@ -78,9 +78,9 @@ Item {
         UiText {
           id: countText
           anchors.centerIn: parent
-          color: root.group.urgency === 2 ? Theme.onError : Theme.onSurfaceVariant
+          color: root.group.urgency === 2 ? Theme.fgError : Theme.fgSurfaceVariant
           font.pixelSize: Theme.type.label_m
-          font.weight: Font.DemiBold
+          font.weight: Font.Bold
           text: root.group.count
         }
       }
@@ -94,7 +94,7 @@ Item {
         color: toggleArea.containsMouse ? Theme.surfaceContainerHighest : "transparent"
         Glyph {
           anchors.centerIn: parent
-          color: Theme.onSurfaceVariant
+          color: Theme.fgSurfaceVariant
           font.pixelSize: Theme.icon.s
           text: root.open ? Icons.chevronUp : Icons.chevronDown
         }
@@ -113,7 +113,7 @@ Item {
         color: clearArea.containsMouse ? Theme.surfaceContainerHighest : "transparent"
         Glyph {
           anchors.centerIn: parent
-          color: Theme.onSurfaceVariant
+          color: Theme.fgSurfaceVariant
           font.pixelSize: Theme.icon.s
           text: Icons.trash
         }

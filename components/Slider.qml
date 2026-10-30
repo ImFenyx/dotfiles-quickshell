@@ -37,7 +37,7 @@ Item {
     width: 14
     height: 14
     radius: 7
-    color: Theme.onSurface
+    color: Theme.fgSurface
     visible: area.containsMouse || area.pressed
   }
 

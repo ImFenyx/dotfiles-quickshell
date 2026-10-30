@@ -35,9 +35,9 @@ PopupBase {
   component Section: UiText {
     Layout.fillWidth: true
     Layout.topMargin: 6
-    color: Theme.onSurfaceVariant
+    color: Theme.fgSurfaceVariant
     font.pixelSize: Theme.type.label_m
-    font.weight: Font.DemiBold
+    font.weight: Font.Bold
   }
 
   // ---- saida ----

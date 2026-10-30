@@ -521,7 +521,7 @@ PopupBase {
               Layout.fillWidth: true
               color: Theme.outline
               font.pixelSize: Theme.type.label_m
-              font.weight: Font.Normal
+              font.weight: Font.Medium
               elide: Text.ElideRight
               textFormat: Text.PlainText
               text: row.modelData.sub || ""
@@ -660,7 +660,7 @@ PopupBase {
           anchors.top: parent.top
           anchors.topMargin: 12
           anchors.horizontalCenter: parent.horizontalCenter
-          color: Theme.onSurfaceVariant
+          color: Theme.fgSurfaceVariant
           font.pixelSize: Theme.type.body_m
           textFormat: Text.PlainText
           text: root.tonePick ? root.tonePick.title + "  ·  tom de pele" : ""
@@ -709,7 +709,7 @@ PopupBase {
     UiText {
       anchors.centerIn: parent
       color: Theme.outline
-      font.weight: Font.Normal
+      font.weight: Font.Medium
       text: root.emptyText
     }
   }
@@ -722,7 +722,7 @@ PopupBase {
     Layout.bottomMargin: 2
     color: Theme.outline
     font.pixelSize: Theme.type.label_m
-    font.weight: Font.Normal
+    font.weight: Font.Medium
     elide: Text.ElideRight
     text: root.mode === "emoji" ? (root.tonePick ? "← →  tom de pele     Enter  inserir     Esc  voltar" : "›  tem tom de pele: Enter ou clique abre a escolha") : (root.imageGrid ? "Alt+t  texto" : "Alt+i  imagens") + "     Alt+d  apagar     Alt+p  apagar as de cima     Alt+n  apagar as de baixo"
   }
@@ -745,7 +745,7 @@ PopupBase {
         id: searchInput
         Layout.fillWidth: true
         Layout.alignment: Qt.AlignVCenter
-        color: Theme.onSurface
+        color: Theme.fgSurface
         font.family: Theme.uiFont
         font.pixelSize: Theme.type.body_l
         focus: root.open
@@ -816,7 +816,7 @@ PopupBase {
           visible: searchInput.text === ""
           color: Theme.outline
           font.pixelSize: Theme.type.body_m
-          font.weight: Font.Normal
+          font.weight: Font.Medium
           text: "Apps     =  calculadora     :  emoji     ;  kaomoji     #  clipboard     @  janelas"
         }
       }

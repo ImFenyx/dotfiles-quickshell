@@ -60,7 +60,7 @@ RowLayout {
     id: pct
     Layout.minimumWidth: pctMetrics.advanceWidth
     horizontalAlignment: Text.AlignRight
-    color: root.muted ? Theme.outline : Theme.onSurfaceVariant
+    color: root.muted ? Theme.outline : Theme.fgSurfaceVariant
     font.pixelSize: Theme.type.label_m
     text: root.muted ? "mudo" : Math.round(root.vol * 100) + "%"
     TextMetrics {

@@ -17,7 +17,7 @@ Pill {
   }
   PillGlyph {
     visible: Brightness.icon !== ""
-    font.weight: Font.Normal
+    font.weight: Font.Medium
     text: Brightness.icon
   }
 }

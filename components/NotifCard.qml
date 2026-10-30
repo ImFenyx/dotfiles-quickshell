@@ -128,7 +128,7 @@ Item {
           visible: root.item.icon === ""
           color: Theme.primary
           font.pixelSize: Theme.type.title_m
-          font.weight: Font.DemiBold
+          font.weight: Font.Bold
           text: root.item.appName.length > 0 ? root.item.appName.charAt(0).toUpperCase() : "?"
         }
       }
@@ -143,7 +143,7 @@ Item {
           spacing: 6
           UiText {
             Layout.fillWidth: true
-            color: Theme.onSurfaceVariant
+            color: Theme.fgSurfaceVariant
             font.pixelSize: Theme.type.label_m
             elide: Text.ElideRight
             textFormat: Text.PlainText
@@ -162,7 +162,7 @@ Item {
             }
             Glyph {
               anchors.centerIn: parent
-              color: Theme.onSurfaceVariant
+              color: Theme.fgSurfaceVariant
               font.pixelSize: Theme.icon.xs
               text: Icons.close
             }
@@ -179,7 +179,7 @@ Item {
         UiText {
           Layout.fillWidth: true
           visible: text !== ""
-          font.weight: Font.DemiBold
+          font.weight: Font.Bold
           wrapMode: Text.Wrap
           maximumLineCount: 2
           elide: Text.ElideRight
@@ -190,7 +190,7 @@ Item {
         UiText {
           Layout.fillWidth: true
           visible: text !== ""
-          color: Theme.onSurfaceVariant
+          color: Theme.fgSurfaceVariant
           font.pixelSize: Theme.type.body_m
           textFormat: Text.StyledText
           linkColor: Theme.info
@@ -261,7 +261,7 @@ Item {
                 id: label
                 anchors.centerIn: parent
                 visible: btn.iconSrc === ""
-                color: btnArea.containsMouse ? Theme.onPrimary : Theme.onSurface
+                color: btnArea.containsMouse ? Theme.fgPrimary : Theme.fgSurface
                 font.pixelSize: Theme.type.label_m
                 text: btn.modelData.text
               }
@@ -298,7 +298,7 @@ Item {
             anchors.verticalCenter: parent.verticalCenter
             anchors.leftMargin: 12
             anchors.rightMargin: 6
-            color: Theme.onSurface
+            color: Theme.fgSurface
             font.family: Theme.uiFont
             font.pixelSize: Theme.type.body_m
             clip: true

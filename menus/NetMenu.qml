@@ -52,7 +52,7 @@ PopupBase {
   UiText {
     Layout.fillWidth: true
     Layout.bottomMargin: 6
-    font.weight: Font.DemiBold
+    font.weight: Font.Bold
     elide: Text.ElideRight
     text: Wifi.strength === "" ? Wifi.name : Wifi.name + " · " + Wifi.strength
   }
@@ -110,7 +110,7 @@ PopupBase {
             UiText {
               anchors.verticalCenter: parent.verticalCenter
               width: parent.width
-              color: net.modelData.connected ? Theme.success : Theme.onSurface
+              color: net.modelData.connected ? Theme.success : Theme.fgSurface
               elide: Text.ElideRight
               textFormat: Text.PlainText
               text: net.armed ? "Esquecer " + net.modelData.name + "?" : net.modelData.name
@@ -186,7 +186,7 @@ PopupBase {
         anchors.leftMargin: 10
         anchors.rightMargin: 10
         verticalAlignment: TextInput.AlignVCenter
-        color: Theme.onSurface
+        color: Theme.fgSurface
         font.family: Theme.uiFont
         font.pixelSize: Theme.type.body_m
         echoMode: TextInput.Password

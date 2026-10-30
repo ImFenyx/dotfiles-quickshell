@@ -60,11 +60,11 @@ PopupBase {
     }
     UiText {
       font.pixelSize: Theme.type.body_l
-      font.weight: Font.DemiBold
+      font.weight: Font.Bold
       text: "Wallpapers"
     }
     UiText {
-      color: Theme.onSurfaceVariant
+      color: Theme.fgSurfaceVariant
       font.pixelSize: Theme.type.body_m
       text: Wallpapers.items.length > 0 ? String(Wallpapers.items.length) : ""
     }
@@ -91,7 +91,7 @@ PopupBase {
         anchors.leftMargin: 34
         anchors.rightMargin: 12
         verticalAlignment: TextInput.AlignVCenter
-        color: Theme.onSurface
+        color: Theme.fgSurface
         font.family: Theme.uiFont
         font.pixelSize: Theme.type.body_m
         focus: root.open
@@ -222,7 +222,7 @@ PopupBase {
             color: Theme.primary
             Glyph {
               anchors.centerIn: parent
-              color: Theme.onPrimary
+              color: Theme.fgPrimary
               font.pixelSize: Theme.icon.xs
               text: Icons.check
             }
@@ -273,7 +273,7 @@ PopupBase {
     Layout.fillWidth: true
     color: Theme.outline
     font.pixelSize: Theme.type.label_m
-    font.weight: Font.Normal
+    font.weight: Font.Medium
     text: "← → ↑ ↓  navegar     Enter  aplicar     Esc  sair"
   }
 }

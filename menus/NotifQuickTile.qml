@@ -33,13 +33,13 @@ Rectangle {
     spacing: 2
     Glyph {
       Layout.alignment: Qt.AlignHCenter
-      color: root.active ? Theme.onPrimary : Theme.primary
+      color: root.active ? Theme.fgPrimary : Theme.primary
       text: root.icon
     }
     UiText {
       Layout.fillWidth: true
       horizontalAlignment: Text.AlignHCenter
-      color: root.active ? Theme.onPrimary : Theme.onSurface
+      color: root.active ? Theme.fgPrimary : Theme.fgSurface
       font.pixelSize: Theme.type.label_m
       fontSizeMode: Text.HorizontalFit
       minimumPointSize: 7
@@ -49,7 +49,7 @@ Rectangle {
       Layout.fillWidth: true
       visible: root.sub !== ""
       horizontalAlignment: Text.AlignHCenter
-      color: root.active ? Theme.onPrimary : Theme.onSurfaceVariant
+      color: root.active ? Theme.fgPrimary : Theme.fgSurfaceVariant
       font.pixelSize: Theme.type.label_s
       elide: Text.ElideRight
       text: root.sub

@@ -47,7 +47,7 @@ Item {
     }
     UiText {
       Layout.fillWidth: true
-      color: row.entry.enabled ? Theme.onSurface : Theme.outline
+      color: row.entry.enabled ? Theme.fgSurface : Theme.outline
       elide: Text.ElideRight
       text: row.entry.text || ""
     }

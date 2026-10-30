@@ -18,7 +18,7 @@ Item {
     spacing: 4
     UiText {
       color: Notifs.dnd ? Theme.outline : Theme.primary
-      font.weight: Font.DemiBold
+      font.weight: Font.Bold
       text: Notifs.count
     }
     Glyph {

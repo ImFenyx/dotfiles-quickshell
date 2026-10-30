@@ -70,7 +70,7 @@ PanelWindow {
       id: tipLabel
       anchors.centerIn: parent
       font.family: root.tipMono ? "monospace" : Theme.uiFont
-      font.weight: Font.DemiBold
+      font.weight: Font.Bold
       text: root.tipText
     }
   }
