@@ -86,11 +86,11 @@ PanelWindow {
     }
 
     // ---- midia: colada no bloco da esquerda, sem passar do centro ----
-    MediaPill {
+    MediaNow {
       anchors.left: leftBlock.right
       anchors.verticalCenter: parent.verticalCenter
       tip: root.tip
-      room: centerBlock.x - leftBlock.x - leftBlock.width - 8
+      room: centerBlock.x - leftBlock.x - leftBlock.width - 12
       onCenterRequested: root.notifCenterRequested()
     }
 
