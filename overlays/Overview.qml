@@ -33,9 +33,16 @@ PopupBase {
   readonly property real tileW: (panelWidth - 2 * padX - (cols - 1) * gap) / cols
   readonly property real s: tileW / monW
   property int sel: 0
-  // false por um instante depois de mover uma janela: a miniatura dela e recriada no
-  // destino e a captura antiga ficava orfa (tudo cinza); religar refaz as capturas
+  // A captura nao acompanha a janela que muda de tamanho (fica cinza). Depois de mover,
+  // abrir ou fechar janela, o layout muda na hora mas cada app redesenha no seu tempo
+  // (navegador ~0,5 s): desliga e religa as capturas aos 0,2 s e de novo a 1 s.
   property bool capturing: true
+
+  function recapture() {
+    Hyprland.refreshToplevels();
+    capturing = false;
+    recaptureOn.restart();
+  }
 
   function wsArg(w) {
     return isNaN(Number(w.name)) ? JSON.stringify(String(w.name)) : String(w.name);
@@ -71,26 +78,27 @@ PopupBase {
     return null;
   }
 
-  // o Hyprland reorganiza depois de mover: posicoes novas um instante depois
-  Timer {
-    id: relayout
-    interval: 150
-    onTriggered: {
-      Hyprland.refreshToplevels();
-      root.capturing = false;
-      recapture.restart();
-    }
-  }
-  // qualquer janela mudando de workspace com o overview aberto (arrasto ou atalho)
   Connections {
     target: Hyprland
     function onRawEvent(event) {
-      if (root.open && event.name === "movewindowv2")
-        relayout.restart();
+      if (root.open && ["movewindowv2", "openwindow", "closewindow"].includes(event.name)) {
+        recaptureSoon.restart();
+        recaptureLate.restart();
+      }
     }
   }
   Timer {
-    id: recapture
+    id: recaptureSoon
+    interval: 200
+    onTriggered: root.recapture()
+  }
+  Timer {
+    id: recaptureLate
+    interval: 1000
+    onTriggered: root.recapture()
+  }
+  Timer {
+    id: recaptureOn
     interval: 50
     onTriggered: root.capturing = true
   }
