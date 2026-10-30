@@ -33,6 +33,9 @@ PopupBase {
   readonly property real tileW: (panelWidth - 2 * padX - (cols - 1) * gap) / cols
   readonly property real s: tileW / monW
   property int sel: 0
+  // false por um instante depois de mover uma janela: a miniatura dela e recriada no
+  // destino e a captura antiga ficava orfa (tudo cinza); religar refaz as capturas
+  property bool capturing: true
 
   function wsArg(w) {
     return isNaN(Number(w.name)) ? JSON.stringify(String(w.name)) : String(w.name);
@@ -57,7 +60,6 @@ PopupBase {
   }
   function moveWindow(t, w) {
     Hyprland.dispatch("hl.dsp.window.move({ window = \"address:0x" + t.address + "\", workspace = " + wsArg(w) + ", follow = false })");
-    relayout.restart();
   }
   // miniatura sob o ponto p (coordenadas do board)
   function tileAt(p) {
@@ -73,7 +75,24 @@ PopupBase {
   Timer {
     id: relayout
     interval: 150
-    onTriggered: Hyprland.refreshToplevels()
+    onTriggered: {
+      Hyprland.refreshToplevels();
+      root.capturing = false;
+      recapture.restart();
+    }
+  }
+  // qualquer janela mudando de workspace com o overview aberto (arrasto ou atalho)
+  Connections {
+    target: Hyprland
+    function onRawEvent(event) {
+      if (root.open && event.name === "movewindowv2")
+        relayout.restart();
+    }
+  }
+  Timer {
+    id: recapture
+    interval: 50
+    onTriggered: root.capturing = true
   }
 
   Item {
@@ -156,8 +175,9 @@ PopupBase {
               border.color: Theme.primary
 
               ScreencopyView {
+                id: shot
                 anchors.fill: parent
-                captureSource: win.modelData.wayland
+                captureSource: root.capturing ? win.modelData.wayland : null
                 live: root.open
               }
               MouseArea {
@@ -179,7 +199,7 @@ PopupBase {
                     dragged = true;
                     ghost.width = win.width;
                     ghost.height = win.height;
-                    ghost.toplevel = win.modelData;
+                    ghost.shot = shot;
                   }
                   if (dragged) {
                     const p = win.mapToItem(board, m.x, m.y);
@@ -194,7 +214,7 @@ PopupBase {
                   if (!dragged)
                     return;
                   const t = root.tileAt(win.mapToItem(board, m.x, m.y));
-                  ghost.toplevel = null;
+                  ghost.shot = null;
                   if (t && t.modelData !== tile.modelData)
                     root.moveWindow(win.modelData, t.modelData);
                 }
@@ -228,21 +248,23 @@ PopupBase {
       }
     }
 
-    // fantasma da janela arrastada: por cima de todas as miniaturas (fora do recorte delas)
+    // fantasma da janela arrastada: por cima de todas as miniaturas (fora do recorte
+    // delas). Copia a textura da propria miniatura: uma 2a captura da mesma janela
+    // derrubava a primeira.
     ClippingRectangle {
       id: ghost
-      property var toplevel: null
-      visible: toplevel !== null
+      property Item shot: null
+      visible: shot !== null
       z: 100
       radius: Theme.shape.xs
       opacity: 0.85
       color: Theme.surfaceContainerHighest
       border.width: 2
       border.color: Theme.primary
-      ScreencopyView {
+      ShaderEffectSource {
         anchors.fill: parent
-        captureSource: ghost.toplevel ? ghost.toplevel.wayland : null
-        live: ghost.visible
+        sourceItem: ghost.shot
+        live: true
       }
     }
   }
