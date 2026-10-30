@@ -248,7 +248,7 @@ ShellRoot {
     description: "Seletor de wallpaper"
     onPressed: wallpaperPicker.toggle()
   }
-  // Sistema (SUPER+ALT no Hyprland): alterna e mostra no OSD, como o Fn Lock
+  // Sistema (SUPER+CTRL no Hyprland): alterna e mostra no OSD, como o Fn Lock
   GlobalShortcut {
     name: "dnd"
     description: "Nao perturbe"
