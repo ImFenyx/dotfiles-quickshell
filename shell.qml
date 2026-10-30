@@ -169,7 +169,7 @@ ShellRoot {
     screen: root.focusedScreen
   }
 
-  // mini-player no canto superior esquerdo (atalho "media", SUPER+CTRL+M)
+  // mini-player no canto inferior esquerdo (atalho "media", SUPER+CTRL+M)
   MediaPlayer {
     id: mediaPlayer
     screen: root.focusedScreen

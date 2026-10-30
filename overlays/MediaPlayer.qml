@@ -9,10 +9,11 @@ import qs.components
 import qs.services
 import qs.menus
 
-// Mini-player no canto superior esquerdo, descendo da barra: o canto de cima completa
-// o canto da moldura (mesmo centro), a aba da direita encaixa na barra e a orelha de
-// baixo concorda com o filete esquerdo. Fica recolhido atras da barra; aparece por uns
-// segundos quando a faixa muda ou da play/pausa, e com o mouse no topo do filete esquerdo. Clique (ou SUPER+CTRL+M) expande no player completo (o cartao do
+// Mini-player no canto inferior esquerdo, encaixado na moldura: o canto de baixo
+// completa o canto da moldura (mesmo centro), a orelha de cima concorda com o filete
+// esquerdo e a aba da direita com o filete de baixo. Fica recolhido dentro do filete;
+// aparece por uns segundos quando a faixa muda ou da play/pausa, e com o mouse no
+// canto do filete. Clique (ou SUPER+CTRL+M) expande no player completo (o cartao do
 // centro); Esc ou clique fora recolhe. Roda troca de faixa; o botao toca/pausa.
 PanelWindow {
   id: root
@@ -22,12 +23,15 @@ PanelWindow {
   WlrLayershell.keyboardFocus: expanded ? WlrKeyboardFocus.OnDemand : WlrKeyboardFocus.None
   exclusionMode: ExclusionMode.Ignore
   anchors.left: true
-  anchors.top: true
-  margins.top: Theme.barH
+  anchors.bottom: true
+  margins.left: Theme.edge
   color: "transparent"
   visible: Media.has
+  // area sensivel: com o mini visivel, o corpo E o filete abaixo dele (sem buraco entre
+  // os dois: antes o mouse parado no filete saia da mascara e o mini piscava); escondido,
+  // so o trecho do filete
   mask: Region {
-    item: root.shown ? body : hot
+    item: hit
   }
 
   readonly property real fr: Theme.frameR
@@ -40,7 +44,8 @@ PanelWindow {
 
   property bool expanded: false
   property bool peek: false
-  readonly property bool shown: expanded || peek || bodyHover.hovered || hotHover.hovered
+  property bool hovering: false
+  readonly property bool shown: expanded || peek || hovering
 
   // corpo atual (anima entre mini e expandido) e recolhimento no filete
   property real bw: expanded ? fullW : miniW
@@ -56,19 +61,18 @@ PanelWindow {
     SpringPanel {}
   }
 
-  implicitWidth: Theme.edge + fullW + fr
-  implicitHeight: fullH + fr
+  implicitWidth: fullW + fr
+  implicitHeight: fullH + fr + Theme.edge
 
   function toggle() {
     if (Media.has)
       expanded = !expanded;
   }
 
-  // corpo: aba (R) a direita encaixando na barra, orelha (R) embaixo concordando com o
-  // filete; canto de cima convexo de raio R (completa o canto da moldura)
+  // body: orelha (R) em cima, aba (R) a direita; coordenadas do corpo comecam no filete
   function shapePath(w, h) {
-    const R = fr, r = pr, bw = w - R, bh = h - R;
-    return `M${R},0 L${w},0 A${R},${R} 0 0 0 ${bw},${R} L${bw},${bh - r} A${r},${r} 0 0 1 ${bw - r},${bh} L${R},${bh} A${R},${R} 0 0 0 0,${h} L0,${R} A${R},${R} 0 0 1 ${R},0 Z`;
+    const R = fr, r = pr, bw = w - R;
+    return `M0,0 A${R},${R} 0 0 0 ${R},${R} L${bw - r},${R} A${r},${r} 0 0 1 ${bw},${R + r} L${bw},${h - R} A${R},${R} 0 0 0 ${w},${h} L${R},${h} A${R},${R} 0 0 1 0,${h - R} Z`;
   }
 
   // aparece por uns segundos quando a faixa muda ou da play/pausa (nao na partida)
@@ -117,28 +121,36 @@ PanelWindow {
     onCleared: root.expanded = false
   }
 
-  // topo do filete esquerdo: com o mouse aqui o mini aparece
+  // mouse na area sensivel mostra; saiu, espera um pouco antes de recolher
   Item {
-    id: hot
+    id: hit
     x: 0
-    y: 0
-    width: Theme.edge
-    height: root.miniH + root.fr
+    y: root.shown ? body.y : root.height - Theme.edge
+    width: root.shown ? body.width : root.miniW
+    height: root.height - y
     HoverHandler {
-      id: hotHover
+      onHoveredChanged: {
+        if (hovered) {
+          leave.stop();
+          root.hovering = true;
+        } else {
+          leave.restart();
+        }
+      }
     }
+  }
+  Timer {
+    id: leave
+    interval: 400
+    onTriggered: root.hovering = false
   }
 
   Item {
     id: body
-    x: Theme.edge
+    x: 0
     width: root.bw + root.fr
     height: root.bh + root.fr
-    y: -root.hide * height   // recolhido: atras da barra (a janela comeca na base dela)
-
-    HoverHandler {
-      id: bodyHover
-    }
+    y: root.height - Theme.edge - height + root.hide * (height + Theme.edge)
 
     Shape {
       anchors.fill: parent
@@ -153,11 +165,11 @@ PanelWindow {
       }
     }
 
-    // area util: acima da orelha, a esquerda da aba
+    // area util: abaixo da orelha, a esquerda da aba
     Item {
       id: area
       x: 0
-      y: 0
+      y: root.fr
       width: root.bw
       height: root.bh
 
