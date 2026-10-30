@@ -157,6 +157,12 @@ ShellRoot {
     screen: root.focusedScreen
   }
 
+  // cheatsheet (atalho "cheatsheet", SUPER+F1) no monitor focado
+  Cheatsheet {
+    id: cheatsheet
+    screen: root.focusedScreen
+  }
+
   // ---- single-instance (segue o foco): launcher + OSD + notificacoes ----
   Launcher {
     id: launcher
@@ -256,6 +262,11 @@ ShellRoot {
     name: "lock"
     description: "Bloquear a tela"
     onPressed: lock.lock()
+  }
+  GlobalShortcut {
+    name: "cheatsheet"
+    description: "Atalhos"
+    onPressed: cheatsheet.toggle()
   }
   GlobalShortcut {
     name: "wallpaper"
