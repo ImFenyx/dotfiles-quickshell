@@ -5,7 +5,7 @@ import Quickshell
 import Quickshell.Hyprland
 import Quickshell.Wayland
 
-// Base de todos os popups (NetMenu, TrayMenu, PowerMenu, Osd, Launcher).
+// Base de todos os popups (NetMenu, TrayMenu, Osd, Launcher, centro, cheatsheet...).
 // Antes cada um copiava ~60 linhas iguais: janela fullscreen Overlay, mascara
 // vazia/cheia, HyprlandFocusGrab, MouseArea de click-fora + Esc, spring do
 // offsetScale e o mesmo path SVG do fundo.

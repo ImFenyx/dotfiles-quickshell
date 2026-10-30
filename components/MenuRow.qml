@@ -18,7 +18,7 @@ Item {
   property color labelColor: Theme.fgSurface
 
   Layout.fillWidth: true
-  implicitHeight: Math.max(32, lines.implicitHeight + 14)   // rotulo com \n cresce (aviso do PowerMenu)
+  implicitHeight: Math.max(32, lines.implicitHeight + 14)   // rotulo com \n cresce
 
   Rectangle {
     anchors.fill: parent

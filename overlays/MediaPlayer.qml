@@ -272,8 +272,8 @@ PanelWindow {
       // ---- expandido: o mesmo cartao do centro ----
       NotifMedia {
         id: card
-        x: Theme.space.lg
-        y: Theme.space.lg
+        x: Theme.space.lg || 16   // os tokens chegam depois do 1o frame no reload
+        y: Theme.space.lg || 16
         width: root.fullW - 2 * Theme.space.lg
         opacity: root.expanded ? 1 : 0
         visible: opacity > 0

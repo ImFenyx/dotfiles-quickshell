@@ -66,7 +66,7 @@ ShellRoot {
           function onPanelRequested(name) {
             if (scr.modelData !== root.focusedScreen)
               return;
-            const menu = { audio: audioMenu, bluetooth: btMenu, network: netMenu, power: powerMenu }[name];
+            const menu = { audio: audioMenu, bluetooth: btMenu, network: netMenu }[name];
             scr.closeMenusExcept(menu);
             if (menu === audioMenu || menu === btMenu)
               root.menuScreen = scr.modelData;
@@ -78,7 +78,7 @@ ShellRoot {
         function closeMenusExcept(keep) {
           hoverTip.hide();
           notifCenter.close();
-          for (const m of [netMenu, trayMenu, powerMenu, audioMenu, btMenu]) {
+          for (const m of [netMenu, trayMenu, audioMenu, btMenu]) {
             if (m !== keep)
               m.close();
           }
@@ -96,8 +96,8 @@ ShellRoot {
             netMenu.toggle();
           }
           onPowerMenuRequested: {
-            scr.closeMenusExcept(powerMenu);
-            powerMenu.toggle();
+            scr.closeMenusExcept(null);
+            session.toggle();
           }
           onNotifCenterRequested: {
             scr.closeMenusExcept(null);
@@ -127,10 +127,6 @@ ShellRoot {
         }
         TrayMenu {
           id: trayMenu
-          screen: scr.modelData
-        }
-        PowerMenu {
-          id: powerMenu
           screen: scr.modelData
         }
 
@@ -166,6 +162,12 @@ ShellRoot {
   // overview dos workspaces (atalho "overview", SUPER+A) no monitor focado
   Overview {
     id: overview
+    screen: root.focusedScreen
+  }
+
+  // tela de sessao (atalho "session", SUPER+CTRL+P; botao de energia da barra)
+  Session {
+    id: session
     screen: root.focusedScreen
   }
 
@@ -313,9 +315,9 @@ ShellRoot {
     onPressed: root.panelRequested("network")
   }
   GlobalShortcut {
-    name: "power"
-    description: "Energia"
-    onPressed: root.panelRequested("power")
+    name: "session"
+    description: "Sessao (bloquear, dormir, desligar...)"
+    onPressed: session.toggle()
   }
 
   // Notificacoes pelo teclado (SUPER+, e SUPER+SHIFT+,)

@@ -78,6 +78,7 @@ Singleton {
   readonly property string shutdown: "\u{F0425}"
   readonly property string reboot: "\u{F0709}"
   readonly property string suspend: "\u{F0904}"
+  readonly property string hibernate: "\u{F0717}"
   readonly property string logout: "\u{F0343}"
 
   // netmenu (no repo original esses icones estavam vazios: o glifo se perdeu)

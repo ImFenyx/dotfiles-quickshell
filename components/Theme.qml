@@ -32,6 +32,7 @@ Singleton {
   readonly property color fgSurfaceVariant: role("on_surface_variant")
   readonly property color outline: role("outline")
   readonly property color outlineVariant: role("outline_variant")
+  readonly property color scrim: role("scrim")
   readonly property bool dark: colors.mode !== "light"
 
   readonly property var fallback: ({
@@ -39,7 +40,7 @@ Singleton {
       secondary: "#b4befe", tertiary: "#f5c2e7", error: "#f38ba8", on_error: "#11111b",
       success: "#a6e3a1", warning: "#f9e2af", info: "#89b4fa",
       surface: "#1e1e2e", surface_container: "#313244", surface_container_high: "#3b3d4f", surface_container_highest: "#45475a",
-      on_surface: "#cdd6f4", on_surface_variant: "#a6adc8", outline: "#6c7086", outline_variant: "#45475a"
+      on_surface: "#cdd6f4", on_surface_variant: "#a6adc8", outline: "#6c7086", outline_variant: "#45475a", scrim: "#11111b"
     })
 
   function role(name) {
