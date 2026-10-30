@@ -29,7 +29,11 @@ Singleton {
 
   property int warned: 101          // menor limite ja avisado nesta descarga
   onPercentChanged: checkLow()
-  onOnBatteryChanged: checkLow()
+  // + perfil de energia do Hyprland (efeitos pesados so na tomada): hypr/modules/profile.lua
+  onOnBatteryChanged: {
+    checkLow();
+    Quickshell.execDetached(["hyprctl", "eval", "eco_profile()"]);
+  }
 
   function checkLow() {
     if (!present || !onBattery) {
