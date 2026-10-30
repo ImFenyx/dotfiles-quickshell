@@ -169,6 +169,12 @@ ShellRoot {
     screen: root.focusedScreen
   }
 
+  // mini-player no canto inferior esquerdo (atalho "media", SUPER+CTRL+M)
+  MediaPlayer {
+    id: mediaPlayer
+    screen: root.focusedScreen
+  }
+
   // ---- single-instance (segue o foco): launcher + OSD + notificacoes ----
   Launcher {
     id: launcher
@@ -268,6 +274,11 @@ ShellRoot {
     name: "lock"
     description: "Bloquear a tela"
     onPressed: lock.lock()
+  }
+  GlobalShortcut {
+    name: "media"
+    description: "Player de midia"
+    onPressed: mediaPlayer.toggle()
   }
   GlobalShortcut {
     name: "overview"
