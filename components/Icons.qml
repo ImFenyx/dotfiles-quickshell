@@ -56,6 +56,9 @@ Singleton {
   // launcher / menus
   readonly property string search: "\uf002"
   readonly property string keyboard: "\u{F030C}"
+  readonly property string palette: "\u{F03D8}"
+  readonly property string sparkle: "\u{F0674}"
+  readonly property string gamepad: "\u{F0297}"
   readonly property string calculator: "\uf1ec"
   readonly property string smile: "\uf118"
   readonly property string kaomoji: "\uf075"

@@ -89,6 +89,27 @@ GridLayout {
     onClicked: Energy.cycle()
     onSecondary: Quickshell.execDetached([Config.powerManager])
   }
+  // eco: tema (Mocha -> Latte -> Wallpaper), efeitos completos na bateria e modo jogo
+  NotifQuickTile {
+    icon: Icons.palette
+    label: "Tema"
+    sub: Eco.themeLabel
+    active: Eco.theme === "wall"
+    onClicked: Eco.cycleTheme()
+  }
+  NotifQuickTile {
+    icon: Icons.sparkle
+    label: "Efeitos"
+    sub: Eco.effectsAlways ? "sempre" : "só na tomada"
+    active: Eco.effectsAlways
+    onClicked: Eco.toggleEffects()
+  }
+  NotifQuickTile {
+    icon: Icons.gamepad
+    label: "Modo jogo"
+    active: Eco.game
+    onClicked: Eco.toggleGame()
+  }
   // so com video de wallpaper: aceso = pausa na bateria (retoma na tomada)
   NotifQuickTile {
     visible: Wallpapers.video !== ""
