@@ -7,7 +7,7 @@ Pill {
 
   property var tip: null
 
-  color: Theme.rosewater
+  color: Theme.tertiary
   spacing: 5
   tipWindow: root.tip
   tipText: "Brilho " + Brightness.text

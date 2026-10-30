@@ -80,13 +80,13 @@ PopupBase {
     spacing: 8
 
     UiText {
-      font.pointSize: 12
+      font.pixelSize: Theme.type.body_l
       font.weight: Font.DemiBold
       text: "Notificações"
     }
     UiText {
       visible: Notifs.total > 0
-      color: Theme.subtext0
+      color: Theme.onSurfaceVariant
       text: Notifs.total
     }
     Item {
@@ -97,19 +97,19 @@ PopupBase {
       implicitWidth: clearRow.implicitWidth + 20
       implicitHeight: 26
       radius: 13
-      color: clearArea.containsMouse ? Theme.surface1 : Theme.surface0
+      color: clearArea.containsMouse ? Theme.surfaceContainerHighest : Theme.surfaceContainer
       RowLayout {
         id: clearRow
         anchors.centerIn: parent
         spacing: 6
         Glyph {
-          color: Theme.subtext0
-          font.pointSize: 9
+          color: Theme.onSurfaceVariant
+          font.pixelSize: Theme.icon.xs
           text: Icons.trash
         }
         UiText {
-          color: Theme.subtext0
-          font.pointSize: 9
+          color: Theme.onSurfaceVariant
+          font.pixelSize: Theme.type.label_m
           text: "Limpar tudo"
         }
       }
@@ -134,13 +134,13 @@ PopupBase {
       spacing: 8
       Glyph {
         anchors.horizontalCenter: parent.horizontalCenter
-        color: Theme.overlay0
-        font.pointSize: 22
+        color: Theme.outline
+        font.pixelSize: Theme.icon.xl
         text: Notifs.dnd ? Icons.bellSlash : Icons.bell
       }
       UiText {
         anchors.horizontalCenter: parent.horizontalCenter
-        color: Theme.overlay0
+        color: Theme.outline
         text: Notifs.dnd ? "Não perturbe ligado" : "Nenhuma notificação"
       }
     }

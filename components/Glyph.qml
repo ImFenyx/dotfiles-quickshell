@@ -1,8 +1,8 @@
 import QtQuick
 
-// Icone Nerd Font (12pt). Passe o glifo via Icons.*.
+// Icone Nerd Font (icon S). Passe o glifo via Icons.*.
 Text {
-  color: Theme.mauve
+  color: Theme.primary
   font.family: Theme.iconFont
-  font.pointSize: 12
+  font.pixelSize: Theme.icon.s
 }

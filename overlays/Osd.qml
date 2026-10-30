@@ -58,7 +58,7 @@ PopupBase {
     spacing: 10
     Glyph {
       font.weight: Font.DemiBold
-      color: root.label !== "" && !root.lit ? Theme.overlay0 : Theme.mauve
+      color: root.label !== "" && !root.lit ? Theme.outline : Theme.primary
       text: root.glyph
     }
     UiText {
@@ -71,7 +71,7 @@ PopupBase {
       visible: root.label === ""
       // largura fixa (a de "100%"): o painel nao muda em 9->10% (cada mudanca re-tessela o fundo)
       Layout.minimumWidth: pctMetrics.advanceWidth
-      color: root.boosted ? Theme.red : Theme.text
+      color: root.boosted ? Theme.error : Theme.onSurface
       font.weight: Font.DemiBold
       text: root.muted ? "Mudo" : root.vol + "%"
       TextMetrics {
@@ -86,12 +86,12 @@ PopupBase {
       Layout.preferredHeight: 10
       Layout.alignment: Qt.AlignVCenter
       radius: 5
-      color: Theme.surface1
+      color: Theme.surfaceContainerHighest
       Rectangle {
         width: parent.width * (root.muted ? 0 : Math.min(root.vol, 100) / 100)
         height: parent.height
         radius: 5
-        color: root.boosted ? Theme.red : Theme.blue
+        color: root.boosted ? Theme.error : Theme.info
         // overshoot com cauda (o mesmo spring das pills): passa do ponto e assenta depois da tecla
         Behavior on width {
           SpringPill {}

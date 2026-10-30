@@ -11,7 +11,7 @@ Pill {
   property var tip: null
   property int tick: 0
 
-  color: Theme.mauve
+  color: Theme.primary
   spacing: 5
   tipWindow: root.tip
   tipText: Updates.tip
@@ -45,9 +45,9 @@ Pill {
             duration: wave.interval
           }
         }
-        color: Theme.base
+        color: Theme.onPrimary
         font.family: Theme.uiFont
-        font.pointSize: 11
+        font.pixelSize: Theme.type.body_m
         font.weight: Font.DemiBold
         text: "\u2022"
       }

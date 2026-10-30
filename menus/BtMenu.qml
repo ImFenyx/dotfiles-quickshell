@@ -50,7 +50,7 @@ PopupBase {
       implicitWidth: 38
       implicitHeight: 22
       radius: height / 2
-      color: Bt.on ? Theme.mauve : Theme.surface1
+      color: Bt.on ? Theme.primary : Theme.surfaceContainerHighest
       Behavior on color {
         ColorAnimation {
           duration: Theme.animNormal
@@ -62,7 +62,7 @@ PopupBase {
         radius: 8
         anchors.verticalCenter: parent.verticalCenter
         x: Bt.on ? parent.width - width - 3 : 3
-        color: Bt.on ? Theme.base : Theme.subtext0
+        color: Bt.on ? Theme.onPrimary : Theme.onSurfaceVariant
         Behavior on x {
           NumberAnimation {
             duration: Theme.animNormal
@@ -84,7 +84,7 @@ PopupBase {
     keepOpen: true
     icon: Bt.scanning ? Icons.netScan : Icons.bluetooth
     label: !Bt.on ? "Bluetooth desligado" : (Bt.scanning ? "Procurando…" : "Nenhum dispositivo")
-    labelColor: Theme.overlay0
+    labelColor: Theme.outline
   }
 
   Repeater {
@@ -112,7 +112,7 @@ PopupBase {
       Rectangle {
         anchors.fill: parent
         radius: 8
-        color: (rowArea.containsMouse || forgetArea.containsMouse) ? Theme.surface1 : "transparent"
+        color: (rowArea.containsMouse || forgetArea.containsMouse) ? Theme.surfaceContainerHighest : "transparent"
       }
       RowLayout {
         anchors.fill: parent
@@ -132,7 +132,7 @@ PopupBase {
           Glyph {
             anchors.centerIn: parent
             visible: !devIcon.visible
-            color: dev.modelData.connected ? Theme.green : Theme.mauve
+            color: dev.modelData.connected ? Theme.success : Theme.primary
             text: Icons.bluetooth
           }
         }
@@ -141,15 +141,15 @@ PopupBase {
           spacing: 0
           UiText {
             Layout.fillWidth: true
-            color: dev.armed ? Theme.red : (dev.modelData.connected ? Theme.green : Theme.text)
+            color: dev.armed ? Theme.error : (dev.modelData.connected ? Theme.success : Theme.onSurface)
             elide: Text.ElideRight
             textFormat: Text.PlainText
             text: dev.armed ? "Esquecer " + Bt.label(dev.modelData) + "?" : Bt.label(dev.modelData)
           }
           UiText {
             Layout.fillWidth: true
-            color: Theme.overlay0
-            font.pointSize: 9
+            color: Theme.outline
+            font.pixelSize: Theme.type.label_m
             elide: Text.ElideRight
             text: dev.status
           }
@@ -161,8 +161,8 @@ PopupBase {
           visible: dev.modelData.paired
           Glyph {
             anchors.centerIn: parent
-            color: dev.armed ? Theme.red : Theme.overlay0
-            font.pointSize: 10
+            color: dev.armed ? Theme.error : Theme.outline
+            font.pixelSize: Theme.icon.s
             text: Icons.close
           }
           MouseArea {
@@ -200,7 +200,7 @@ PopupBase {
     Layout.topMargin: 4
     Layout.bottomMargin: 4
     height: 1
-    color: Theme.surface1
+    color: Theme.surfaceContainerHighest
   }
   MenuRow {
     popup: root

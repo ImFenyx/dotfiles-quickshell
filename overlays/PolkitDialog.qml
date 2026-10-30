@@ -80,7 +80,7 @@ PopupBase {
       Glyph {
         anchors.centerIn: parent
         visible: !appIcon.visible
-        font.pointSize: 20
+        font.pixelSize: Theme.icon.l
         text: Icons.lock
       }
     }
@@ -88,15 +88,15 @@ PopupBase {
       Layout.fillWidth: true
       spacing: 0
       UiText {
-        font.pointSize: 12
+        font.pixelSize: Theme.type.body_l
         font.weight: Font.DemiBold
         text: "Autenticação necessária"
       }
       UiText {
         Layout.fillWidth: true
         visible: text !== ""
-        color: Theme.overlay0
-        font.pointSize: 8
+        color: Theme.outline
+        font.pixelSize: Theme.type.label_s
         elide: Text.ElideMiddle
         textFormat: Text.PlainText
         text: root.flow ? root.flow.actionId : ""
@@ -106,8 +106,8 @@ PopupBase {
 
   UiText {
     Layout.fillWidth: true
-    color: Theme.subtext0
-    font.pointSize: 10
+    color: Theme.onSurfaceVariant
+    font.pixelSize: Theme.type.body_m
     wrapMode: Text.Wrap
     textFormat: Text.PlainText
     text: root.flow ? root.flow.message : ""
@@ -119,15 +119,15 @@ PopupBase {
     Layout.topMargin: 4
     Layout.preferredHeight: 42
     radius: height / 2
-    color: Theme.surface0
+    color: Theme.surfaceContainer
     border.width: 1
-    border.color: root.error !== "" ? Theme.red : (input.activeFocus ? Theme.mauve : Theme.surface1)
+    border.color: root.error !== "" ? Theme.error : (input.activeFocus ? Theme.primary : Theme.surfaceContainerHighest)
 
     Glyph {
       anchors.left: parent.left
       anchors.leftMargin: 16
       anchors.verticalCenter: parent.verticalCenter
-      color: root.error !== "" ? Theme.red : Theme.mauve
+      color: root.error !== "" ? Theme.error : Theme.primary
       text: Icons.lock
     }
     TextInput {
@@ -136,9 +136,9 @@ PopupBase {
       anchors.leftMargin: 40
       anchors.rightMargin: 16
       verticalAlignment: TextInput.AlignVCenter
-      color: Theme.text
+      color: Theme.onSurface
       font.family: Theme.uiFont
-      font.pointSize: 12
+      font.pixelSize: Theme.type.body_l
       echoMode: root.flow && root.flow.responseVisible ? TextInput.Normal : TextInput.Password
       passwordCharacter: "•"
       focus: root.open
@@ -154,8 +154,8 @@ PopupBase {
       anchors.fill: input
       visible: input.text === ""
       verticalAlignment: Text.AlignVCenter
-      color: Theme.overlay0
-      font.pointSize: 12
+      color: Theme.outline
+      font.pixelSize: Theme.type.body_l
       elide: Text.ElideRight
       textFormat: Text.PlainText
       // "Password:" do PAM sem os dois pontos; sem prompt = "Senha"
@@ -167,8 +167,8 @@ PopupBase {
   UiText {
     Layout.fillWidth: true
     visible: text !== ""
-    color: root.error !== "" || (root.flow && root.flow.supplementaryIsError) ? Theme.red : Theme.subtext0
-    font.pointSize: 9
+    color: root.error !== "" || (root.flow && root.flow.supplementaryIsError) ? Theme.error : Theme.onSurfaceVariant
+    font.pixelSize: Theme.type.label_m
     wrapMode: Text.Wrap
     textFormat: Text.PlainText
     text: root.error !== "" ? root.error : (root.flow ? root.flow.supplementaryMessage : "")
@@ -198,13 +198,13 @@ PopupBase {
         implicitWidth: btnLabel.implicitWidth + 32
         implicitHeight: 32
         radius: 16
-        color: btn.modelData.main ? (btnArea.containsMouse ? Theme.lavender : Theme.mauve) : (btnArea.containsMouse ? Theme.surface1 : Theme.surface0)
+        color: btn.modelData.main ? (btnArea.containsMouse ? Theme.secondary : Theme.primary) : (btnArea.containsMouse ? Theme.surfaceContainerHighest : Theme.surfaceContainer)
         opacity: btn.modelData.main && root.waiting ? 0.5 : 1
         UiText {
           id: btnLabel
           anchors.centerIn: parent
-          color: btn.modelData.main ? Theme.base : Theme.text
-          font.pointSize: 10
+          color: btn.modelData.main ? Theme.onPrimary : Theme.onSurface
+          font.pixelSize: Theme.type.body_m
           font.weight: Font.DemiBold
           text: btn.modelData.label
         }

@@ -12,8 +12,8 @@ RowLayout {
   spacing: 14
 
   Glyph {
-    color: Theme.lavender
-    font.pointSize: 11
+    color: Theme.secondary
+    font.pixelSize: Theme.icon.s
     font.weight: Font.DemiBold
     text: Icons.lock
     MouseArea {
@@ -23,8 +23,8 @@ RowLayout {
     }
   }
   Glyph {
-    color: Theme.red
-    font.pointSize: 11
+    color: Theme.error
+    font.pixelSize: Theme.icon.s
     font.weight: Font.DemiBold
     text: Icons.power
     MouseArea {

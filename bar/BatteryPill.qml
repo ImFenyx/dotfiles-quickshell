@@ -8,7 +8,7 @@ Pill {
   property var tip: null
 
   visible: Battery.present
-  color: Battery.percent <= 20 ? Theme.red : (Battery.percent <= 40 ? Theme.peach : Theme.green)
+  color: Battery.percent <= 20 ? Theme.error : (Battery.percent <= 40 ? Theme.warning : Theme.success)
   spacing: 4
   tipWindow: root.tip
   tipText: Battery.tooltip

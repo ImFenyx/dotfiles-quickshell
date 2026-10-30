@@ -59,7 +59,7 @@ Pill {
     return 0;
   }
 
-  color: Theme.surface1
+  color: Theme.surfaceContainerHighest
   implicitHeight: 30
   hpad: 12
   spacing: 4
@@ -82,7 +82,7 @@ Pill {
       Layout.preferredWidth: (isActive ? root.dotActive : root.dot) + root.slots(apps.length, cap) * root.slot
       Layout.preferredHeight: 26
       radius: 99
-      color: isActive ? Theme.mauve : (occupied && !isSpecial ? Theme.overlay0 : Theme.base)
+      color: isActive ? Theme.primary : (occupied && !isSpecial ? Theme.outline : Theme.surface)
       // icones entram antes da largura assentar
       clip: true
 
@@ -107,7 +107,7 @@ Pill {
           // respiro antes dos icones: so encolhe as margens (a largura e fixa)
           Layout.rightMargin: ws.shown.length > 0 ? 2 : 0
           text: ws.isSpecial ? Icons.workspaceSpecial : ws.wsName
-          color: ws.isActive ? Theme.base : Theme.text
+          color: ws.isActive ? Theme.onPrimary : Theme.onSurface
           font.family: ws.isSpecial ? Theme.iconFont : Theme.uiFont
           font.weight: ws.isActive ? Font.DemiBold : Font.Medium
         }
@@ -142,8 +142,8 @@ Pill {
               anchors.centerIn: parent
               visible: img.status === Image.Null || img.status === Image.Error
               text: ((app.entry ? app.entry.name : app.modelData) || "?").charAt(0).toUpperCase()
-              color: ws.isActive ? Theme.base : Theme.text
-              font.pointSize: 9
+              color: ws.isActive ? Theme.onPrimary : Theme.onSurface
+              font.pixelSize: Theme.type.label_m
               font.weight: Font.DemiBold
             }
           }
@@ -153,8 +153,8 @@ Pill {
           Layout.preferredWidth: Theme.wsIcon
           horizontalAlignment: Text.AlignHCenter
           text: "+" + (ws.apps.length - ws.shown.length)
-          color: ws.isActive ? Theme.base : Theme.text
-          font.pointSize: 8
+          color: ws.isActive ? Theme.onPrimary : Theme.onSurface
+          font.pixelSize: Theme.type.label_s
           font.weight: Font.DemiBold
         }
       }

@@ -27,9 +27,9 @@ Item {
     implicitHeight: content.implicitHeight + 24
     height: implicitHeight
     radius: 14
-    color: area.containsMouse ? Theme.surface1 : Theme.surface0
+    color: area.containsMouse ? Theme.surfaceContainerHighest : Theme.surfaceContainer
     border.width: root.item.urgency === 2 ? 1 : 0
-    border.color: Theme.red
+    border.color: Theme.error
     // some conforme sai pela borda
     opacity: 1 - 0.8 * Math.min(1, x / Math.max(1, root.width))
 
@@ -112,7 +112,7 @@ Item {
         Layout.preferredWidth: 40
         Layout.preferredHeight: 40
         radius: 12
-        color: Theme.surface1
+        color: Theme.surfaceContainerHighest
 
         Image {
           anchors.fill: parent
@@ -126,8 +126,8 @@ Item {
         UiText {
           anchors.centerIn: parent
           visible: root.item.icon === ""
-          color: Theme.mauve
-          font.pointSize: 14
+          color: Theme.primary
+          font.pixelSize: Theme.type.title_m
           font.weight: Font.DemiBold
           text: root.item.appName.length > 0 ? root.item.appName.charAt(0).toUpperCase() : "?"
         }
@@ -143,8 +143,8 @@ Item {
           spacing: 6
           UiText {
             Layout.fillWidth: true
-            color: Theme.subtext0
-            font.pointSize: 9
+            color: Theme.onSurfaceVariant
+            font.pixelSize: Theme.type.label_m
             elide: Text.ElideRight
             textFormat: Text.PlainText
             text: root.item.appName + "  \u00b7  " + root.item.ago
@@ -154,7 +154,7 @@ Item {
             Layout.preferredHeight: 20
             radius: 10
             opacity: (area.containsMouse || closeArea.containsMouse || root.toast) ? 1 : 0
-            color: closeArea.containsMouse ? Theme.surface0 : "transparent"
+            color: closeArea.containsMouse ? Theme.surfaceContainer : "transparent"
             Behavior on opacity {
               NumberAnimation {
                 duration: Theme.animFast
@@ -162,8 +162,8 @@ Item {
             }
             Glyph {
               anchors.centerIn: parent
-              color: Theme.subtext0
-              font.pointSize: 9
+              color: Theme.onSurfaceVariant
+              font.pixelSize: Theme.icon.xs
               text: Icons.close
             }
             MouseArea {
@@ -190,10 +190,10 @@ Item {
         UiText {
           Layout.fillWidth: true
           visible: text !== ""
-          color: Theme.subtext0
-          font.pointSize: 10
+          color: Theme.onSurfaceVariant
+          font.pixelSize: Theme.type.body_m
           textFormat: Text.StyledText
-          linkColor: Theme.blue
+          linkColor: Theme.info
           wrapMode: Text.Wrap
           maximumLineCount: root.toast ? 3 : 6
           elide: Text.ElideRight
@@ -208,7 +208,7 @@ Item {
           Layout.preferredHeight: 110
           visible: root.item.bodyImage !== "" && bodyImg.status === Image.Ready
           radius: 10
-          color: Theme.surface1
+          color: Theme.surfaceContainerHighest
           Image {
             id: bodyImg
             anchors.fill: parent
@@ -226,12 +226,12 @@ Item {
           Layout.preferredHeight: 6
           visible: root.item.progress >= 0
           radius: 3
-          color: Theme.surface1
+          color: Theme.surfaceContainerHighest
           Rectangle {
             width: parent.width * root.item.progress / 100
             height: parent.height
             radius: 3
-            color: Theme.mauve
+            color: Theme.primary
           }
         }
 
@@ -250,7 +250,7 @@ Item {
               width: iconSrc !== "" ? 30 : label.implicitWidth + 20
               height: 26
               radius: 13
-              color: btnArea.containsMouse ? Theme.mauve : Theme.surface1
+              color: btnArea.containsMouse ? Theme.primary : Theme.surfaceContainerHighest
               IconImage {
                 anchors.centerIn: parent
                 visible: btn.iconSrc !== ""
@@ -261,8 +261,8 @@ Item {
                 id: label
                 anchors.centerIn: parent
                 visible: btn.iconSrc === ""
-                color: btnArea.containsMouse ? Theme.base : Theme.text
-                font.pointSize: 9
+                color: btnArea.containsMouse ? Theme.onPrimary : Theme.onSurface
+                font.pixelSize: Theme.type.label_m
                 text: btn.modelData.text
               }
               MouseArea {
@@ -287,9 +287,9 @@ Item {
           Layout.preferredHeight: 32
           visible: root.item.hasReply && !root.toast
           radius: 16
-          color: Theme.surface1
+          color: Theme.surfaceContainerHighest
           border.width: input.activeFocus ? 1 : 0
-          border.color: Theme.mauve
+          border.color: Theme.primary
 
           TextInput {
             id: input
@@ -298,9 +298,9 @@ Item {
             anchors.verticalCenter: parent.verticalCenter
             anchors.leftMargin: 12
             anchors.rightMargin: 6
-            color: Theme.text
+            color: Theme.onSurface
             font.family: Theme.uiFont
-            font.pointSize: 10
+            font.pixelSize: Theme.type.body_m
             clip: true
             selectByMouse: true
             onAccepted: {
@@ -313,8 +313,8 @@ Item {
             UiText {
               anchors.fill: parent
               visible: input.text === ""
-              color: Theme.overlay0
-              font.pointSize: 10
+              color: Theme.outline
+              font.pixelSize: Theme.type.body_m
               verticalAlignment: Text.AlignVCenter
               text: root.item.replyHint !== "" ? root.item.replyHint : "Responder…"
             }
@@ -324,8 +324,8 @@ Item {
             anchors.right: parent.right
             anchors.verticalCenter: parent.verticalCenter
             anchors.rightMargin: 12
-            color: input.text !== "" ? Theme.mauve : Theme.overlay0
-            font.pointSize: 11
+            color: input.text !== "" ? Theme.primary : Theme.outline
+            font.pixelSize: Theme.icon.s
             text: Icons.send
             MouseArea {
               anchors.fill: parent

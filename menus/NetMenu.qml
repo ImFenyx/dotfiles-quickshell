@@ -94,7 +94,7 @@ PopupBase {
         Rectangle {
           anchors.fill: parent
           radius: 8
-          color: (ssidArea.containsMouse || lockArea.containsMouse) ? Theme.surface1 : "transparent"
+          color: (ssidArea.containsMouse || lockArea.containsMouse) ? Theme.surfaceContainerHighest : "transparent"
         }
         RowLayout {
           anchors.fill: parent
@@ -110,7 +110,7 @@ PopupBase {
             UiText {
               anchors.verticalCenter: parent.verticalCenter
               width: parent.width
-              color: net.modelData.connected ? Theme.green : Theme.text
+              color: net.modelData.connected ? Theme.success : Theme.onSurface
               elide: Text.ElideRight
               textFormat: Text.PlainText
               text: net.armed ? "Esquecer " + net.modelData.name + "?" : net.modelData.name
@@ -143,7 +143,7 @@ PopupBase {
             Glyph {
               anchors.centerIn: parent
               visible: net.secured
-              color: net.armed ? Theme.red : Theme.mauve
+              color: net.armed ? Theme.error : Theme.primary
               text: Icons.padlock
             }
             MouseArea {
@@ -178,7 +178,7 @@ PopupBase {
       Rectangle {
         anchors.fill: parent
         radius: 8
-        color: Theme.surface1
+        color: Theme.surfaceContainerHighest
       }
       TextInput {
         id: pwInput
@@ -186,9 +186,9 @@ PopupBase {
         anchors.leftMargin: 10
         anchors.rightMargin: 10
         verticalAlignment: TextInput.AlignVCenter
-        color: Theme.text
+        color: Theme.onSurface
         font.family: Theme.uiFont
-        font.pointSize: 11
+        font.pixelSize: Theme.type.body_m
         echoMode: TextInput.Password
         focus: root.pwNet !== null
         Keys.onEscapePressed: root.close()
@@ -206,7 +206,7 @@ PopupBase {
         anchors.leftMargin: 10
         anchors.rightMargin: 10
         verticalAlignment: Text.AlignVCenter
-        color: Theme.overlay0
+        color: Theme.outline
         elide: Text.ElideRight
         textFormat: Text.PlainText
         text: root.pwNet ? "Senha p/ " + root.pwNet.name + "… (Enter conecta)" : ""
@@ -226,7 +226,7 @@ PopupBase {
     Layout.topMargin: 4
     Layout.bottomMargin: 4
     height: 1
-    color: Theme.surface1
+    color: Theme.surfaceContainerHighest
   }
   MenuRow {
     popup: root

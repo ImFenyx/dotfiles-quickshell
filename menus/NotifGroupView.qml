@@ -43,7 +43,7 @@ Item {
         Layout.preferredWidth: 20
         Layout.preferredHeight: 20
         radius: 6
-        color: Theme.surface1
+        color: Theme.surfaceContainerHighest
         Image {
           anchors.fill: parent
           visible: root.group.icon !== "" && status === Image.Ready
@@ -56,14 +56,14 @@ Item {
         UiText {
           anchors.centerIn: parent
           visible: root.group.icon === ""
-          color: Theme.mauve
-          font.pointSize: 9
+          color: Theme.primary
+          font.pixelSize: Theme.type.label_m
           font.weight: Font.DemiBold
           text: root.group.appName.length > 0 ? root.group.appName.charAt(0).toUpperCase() : "?"
         }
       }
       UiText {
-        font.pointSize: 10
+        font.pixelSize: Theme.type.body_m
         font.weight: Font.DemiBold
         elide: Text.ElideRight
         Layout.maximumWidth: 180
@@ -74,12 +74,12 @@ Item {
         implicitWidth: countText.implicitWidth + 12
         implicitHeight: 18
         radius: 9
-        color: root.group.urgency === 2 ? Theme.red : Theme.surface1
+        color: root.group.urgency === 2 ? Theme.error : Theme.surfaceContainerHighest
         UiText {
           id: countText
           anchors.centerIn: parent
-          color: root.group.urgency === 2 ? Theme.base : Theme.subtext0
-          font.pointSize: 9
+          color: root.group.urgency === 2 ? Theme.onError : Theme.onSurfaceVariant
+          font.pixelSize: Theme.type.label_m
           font.weight: Font.DemiBold
           text: root.group.count
         }
@@ -91,11 +91,11 @@ Item {
         Layout.preferredWidth: 24
         Layout.preferredHeight: 24
         radius: 12
-        color: toggleArea.containsMouse ? Theme.surface1 : "transparent"
+        color: toggleArea.containsMouse ? Theme.surfaceContainerHighest : "transparent"
         Glyph {
           anchors.centerIn: parent
-          color: Theme.subtext0
-          font.pointSize: 10
+          color: Theme.onSurfaceVariant
+          font.pixelSize: Theme.icon.s
           text: root.open ? Icons.chevronUp : Icons.chevronDown
         }
         MouseArea {
@@ -110,11 +110,11 @@ Item {
         Layout.preferredWidth: 24
         Layout.preferredHeight: 24
         radius: 12
-        color: clearArea.containsMouse ? Theme.surface1 : "transparent"
+        color: clearArea.containsMouse ? Theme.surfaceContainerHighest : "transparent"
         Glyph {
           anchors.centerIn: parent
-          color: Theme.subtext0
-          font.pointSize: 10
+          color: Theme.onSurfaceVariant
+          font.pixelSize: Theme.icon.s
           text: Icons.trash
         }
         MouseArea {
@@ -139,7 +139,7 @@ Item {
         width: parent.width - 16
         height: 24
         radius: 14
-        color: Theme.surface0
+        color: Theme.surfaceContainer
         opacity: 0.75
       }
       Rectangle {
@@ -149,7 +149,7 @@ Item {
         width: parent.width - 32
         height: 24
         radius: 14
-        color: Theme.surface0
+        color: Theme.surfaceContainer
         opacity: 0.45
       }
 

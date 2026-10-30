@@ -87,7 +87,7 @@ PanelWindow {
 
       EdgeTab {
         anchors.fill: parent
-        color: Theme.base
+        color: Theme.surface
       }
 
       Column {

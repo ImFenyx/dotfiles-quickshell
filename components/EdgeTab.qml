@@ -13,7 +13,7 @@ import QtQuick.Shapes
 Shape {
   id: root
 
-  property color color: Theme.base
+  property color color: Theme.surface
   property real edge: Theme.edge     // largura do filete da moldura
   property real ear: Theme.scoop     // raio da concordancia com o filete
   property real radius: 18           // cantos do lado de dentro da tela

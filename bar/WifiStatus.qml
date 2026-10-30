@@ -13,7 +13,7 @@ RowLayout {
   spacing: 5
 
   UiText {
-    color: Wifi.on ? Theme.text : Theme.overlay0
+    color: Wifi.on ? Theme.onSurface : Theme.outline
     font.weight: Font.DemiBold
     text: Wifi.name
 
@@ -30,7 +30,7 @@ RowLayout {
   }
   Glyph {
     visible: Wifi.icon !== ""
-    color: Wifi.on ? Theme.text : Theme.overlay0
+    color: Wifi.on ? Theme.onSurface : Theme.outline
     text: Wifi.icon
   }
 }

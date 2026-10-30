@@ -39,7 +39,7 @@ PanelWindow {
       anchors.left: parent.left
       anchors.right: parent.right
       height: Theme.barH
-      color: Theme.base
+      color: Theme.surface
     }
 
     // decoradores: curva concava da ponta da barra ate a lateral da tela.
@@ -56,7 +56,7 @@ PanelWindow {
         anchors.left: parent.left
         implicitSize: Theme.scoop
         tail: Theme.edge
-        color: Theme.base
+        color: Theme.surface
         borderWidth: 0
         corner: RoundCorner.CornerEnum.TopLeft
       }
@@ -66,7 +66,7 @@ PanelWindow {
         anchors.right: parent.right
         implicitSize: Theme.scoop
         tail: Theme.edge
-        color: Theme.base
+        color: Theme.surface
         borderWidth: 0
         corner: RoundCorner.CornerEnum.TopRight
       }

@@ -2,29 +2,54 @@ pragma Singleton
 
 import QtQuick
 import Quickshell
+import Quickshell.Io
 
-// Fonte unica de cores, fontes e geometria (Catppuccin Mocha).
-// Antes: hex e "Rubik" copiados em todo arquivo, menuBg redefinido 5x e
-// barH espelhado a mao (shRoot.barH vs barWin.barH).
+// Cores e tokens do eco (~/eco/DESIGN.md). Cores = papeis M3 de
+// ~/.local/state/eco/colors.json, gerado pelo `eco-theme` (Catppuccin ou wallpaper);
+// tokens = ~/.config/eco/tokens.json. Os dois sao vigiados: trocar o tema troca a
+// shell ao vivo. Nenhum hex fora daqui (o fallback e o mocha, so ate o primeiro eco-theme).
 Singleton {
-  // ---- cores ----
-  readonly property color base: "#1e1e2e"
-  readonly property color surface0: "#313244"
-  readonly property color surface1: "#45475a"
-  readonly property color overlay0: "#6c7086"
-  readonly property color subtext0: "#a6adc8"
-  readonly property color text: "#cdd6f4"
-  readonly property color mauve: "#cba6f7"
-  readonly property color lavender: "#b4befe"
-  readonly property color blue: "#89b4fa"
-  readonly property color green: "#a6e3a1"
-  readonly property color peach: "#fab387"
-  readonly property color red: "#f38ba8"
-  readonly property color rosewater: "#f5e0dc"
+  id: root
 
-  // ---- fontes ----
-  readonly property string uiFont: "Rubik"
-  readonly property string iconFont: "JetBrainsMono Nerd Font Propo"
+  // ---- cores (papeis M3) ----
+  readonly property color primary: role("primary")
+  readonly property color onPrimary: role("on_primary")
+  readonly property color primaryContainer: role("primary_container")
+  readonly property color onPrimaryContainer: role("on_primary_container")
+  readonly property color secondary: role("secondary")
+  readonly property color tertiary: role("tertiary")
+  readonly property color error: role("error")
+  readonly property color onError: role("on_error")
+  readonly property color success: role("success")
+  readonly property color warning: role("warning")
+  readonly property color info: role("info")
+  readonly property color surface: role("surface")
+  readonly property color surfaceContainer: role("surface_container")
+  readonly property color surfaceContainerHigh: role("surface_container_high")
+  readonly property color surfaceContainerHighest: role("surface_container_highest")
+  readonly property color onSurface: role("on_surface")
+  readonly property color onSurfaceVariant: role("on_surface_variant")
+  readonly property color outline: role("outline")
+  readonly property color outlineVariant: role("outline_variant")
+  readonly property bool dark: colors.mode !== "light"
+
+  readonly property var fallback: ({
+      primary: "#cba6f7", on_primary: "#11111b", primary_container: "#494060", on_primary_container: "#cba6f7",
+      secondary: "#b4befe", tertiary: "#f5c2e7", error: "#f38ba8", on_error: "#11111b",
+      success: "#a6e3a1", warning: "#f9e2af", info: "#89b4fa",
+      surface: "#1e1e2e", surface_container: "#313244", surface_container_high: "#3b3d4f", surface_container_highest: "#45475a",
+      on_surface: "#cdd6f4", on_surface_variant: "#a6adc8", outline: "#6c7086", outline_variant: "#45475a"
+    })
+
+  function role(name) {
+    return colors.colors[name] ?? fallback[name];
+  }
+
+  // ---- fontes e tamanhos (px) ----
+  readonly property string uiFont: tokens.font.ui ?? "Google Sans Flex"
+  readonly property string iconFont: tokens.font.icon ?? "JetBrainsMono Nerd Font Propo"
+  readonly property var type: tokens.type     // label_s/m/l, body_s/m/l, title_s/m/l, headline_s/m/l, display_s
+  readonly property var icon: tokens.icon     // xs, s, m, l, xl
 
   // ---- geometria ----
   // Medidas derivadas do gaps_out do Hyprland (modules/look.lua).
@@ -52,4 +77,29 @@ Singleton {
   readonly property int animFast: 120      // hover: cor e opacidade; seguir a linha do submenu
   readonly property int animNormal: 150    // fade de entrada/saida, cor de pill/atalho, largura dos blocos da barra
   readonly property int animMove: 180      // altura, deslocamento de lista, volta do swipe
+
+  // ---- arquivos ----
+  FileView {
+    path: (Quickshell.env("XDG_STATE_HOME") || Quickshell.env("HOME") + "/.local/state") + "/eco/colors.json"
+    blockLoading: true
+    watchChanges: true
+    onFileChanged: reload()
+    JsonAdapter {
+      id: colors
+      property var colors: ({})
+      property string mode: "dark"
+    }
+  }
+  FileView {
+    path: (Quickshell.env("XDG_CONFIG_HOME") || Quickshell.env("HOME") + "/.config") + "/eco/tokens.json"
+    blockLoading: true
+    watchChanges: true
+    onFileChanged: reload()
+    JsonAdapter {
+      id: tokens
+      property var font: ({})
+      property var type: ({})
+      property var icon: ({})
+    }
+  }
 }

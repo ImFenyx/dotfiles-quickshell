@@ -49,7 +49,7 @@ PanelWindow {
   property int padX: 18
   property int padRight: padX          // fromRight: some o filete aqui (edge + respiro)
   property real bendK: 10              // altura da curva do notch
-  property color menuBg: Theme.base
+  property color menuBg: Theme.surface
 
   // 0 = aberto, 1 = fechado. close direto: o spring resolve o colapso.
   property real offsetScale: open ? 0 : 1

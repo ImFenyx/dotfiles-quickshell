@@ -35,8 +35,8 @@ PopupBase {
   component Section: UiText {
     Layout.fillWidth: true
     Layout.topMargin: 6
-    color: Theme.subtext0
-    font.pointSize: 9
+    color: Theme.onSurfaceVariant
+    font.pixelSize: Theme.type.label_m
     font.weight: Font.DemiBold
   }
 
@@ -102,7 +102,7 @@ PopupBase {
       UiText {
         Layout.fillWidth: true
         Layout.leftMargin: 32
-        font.pointSize: 10
+        font.pixelSize: Theme.type.body_m
         elide: Text.ElideRight
         textFormat: Text.PlainText
         // "Firefox · titulo do video"
@@ -120,7 +120,7 @@ PopupBase {
     Layout.topMargin: 6
     Layout.bottomMargin: 2
     height: 1
-    color: Theme.surface1
+    color: Theme.surfaceContainerHighest
   }
   MenuRow {
     popup: root

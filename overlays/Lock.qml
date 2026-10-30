@@ -80,7 +80,7 @@ Scope {
 
     WlSessionLockSurface {
       id: surface
-      color: Theme.base
+      color: Theme.surface
 
       ScreencopyView {
         id: shot
@@ -91,7 +91,7 @@ Scope {
       MultiEffect {
         anchors.fill: parent
         source: shot
-        visible: shot.hasContent   // sem captura: fica o Theme.base
+        visible: shot.hasContent   // sem captura: fica o Theme.surface
         blurEnabled: true
         blur: 1
         blurMax: 64
@@ -110,8 +110,8 @@ Scope {
         }
         UiText {
           Layout.alignment: Qt.AlignHCenter
-          color: Theme.subtext0
-          font.pointSize: 13
+          color: Theme.onSurfaceVariant
+          font.pixelSize: Theme.type.body_l
           text: Time.longDate
         }
 
@@ -121,15 +121,15 @@ Scope {
           Layout.preferredWidth: 320
           Layout.preferredHeight: 46
           radius: height / 2
-          color: Theme.surface0
+          color: Theme.surfaceContainer
           border.width: 1
-          border.color: root.failed ? Theme.red : (input.activeFocus ? Theme.mauve : Theme.surface1)
+          border.color: root.failed ? Theme.error : (input.activeFocus ? Theme.primary : Theme.surfaceContainerHighest)
 
           Glyph {
             anchors.left: parent.left
             anchors.leftMargin: 18
             anchors.verticalCenter: parent.verticalCenter
-            color: root.failed ? Theme.red : Theme.mauve
+            color: root.failed ? Theme.error : Theme.primary
             text: Icons.lock
           }
           TextInput {
@@ -138,9 +138,9 @@ Scope {
             anchors.leftMargin: 44
             anchors.rightMargin: 18
             verticalAlignment: TextInput.AlignVCenter
-            color: Theme.text
+            color: Theme.onSurface
             font.family: Theme.uiFont
-            font.pointSize: 13
+            font.pixelSize: Theme.type.body_l
             echoMode: TextInput.Password
             passwordCharacter: "•"
             focus: true
@@ -159,8 +159,8 @@ Scope {
             anchors.fill: input
             visible: input.text === ""
             verticalAlignment: Text.AlignVCenter
-            color: Theme.overlay0
-            font.pointSize: 13
+            color: Theme.outline
+            font.pixelSize: Theme.type.body_l
             text: pam.active ? "Verificando…" : "Senha"
           }
         }
@@ -173,8 +173,8 @@ Scope {
           horizontalAlignment: Text.AlignHCenter
           wrapMode: Text.Wrap
           textFormat: Text.PlainText
-          color: Theme.red
-          font.pointSize: 10
+          color: Theme.error
+          font.pixelSize: Theme.type.body_m
           text: root.status
         }
       }

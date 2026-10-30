@@ -9,7 +9,7 @@ Item {
 
   property real value: 0
   property bool muted: false        // preenchimento apagado
-  property color fill: Theme.blue
+  property color fill: Theme.info
   signal moved(real value)
 
   readonly property real frac: Math.max(0, Math.min(1, value))
@@ -23,12 +23,12 @@ Item {
     width: parent.width
     height: 6
     radius: 3
-    color: Theme.surface1
+    color: Theme.surfaceContainerHighest
     Rectangle {
       width: parent.width * root.frac
       height: parent.height
       radius: 3
-      color: root.muted ? Theme.overlay0 : root.fill
+      color: root.muted ? Theme.outline : root.fill
     }
   }
   Rectangle {
@@ -37,7 +37,7 @@ Item {
     width: 14
     height: 14
     radius: 7
-    color: Theme.text
+    color: Theme.onSurface
     visible: area.containsMouse || area.pressed
   }
 

@@ -57,8 +57,8 @@ PanelWindow {
   }
 
   Rectangle {
-    color: Theme.base
-    border.color: Theme.mauve
+    color: Theme.surface
+    border.color: Theme.primary
     border.width: 1
     radius: 8
     width: tipLabel.implicitWidth + 20

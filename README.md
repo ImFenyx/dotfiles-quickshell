@@ -1,14 +1,15 @@
 # dotfiles-quickshell
 
 Shell do Hyprland feita em [Quickshell](https://quickshell.org): barra, menus
-(rede, tray, energia), launcher, OSD e centro de notificacoes. Tema Catppuccin Mocha.
+(rede, tray, energia), launcher, OSD e centro de notificacoes. Cores e tokens do eco
+(~/eco/DESIGN.md): papeis M3 gerados pelo `eco-theme` (Catppuccin mocha/latte ou wallpaper).
 
 ## Estrutura
 
 ```
 shell.qml        composicao: so liga as pecas e expoe os atalhos (IPC)
 components/      blocos reutilizaveis
-  Theme.qml        cores, fontes e geometria (fonte unica)
+  Theme.qml        cores (papeis M3 de ~/.local/state/eco/colors.json), fontes, tamanhos e geometria
   Icons.qml        glifos Nerd Font (sempre via escape \u...)
   Config.qml       programas externos (terminal, mixer, locker...)
   Pill / PillText / PillGlyph / UiText / Glyph
@@ -41,7 +42,7 @@ data/            listas estaticas (kaomoji.tsv)
 
 Regras de bolso:
 
-- cor, fonte ou medida nova -> `components/Theme.qml`
+- cor, fonte ou medida nova -> `~/.config/eco/tokens.json` (ou o template de cores) e exposta em `components/Theme.qml`; nos arquivos, so `Theme.<papel>` e `Theme.type.*`/`Theme.icon.*`
 - glifo novo -> `components/Icons.qml` (escape `\u...`, nunca o caractere literal)
 - programa externo -> `components/Config.qml`
 - widget novo que abre popup -> use `PopupBase`; ele cuida de janela, mascara,
@@ -64,7 +65,7 @@ Regras de bolso:
 ## Dependencias
 
 - Hyprland e Quickshell (com os modulos Hyprland, PipeWire, UPower, SystemTray, Networking e Bluetooth)
-- Fontes: Rubik, JetBrainsMono Nerd Font (Propo)
+- Fontes: Google Sans Flex (UI), JetBrainsMono Nerd Font Propo (icones)
 - Tema de icones: MacTahoe-purple-dark (`//@ pragma IconTheme` no `shell.qml`)
 - NetworkManager: Wi-Fi pelo D-Bus (Quickshell.Networking); `nmcli` so p/ "Alternar rede" e
   `scripts/netinfo.sh`; `nm-connection-editor`

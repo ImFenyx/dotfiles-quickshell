@@ -478,7 +478,7 @@ PopupBase {
         Rectangle {
           anchors.fill: parent
           radius: 8
-          color: row.selected ? Theme.surface1 : (rowArea.containsMouse ? Theme.surface0 : "transparent")
+          color: row.selected ? Theme.surfaceContainerHighest : (rowArea.containsMouse ? Theme.surfaceContainer : "transparent")
         }
         RowLayout {
           anchors.fill: parent
@@ -499,9 +499,9 @@ PopupBase {
             UiText {
               anchors.centerIn: parent
               visible: !row.modelData.icon
-              color: Theme.mauve
+              color: Theme.primary
               font.family: row.modelData.nerd ? Theme.iconFont : Theme.uiFont
-              font.pointSize: 15
+              font.pixelSize: Theme.type.title_m
               text: row.modelData.glyph || ""
             }
           }
@@ -519,8 +519,8 @@ PopupBase {
             UiText {
               visible: text !== ""
               Layout.fillWidth: true
-              color: Theme.overlay0
-              font.pointSize: 9
+              color: Theme.outline
+              font.pixelSize: Theme.type.label_m
               font.weight: Font.Normal
               elide: Text.ElideRight
               textFormat: Text.PlainText
@@ -530,8 +530,8 @@ PopupBase {
           // emoji com tons de pele: Enter/clique abre o popup de tom
           Glyph {
             visible: !!row.modelData.tones
-            color: Theme.overlay0
-            font.pointSize: 10
+            color: Theme.outline
+            font.pixelSize: Theme.icon.s
             text: Icons.chevronRight
           }
         }
@@ -570,9 +570,9 @@ PopupBase {
           anchors.fill: parent
           anchors.margins: 4
           radius: 10
-          color: Theme.surface0
+          color: Theme.surfaceContainer
           border.width: 2
-          border.color: root.selectedIndex === cell.index ? Theme.mauve : (cellArea.containsMouse ? Theme.surface1 : "transparent")
+          border.color: root.selectedIndex === cell.index ? Theme.primary : (cellArea.containsMouse ? Theme.surfaceContainerHighest : "transparent")
 
           ClippingRectangle {
             anchors.fill: parent
@@ -593,8 +593,8 @@ PopupBase {
           UiText {
             anchors.centerIn: parent
             visible: thumb.status !== Image.Ready
-            color: Theme.overlay0
-            font.pointSize: 9
+            color: Theme.outline
+            font.pixelSize: Theme.type.label_m
             text: cell.modelData.title + "\n" + cell.modelData.sub
             horizontalAlignment: Text.AlignHCenter
           }
@@ -621,14 +621,14 @@ PopupBase {
       Rectangle {
         anchors.fill: parent
         radius: 2
-        color: Theme.surface0
+        color: Theme.surfaceContainer
       }
       Rectangle {
         width: parent.width
         y: parent.view.visibleArea.yPosition * parent.height
         height: Math.max(24, parent.view.visibleArea.heightRatio * parent.height)
         radius: 2
-        color: Theme.surface1
+        color: Theme.surfaceContainerHighest
       }
     }
 
@@ -641,7 +641,7 @@ PopupBase {
 
       Rectangle {
         anchors.fill: parent
-        color: Theme.base
+        color: Theme.surface
         opacity: 0.7
       }
       Rectangle {
@@ -649,9 +649,9 @@ PopupBase {
         width: toneRow.implicitWidth + 28
         height: toneRow.implicitHeight + toneTitle.implicitHeight + 34
         radius: 14
-        color: Theme.surface0
+        color: Theme.surfaceContainer
         border.width: 1
-        border.color: Theme.surface1
+        border.color: Theme.surfaceContainerHighest
         MouseArea {
           anchors.fill: parent    // clique no cartao (fora das opcoes) nao fecha
         }
@@ -660,8 +660,8 @@ PopupBase {
           anchors.top: parent.top
           anchors.topMargin: 12
           anchors.horizontalCenter: parent.horizontalCenter
-          color: Theme.subtext0
-          font.pointSize: 10
+          color: Theme.onSurfaceVariant
+          font.pixelSize: Theme.type.body_m
           textFormat: Text.PlainText
           text: root.tonePick ? root.tonePick.title + "  ·  tom de pele" : ""
         }
@@ -680,12 +680,12 @@ PopupBase {
               width: 52
               height: 52
               radius: 12
-              color: root.toneSel === index ? Theme.surface1 : "transparent"
+              color: root.toneSel === index ? Theme.surfaceContainerHighest : "transparent"
               border.width: 2
-              border.color: root.toneSel === index ? Theme.mauve : "transparent"
+              border.color: root.toneSel === index ? Theme.primary : "transparent"
               UiText {
                 anchors.centerIn: parent
-                font.pointSize: 22
+                font.pixelSize: Theme.type.headline_m
                 text: toneCell.modelData
               }
               MouseArea {
@@ -708,7 +708,7 @@ PopupBase {
     Layout.preferredHeight: 318
     UiText {
       anchors.centerIn: parent
-      color: Theme.overlay0
+      color: Theme.outline
       font.weight: Font.Normal
       text: root.emptyText
     }
@@ -720,8 +720,8 @@ PopupBase {
     Layout.fillWidth: true
     Layout.leftMargin: 4
     Layout.bottomMargin: 2
-    color: Theme.overlay0
-    font.pointSize: 9
+    color: Theme.outline
+    font.pixelSize: Theme.type.label_m
     font.weight: Font.Normal
     elide: Text.ElideRight
     text: root.mode === "emoji" ? (root.tonePick ? "← →  tom de pele     Enter  inserir     Esc  voltar" : "›  tem tom de pele: Enter ou clique abre a escolha") : (root.imageGrid ? "Alt+t  texto" : "Alt+i  imagens") + "     Alt+d  apagar     Alt+p  apagar as de cima     Alt+n  apagar as de baixo"
@@ -731,23 +731,23 @@ PopupBase {
     Layout.fillWidth: true
     Layout.preferredHeight: 42
     radius: 10
-    color: Theme.surface1
+    color: Theme.surfaceContainerHighest
     RowLayout {
       anchors.fill: parent
       anchors.leftMargin: 12
       anchors.rightMargin: 12
       spacing: 10
       Glyph {
-        font.pointSize: 13
+        font.pixelSize: Theme.icon.m
         text: root.mode === "calc" ? Icons.calculator : root.mode === "emoji" ? Icons.smile : root.mode === "kaomoji" ? Icons.kaomoji : root.mode === "clip" ? Icons.clipboard : root.mode === "win" ? Icons.window : Icons.search
       }
       TextInput {
         id: searchInput
         Layout.fillWidth: true
         Layout.alignment: Qt.AlignVCenter
-        color: Theme.text
+        color: Theme.onSurface
         font.family: Theme.uiFont
-        font.pointSize: 12
+        font.pixelSize: Theme.type.body_l
         focus: root.open
         Keys.onEscapePressed: {
           if (root.tonePick)
@@ -814,8 +814,8 @@ PopupBase {
         UiText {
           anchors.verticalCenter: parent.verticalCenter
           visible: searchInput.text === ""
-          color: Theme.overlay0
-          font.pointSize: 11
+          color: Theme.outline
+          font.pixelSize: Theme.type.body_m
           font.weight: Font.Normal
           text: "Apps     =  calculadora     :  emoji     ;  kaomoji     #  clipboard     @  janelas"
         }

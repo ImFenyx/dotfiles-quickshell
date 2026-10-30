@@ -24,13 +24,13 @@ Item {
     anchors.centerIn: parent
     width: parent.width
     height: 1
-    color: Theme.surface1
+    color: Theme.surfaceContainerHighest
   }
   Rectangle {
     visible: !row.entry.isSeparator
     anchors.fill: parent
     radius: 8
-    color: (row.active || (area.containsMouse && row.entry.enabled)) ? Theme.surface1 : "transparent"
+    color: (row.active || (area.containsMouse && row.entry.enabled)) ? Theme.surfaceContainerHighest : "transparent"
   }
   RowLayout {
     visible: !row.entry.isSeparator
@@ -47,7 +47,7 @@ Item {
     }
     UiText {
       Layout.fillWidth: true
-      color: row.entry.enabled ? Theme.text : Theme.overlay0
+      color: row.entry.enabled ? Theme.onSurface : Theme.outline
       elide: Text.ElideRight
       text: row.entry.text || ""
     }

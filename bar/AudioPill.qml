@@ -11,7 +11,7 @@ Pill {
 
   property var tip: null
 
-  color: Theme.blue
+  color: Theme.info
   spacing: 5
   tipWindow: root.tip
   tipText: "Saída " + Audio.sinkText + (Audio.micVisible ? " \u00b7 Entrada " + Audio.micText : "")

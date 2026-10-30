@@ -77,7 +77,7 @@ Item {
     Rectangle {
       anchors.fill: parent
       radius: 16
-      color: Theme.base
+      color: Theme.surface
     }
     TrayMenuList {
       id: list

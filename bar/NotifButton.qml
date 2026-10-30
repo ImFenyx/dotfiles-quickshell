@@ -17,12 +17,12 @@ Item {
     id: row
     spacing: 4
     UiText {
-      color: Notifs.dnd ? Theme.overlay0 : Theme.mauve
+      color: Notifs.dnd ? Theme.outline : Theme.primary
       font.weight: Font.DemiBold
       text: Notifs.count
     }
     Glyph {
-      color: Notifs.dnd ? Theme.overlay0 : Theme.mauve
+      color: Notifs.dnd ? Theme.outline : Theme.primary
       text: Notifs.dnd ? Icons.bellSlash : Icons.bell
     }
   }

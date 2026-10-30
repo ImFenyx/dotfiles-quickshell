@@ -19,7 +19,7 @@ Rectangle {
   Layout.preferredWidth: 1
   Layout.preferredHeight: 62
   radius: 14
-  color: active ? Theme.mauve : (area.containsMouse ? Theme.surface1 : Theme.surface0)
+  color: active ? Theme.primary : (area.containsMouse ? Theme.surfaceContainerHighest : Theme.surfaceContainer)
 
   Behavior on color {
     ColorAnimation {
@@ -33,14 +33,14 @@ Rectangle {
     spacing: 2
     Glyph {
       Layout.alignment: Qt.AlignHCenter
-      color: root.active ? Theme.base : Theme.mauve
+      color: root.active ? Theme.onPrimary : Theme.primary
       text: root.icon
     }
     UiText {
       Layout.fillWidth: true
       horizontalAlignment: Text.AlignHCenter
-      color: root.active ? Theme.base : Theme.text
-      font.pointSize: 9
+      color: root.active ? Theme.onPrimary : Theme.onSurface
+      font.pixelSize: Theme.type.label_m
       fontSizeMode: Text.HorizontalFit
       minimumPointSize: 7
       text: root.label
@@ -49,8 +49,8 @@ Rectangle {
       Layout.fillWidth: true
       visible: root.sub !== ""
       horizontalAlignment: Text.AlignHCenter
-      color: root.active ? Theme.base : Theme.subtext0
-      font.pointSize: 8
+      color: root.active ? Theme.onPrimary : Theme.onSurfaceVariant
+      font.pixelSize: Theme.type.label_s
       elide: Text.ElideRight
       text: root.sub
     }

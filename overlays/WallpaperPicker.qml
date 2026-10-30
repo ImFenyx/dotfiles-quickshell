@@ -55,17 +55,17 @@ PopupBase {
     Layout.fillWidth: true
     spacing: 10
     Glyph {
-      font.pointSize: 14
+      font.pixelSize: Theme.icon.m
       text: Icons.image
     }
     UiText {
-      font.pointSize: 12
+      font.pixelSize: Theme.type.body_l
       font.weight: Font.DemiBold
       text: "Wallpapers"
     }
     UiText {
-      color: Theme.subtext0
-      font.pointSize: 10
+      color: Theme.onSurfaceVariant
+      font.pixelSize: Theme.type.body_m
       text: Wallpapers.items.length > 0 ? String(Wallpapers.items.length) : ""
     }
     Item {
@@ -75,14 +75,14 @@ PopupBase {
       Layout.preferredWidth: 240
       Layout.preferredHeight: 32
       radius: height / 2
-      color: Theme.surface0
+      color: Theme.surfaceContainer
       border.width: 1
-      border.color: search.activeFocus ? Theme.mauve : Theme.surface1
+      border.color: search.activeFocus ? Theme.primary : Theme.surfaceContainerHighest
       Glyph {
         anchors.left: parent.left
         anchors.leftMargin: 12
         anchors.verticalCenter: parent.verticalCenter
-        font.pointSize: 10
+        font.pixelSize: Theme.icon.s
         text: Icons.search
       }
       TextInput {
@@ -91,9 +91,9 @@ PopupBase {
         anchors.leftMargin: 34
         anchors.rightMargin: 12
         verticalAlignment: TextInput.AlignVCenter
-        color: Theme.text
+        color: Theme.onSurface
         font.family: Theme.uiFont
-        font.pointSize: 10
+        font.pixelSize: Theme.type.body_m
         focus: root.open
         onTextChanged: root.sel = 0
         Keys.onEscapePressed: root.close()
@@ -117,8 +117,8 @@ PopupBase {
           anchors.fill: parent
           visible: search.text === ""
           verticalAlignment: Text.AlignVCenter
-          color: Theme.overlay0
-          font.pointSize: 10
+          color: Theme.outline
+          font.pixelSize: Theme.type.body_m
           text: "Buscar"
         }
       }
@@ -155,9 +155,9 @@ PopupBase {
           anchors.fill: parent
           anchors.margins: 4
           radius: 10
-          color: Theme.surface0
+          color: Theme.surfaceContainer
           border.width: 2
-          border.color: cell.selected ? Theme.mauve : (cellArea.containsMouse ? Theme.surface1 : "transparent")
+          border.color: cell.selected ? Theme.primary : (cellArea.containsMouse ? Theme.surfaceContainerHighest : "transparent")
 
           ClippingRectangle {
             anchors.fill: parent
@@ -179,14 +179,14 @@ PopupBase {
               anchors.bottom: parent.bottom
               height: 22
               visible: cell.selected || cellArea.containsMouse
-              color: Theme.base
+              color: Theme.surface
               opacity: 0.85
               UiText {
                 anchors.fill: parent
                 anchors.leftMargin: 8
                 anchors.rightMargin: 8
                 verticalAlignment: Text.AlignVCenter
-                font.pointSize: 8
+                font.pixelSize: Theme.type.label_s
                 elide: Text.ElideMiddle
                 textFormat: Text.PlainText
                 text: cell.modelData.name
@@ -202,11 +202,11 @@ PopupBase {
             height: 20
             radius: 6
             visible: cell.modelData.video
-            color: Theme.base
+            color: Theme.surface
             opacity: 0.85
             Glyph {
               anchors.centerIn: parent
-              font.pointSize: 8
+              font.pixelSize: Theme.icon.xs
               text: Icons.play
             }
           }
@@ -219,11 +219,11 @@ PopupBase {
             height: 20
             radius: 10
             visible: cell.isCurrent
-            color: Theme.mauve
+            color: Theme.primary
             Glyph {
               anchors.centerIn: parent
-              color: Theme.base
-              font.pointSize: 8
+              color: Theme.onPrimary
+              font.pixelSize: Theme.icon.xs
               text: Icons.check
             }
           }
@@ -249,21 +249,21 @@ PopupBase {
       Rectangle {
         anchors.fill: parent
         radius: 2
-        color: Theme.surface0
+        color: Theme.surfaceContainer
       }
       Rectangle {
         width: parent.width
         y: grid.visibleArea.yPosition * parent.height
         height: Math.max(24, grid.visibleArea.heightRatio * parent.height)
         radius: 2
-        color: Theme.surface1
+        color: Theme.surfaceContainerHighest
       }
     }
 
     UiText {
       anchors.centerIn: parent
       visible: root.results.length === 0
-      color: Theme.overlay0
+      color: Theme.outline
       textFormat: Text.PlainText
       text: Wallpapers.loading && Wallpapers.items.length === 0 ? "Gerando miniaturas…" : (search.text !== "" ? "Nada encontrado" : "Nenhuma imagem em " + Config.wallpaperDir)
     }
@@ -271,8 +271,8 @@ PopupBase {
 
   UiText {
     Layout.fillWidth: true
-    color: Theme.overlay0
-    font.pointSize: 9
+    color: Theme.outline
+    font.pixelSize: Theme.type.label_m
     font.weight: Font.Normal
     text: "← → ↑ ↓  navegar     Enter  aplicar     Esc  sair"
   }

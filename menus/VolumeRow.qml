@@ -35,7 +35,7 @@ RowLayout {
     Glyph {
       anchors.centerIn: parent
       visible: !appImage.visible
-      color: root.muted ? Theme.overlay0 : Theme.mauve
+      color: root.muted ? Theme.outline : Theme.primary
       text: root.muted ? root.glyphMuted : root.glyph
     }
     MouseArea {
@@ -60,8 +60,8 @@ RowLayout {
     id: pct
     Layout.minimumWidth: pctMetrics.advanceWidth
     horizontalAlignment: Text.AlignRight
-    color: root.muted ? Theme.overlay0 : Theme.subtext0
-    font.pointSize: 9
+    color: root.muted ? Theme.outline : Theme.onSurfaceVariant
+    font.pixelSize: Theme.type.label_m
     text: root.muted ? "mudo" : Math.round(root.vol * 100) + "%"
     TextMetrics {
       id: pctMetrics

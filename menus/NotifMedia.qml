@@ -22,7 +22,7 @@ Rectangle {
   Layout.fillWidth: true
   implicitHeight: col.implicitHeight + 24
   radius: 16
-  color: Theme.surface0
+  color: Theme.surfaceContainer
 
   // a posicao do MPRIS nao notifica: puxa a cada segundo (so tocando e visivel)
   Timer {
@@ -48,7 +48,7 @@ Rectangle {
         Layout.preferredWidth: 58
         Layout.preferredHeight: 58
         radius: 12
-        color: Theme.surface1
+        color: Theme.surfaceContainerHighest
         Image {
           anchors.fill: parent
           visible: Media.art !== "" && status === Image.Ready
@@ -61,8 +61,8 @@ Rectangle {
         Glyph {
           anchors.centerIn: parent
           visible: Media.art === ""
-          font.pointSize: 18
-          color: Theme.overlay0
+          font.pixelSize: Theme.icon.l
+          color: Theme.outline
           text: Media.kindIcon
         }
       }
@@ -74,14 +74,14 @@ Rectangle {
         RowLayout {
           spacing: 6
           Glyph {
-            color: Media.kind === "video" ? Theme.peach : Theme.green
-            font.pointSize: 9
+            color: Media.kind === "video" ? Theme.warning : Theme.success
+            font.pixelSize: Theme.icon.xs
             text: Media.kindIcon
           }
           UiText {
             Layout.fillWidth: true
-            color: Theme.subtext0
-            font.pointSize: 9
+            color: Theme.onSurfaceVariant
+            font.pixelSize: Theme.type.label_m
             elide: Text.ElideRight
             text: Media.kindLabel + (Media.player !== "" ? "  \u00b7  " + Media.player : "")
           }
@@ -95,8 +95,8 @@ Rectangle {
         UiText {
           Layout.fillWidth: true
           visible: Media.artist !== ""
-          color: Theme.subtext0
-          font.pointSize: 10
+          color: Theme.onSurfaceVariant
+          font.pixelSize: Theme.type.body_m
           elide: Text.ElideRight
           text: Media.artist
         }
@@ -109,11 +109,11 @@ Rectangle {
         Layout.preferredWidth: 24
         Layout.preferredHeight: 24
         radius: 12
-        color: swapArea.containsMouse ? Theme.surface1 : "transparent"
+        color: swapArea.containsMouse ? Theme.surfaceContainerHighest : "transparent"
         Glyph {
           anchors.centerIn: parent
-          font.pointSize: 10
-          color: Theme.subtext0
+          font.pixelSize: Theme.icon.s
+          color: Theme.onSurfaceVariant
           text: Icons.chevronRight
         }
         MouseArea {
@@ -140,12 +140,12 @@ Rectangle {
           width: parent.width
           height: 5
           radius: 3
-          color: Theme.surface1
+          color: Theme.surfaceContainerHighest
           Rectangle {
             width: parent.width * Math.min(1, Media.position / Media.length)
             height: parent.height
             radius: 3
-            color: Theme.mauve
+            color: Theme.primary
           }
         }
         MouseArea {
@@ -158,16 +158,16 @@ Rectangle {
       RowLayout {
         Layout.fillWidth: true
         UiText {
-          color: Theme.subtext0
-          font.pointSize: 9
+          color: Theme.onSurfaceVariant
+          font.pixelSize: Theme.type.label_m
           text: root.fmt(Media.position)
         }
         Item {
           Layout.fillWidth: true
         }
         UiText {
-          color: Theme.subtext0
-          font.pointSize: 9
+          color: Theme.onSurfaceVariant
+          font.pixelSize: Theme.type.label_m
           text: root.fmt(Media.length)
         }
       }
@@ -182,10 +182,10 @@ Rectangle {
         Layout.preferredHeight: 36
         radius: 18
         opacity: Media.canPrev ? 1 : 0.35
-        color: prevArea.containsMouse ? Theme.surface1 : "transparent"
+        color: prevArea.containsMouse ? Theme.surfaceContainerHighest : "transparent"
         Glyph {
           anchors.centerIn: parent
-          color: Theme.text
+          color: Theme.onSurface
           text: Icons.prev
         }
         MouseArea {
@@ -202,11 +202,11 @@ Rectangle {
         Layout.preferredHeight: 44
         radius: 22
         opacity: Media.canToggle ? 1 : 0.35
-        color: playArea.containsMouse ? Theme.lavender : Theme.mauve
+        color: playArea.containsMouse ? Theme.secondary : Theme.primary
         Glyph {
           anchors.centerIn: parent
-          color: Theme.base
-          font.pointSize: 14
+          color: Theme.onPrimary
+          font.pixelSize: Theme.icon.m
           text: Media.playing ? Icons.pause : Icons.play
         }
         MouseArea {
@@ -223,10 +223,10 @@ Rectangle {
         Layout.preferredHeight: 36
         radius: 18
         opacity: Media.canNext ? 1 : 0.35
-        color: nextArea.containsMouse ? Theme.surface1 : "transparent"
+        color: nextArea.containsMouse ? Theme.surfaceContainerHighest : "transparent"
         Glyph {
           anchors.centerIn: parent
-          color: Theme.text
+          color: Theme.onSurface
           text: Icons.next
         }
         MouseArea {
