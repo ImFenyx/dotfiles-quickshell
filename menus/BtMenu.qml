@@ -14,7 +14,7 @@ PopupBase {
   id: root
 
   panelWidth: 320
-  panelX: root.width - panelWidth - 8
+  panelX: root.width - panelWidth - Theme.edge
   spacing: 2
 
   property var forgetArmed: null
@@ -59,7 +59,7 @@ PopupBase {
       Rectangle {
         width: 16
         height: 16
-        radius: 8
+        radius: Theme.shape.sm
         anchors.verticalCenter: parent.verticalCenter
         x: Bt.on ? parent.width - width - 3 : 3
         color: Bt.on ? Theme.fgPrimary : Theme.fgSurfaceVariant
@@ -111,7 +111,7 @@ PopupBase {
 
       Rectangle {
         anchors.fill: parent
-        radius: 8
+        radius: Theme.shape.sm
         color: (rowArea.containsMouse || forgetArea.containsMouse) ? Theme.surfaceContainerHighest : "transparent"
       }
       RowLayout {

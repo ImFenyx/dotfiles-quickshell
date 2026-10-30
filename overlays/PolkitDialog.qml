@@ -13,9 +13,9 @@ PopupBase {
   id: root
 
   panelWidth: 420
-  padTop: 16
-  padBottom: 14
-  padX: 22
+  padTop: Theme.space.xl
+  padBottom: Theme.space.xl
+  padX: Theme.space.xl
   spacing: 10
   backdropFocus: false     // o foco e do campo de senha
 
@@ -197,7 +197,7 @@ PopupBase {
         required property var modelData
         implicitWidth: btnLabel.implicitWidth + 32
         implicitHeight: 32
-        radius: 16
+        radius: height / 2
         color: btn.modelData.main ? (btnArea.containsMouse ? Theme.secondary : Theme.primary) : (btnArea.containsMouse ? Theme.surfaceContainerHighest : Theme.surfaceContainer)
         opacity: btn.modelData.main && root.waiting ? 0.5 : 1
         UiText {

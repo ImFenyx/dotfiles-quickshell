@@ -52,18 +52,19 @@ Singleton {
   readonly property var type: tokens.type     // label_s/m/l, body_s/m/l, title_s/m/l, headline_s/m/l, display_s
   readonly property var icon: tokens.icon     // xs, s, m, l, xl
 
-  // ---- geometria ----
-  // Medidas derivadas do gaps_out do Hyprland (modules/look.lua).
-  // Troque gap junto com o gaps_out para manter a proporcao.
-  readonly property int gap: 16
-  readonly property int barH: gap * 3
-  readonly property int scoop: gap
-  readonly property int edge: gap / 2          // largura do filete lateral/inferior
-  readonly property int bendR: scoop - edge    // raio interno da dobra inferior
-  readonly property int topH: barH + scoop     // faixa da barra (barra + scoop)
+  readonly property var shape: tokens.shape   // xs..xl_inc, window, frame_inner, popup, dialog
+  readonly property var space: tokens.space   // xs..xxl, gap_in, gap_out, border
 
-  // aba colada no filete direito (toasts + centro de notificacoes)
-  readonly property int sideTabTop: topH + gap / 2   // y onde a concordancia comeca, abaixo do scoop da barra
+  // ---- moldura (DESIGN.md › Forma/Espaço) ----
+  // Janela: gaps_out 8 do filete, canto 12. Filete = gaps_out, entao o canto interno
+  // da moldura (12 + 8 = 20) tem o mesmo centro do canto da janela: concentrico.
+  readonly property int barH: 48
+  readonly property int edge: space.gap_out          // largura do filete lateral/inferior (= reserva)
+  readonly property int frameR: shape.frame_inner    // canto interno da moldura
+
+  // aba colada no filete direito (toasts + centro de notificacoes): comeca onde
+  // termina o canto superior direito da moldura
+  readonly property int sideTabTop: barH + frameR
   readonly property int sideTabW: 380                // largura do corpo (sem o filete)
 
   // workspaces da barra: icone de app e teto da faixa. 360 ~ a faixa antiga no pior
@@ -101,6 +102,8 @@ Singleton {
       property var font: ({})
       property var type: ({})
       property var icon: ({})
+      property var shape: ({})
+      property var space: ({})
     }
   }
 }

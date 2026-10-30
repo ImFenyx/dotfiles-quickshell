@@ -22,12 +22,12 @@ Item {
     anchors.verticalCenter: parent.verticalCenter
     width: parent.width
     height: 6
-    radius: 3
+    radius: height / 2
     color: Theme.surfaceContainerHighest
     Rectangle {
       width: parent.width * root.frac
       height: parent.height
-      radius: 3
+      radius: height / 2
       color: root.muted ? Theme.outline : root.fill
     }
   }
@@ -36,7 +36,7 @@ Item {
     x: track.width * root.frac - width / 2
     width: 14
     height: 14
-    radius: 7
+    radius: height / 2
     color: Theme.fgSurface
     visible: area.containsMouse || area.pressed
   }

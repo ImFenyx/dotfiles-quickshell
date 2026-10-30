@@ -42,14 +42,18 @@ PanelWindow {
 
   property int topY: Theme.barH
   property int tuck: 0                 // 1px p/ dentro da borda (mesma cor = sem hairline)
+  // panelWidth/panelX = corpo; as abas de encaixe (flare) ficam fora dele.
+  // Padding conta da borda do corpo: menu de lista 8 (padrao, linhas de raio 8
+  // concentricas ao popup 16), painel 16, dialogo 24 (DESIGN.md).
   property real panelWidth: 270
   property real panelX: (width - panelWidth) / 2
-  property int padTop: 14
-  property int padBottom: 10
-  property int padX: 18
+  property int padTop: Theme.space.sm
+  property int padBottom: Theme.space.sm
+  property int padX: Theme.space.sm
   property int padRight: padX          // fromRight: some o filete aqui (edge + respiro)
-  property real bendK: 10              // altura da curva do notch
   property color menuBg: Theme.surface
+  // aba de encaixe na barra/filete: arco do mesmo raio dos cantos da moldura
+  readonly property real flare: (fromRight || pill) ? 0 : Theme.frameR
 
   // 0 = aberto, 1 = fechado. close direto: o spring resolve o colapso.
   property real offsetScale: open ? 0 : 1
@@ -61,13 +65,14 @@ PanelWindow {
     open = false;
   }
 
-  // Fundo: topo (ou base) reto com notch curvo nas laterais + cantos redondos.
+  // Fundo: topo (ou base) reto com abas de encaixe concavas nas laterais (raio
+  // frameR) + cantos do corpo (shape.popup), tudo em arco circular. w inclui as abas.
   function shapePath(w, h) {
-    const r = 16, f = 8, k = bendK;
+    const r = Theme.shape.popup, f = Math.min(flare, Math.max(0, h - r));
     const bx = w - f;
     if (fromBottom)
-      return `M0,${h} L${w},${h} C${w - 2},${h} ${bx},${h - k * 0.25} ${bx},${h - k} L${bx},${r} Q${bx},0 ${bx - r},0 L${f + r},0 Q${f},0 ${f},${r} L${f},${h - k} C${f},${h - k * 0.25} 2,${h} 0,${h} Z`;
-    return `M0,0 L${w},0 C${w - 2},0 ${bx},${k * 0.25} ${bx},${k} L${bx},${h - r} Q${bx},${h} ${bx - r},${h} L${f + r},${h} Q${f},${h} ${f},${h - r} L${f},${k} C${f},${k * 0.25} 2,0 0,0 Z`;
+      return `M0,${h} L${w},${h} A${f},${f} 0 0 1 ${bx},${h - f} L${bx},${r} A${r},${r} 0 0 0 ${bx - r},0 L${f + r},0 A${r},${r} 0 0 0 ${f},${r} L${f},${h - f} A${f},${f} 0 0 1 0,${h} Z`;
+    return `M0,0 L${w},0 A${f},${f} 0 0 0 ${bx},${f} L${bx},${h - r} A${r},${r} 0 0 1 ${bx - r},${h} L${f + r},${h} A${r},${r} 0 0 1 ${f},${h - r} L${f},${f} A${f},${f} 0 0 0 0,0 Z`;
   }
 
   anchors.top: true
@@ -136,10 +141,10 @@ PanelWindow {
   }
 
   Item {
-    width: root.panelWidth
+    width: root.panelWidth + 2 * root.flare
     height: root.panelHeight
     clip: true
-    x: root.panelX
+    x: root.panelX - root.flare
     y: root.fromBottom ? root.height - height + root.tuck : root.topY - root.tuck
     visible: root.offsetScale < 1
 
@@ -185,8 +190,8 @@ PanelWindow {
         anchors.left: parent.left
         anchors.right: parent.right
         anchors.topMargin: root.padTop
-        anchors.leftMargin: root.padX
-        anchors.rightMargin: root.padRight
+        anchors.leftMargin: root.padX + root.flare
+        anchors.rightMargin: root.padRight + root.flare
         spacing: 2
       }
     }

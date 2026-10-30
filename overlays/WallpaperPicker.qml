@@ -13,9 +13,9 @@ PopupBase {
   id: root
 
   panelWidth: 760
-  padTop: 16
-  padBottom: 12
-  padX: 20
+  padTop: Theme.space.lg
+  padBottom: Theme.space.lg
+  padX: Theme.space.lg
   spacing: 10
   backdropFocus: false     // o foco e do campo de busca
 
@@ -154,7 +154,7 @@ PopupBase {
         Rectangle {
           anchors.fill: parent
           anchors.margins: 4
-          radius: 10
+          radius: Theme.shape.md
           color: Theme.surfaceContainer
           border.width: 2
           border.color: cell.selected ? Theme.primary : (cellArea.containsMouse ? Theme.surfaceContainerHighest : "transparent")
@@ -162,7 +162,7 @@ PopupBase {
           ClippingRectangle {
             anchors.fill: parent
             anchors.margins: 3
-            radius: 7
+            radius: Theme.shape.sm
             color: "transparent"
             Image {
               anchors.fill: parent
@@ -200,7 +200,7 @@ PopupBase {
             anchors.margins: 8
             width: 22
             height: 20
-            radius: 6
+            radius: height / 2
             visible: cell.modelData.video
             color: Theme.surface
             opacity: 0.85
@@ -217,7 +217,7 @@ PopupBase {
             anchors.margins: 8
             width: 20
             height: 20
-            radius: 10
+            radius: height / 2
             visible: cell.isCurrent
             color: Theme.primary
             Glyph {
@@ -248,14 +248,14 @@ PopupBase {
       height: parent.height
       Rectangle {
         anchors.fill: parent
-        radius: 2
+        radius: height / 2
         color: Theme.surfaceContainer
       }
       Rectangle {
         width: parent.width
         y: grid.visibleArea.yPosition * parent.height
         height: Math.max(24, grid.visibleArea.heightRatio * parent.height)
-        radius: 2
+        radius: height / 2
         color: Theme.surfaceContainerHighest
       }
     }

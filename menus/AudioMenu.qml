@@ -13,9 +13,9 @@ PopupBase {
   id: root
 
   panelWidth: 380
-  padTop: 16
-  padBottom: 12
-  padX: 20
+  padTop: Theme.space.lg
+  padBottom: Theme.space.lg
+  padX: Theme.space.lg
   spacing: 6
 
   function toggle() {

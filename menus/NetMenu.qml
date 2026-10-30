@@ -12,7 +12,7 @@ PopupBase {
   id: root
 
   panelWidth: 270
-  panelX: root.width - panelWidth - 8
+  panelX: root.width - panelWidth - Theme.edge
   // cede foco p/ senha quando aberta (senao digitacao falha)
   backdropFocus: pwNet === null
 
@@ -93,7 +93,7 @@ PopupBase {
 
         Rectangle {
           anchors.fill: parent
-          radius: 8
+          radius: Theme.shape.sm
           color: (ssidArea.containsMouse || lockArea.containsMouse) ? Theme.surfaceContainerHighest : "transparent"
         }
         RowLayout {
@@ -177,7 +177,7 @@ PopupBase {
       implicitHeight: 32
       Rectangle {
         anchors.fill: parent
-        radius: 8
+        radius: Theme.shape.sm
         color: Theme.surfaceContainerHighest
       }
       TextInput {

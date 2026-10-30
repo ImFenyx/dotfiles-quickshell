@@ -13,7 +13,7 @@ PopupBase {
   id: root
 
   panelWidth: 280
-  panelX: Math.max(8, Math.min(root.width - panelWidth - 8, anchorX - panelWidth / 2))
+  panelX: Math.max(Theme.edge, Math.min(root.width - panelWidth - Theme.edge, anchorX - panelWidth / 2))
 
   property var trayItem: null
   property real anchorX: 0

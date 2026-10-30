@@ -18,10 +18,10 @@ PopupBase {
   panelWidth: Theme.sideTabW + Theme.edge
   panelX: root.width - panelWidth
   // topo e base incluem a orelha da concordancia com o filete (EdgeTab.ear)
-  padTop: Theme.scoop + 14
-  padBottom: Theme.scoop + 14
-  padX: 14
-  padRight: Theme.edge + 14
+  padTop: Theme.frameR + Theme.space.lg
+  padBottom: Theme.frameR + Theme.space.lg
+  padX: Theme.space.lg
+  padRight: Theme.edge + Theme.space.lg
   spacing: 10
   // digitando uma resposta: o foco e do campo de texto (como na senha do NetMenu)
   backdropFocus: !Notifs.list.some(n => n.replying)
@@ -96,7 +96,7 @@ PopupBase {
       visible: Notifs.total > 0
       implicitWidth: clearRow.implicitWidth + 20
       implicitHeight: 26
-      radius: 13
+      radius: height / 2
       color: clearArea.containsMouse ? Theme.surfaceContainerHighest : Theme.surfaceContainer
       RowLayout {
         id: clearRow

@@ -18,12 +18,11 @@ PopupBase {
   fromBottom: true
   tuck: 1                 // mesma cor da borda = sem hairline
   panelWidth: 600
-  padTop: 12
-  padBottom: 8
-  padX: 18
+  padTop: Theme.space.lg
+  padBottom: Theme.edge + Theme.space.sm
+  padX: Theme.space.lg
   // k=18: moldura EdgeFrame (8px, mesma cor) esconde a base do scoop;
   // sobram ~10px visiveis = paridade com os menus.
-  bendK: 18
   asyncShape: false
   backdropFocus: false    // o foco e do TextInput
 
@@ -477,7 +476,7 @@ PopupBase {
 
         Rectangle {
           anchors.fill: parent
-          radius: 8
+          radius: Theme.shape.sm
           color: row.selected ? Theme.surfaceContainerHighest : (rowArea.containsMouse ? Theme.surfaceContainer : "transparent")
         }
         RowLayout {
@@ -569,7 +568,7 @@ PopupBase {
         Rectangle {
           anchors.fill: parent
           anchors.margins: 4
-          radius: 10
+          radius: Theme.shape.md
           color: Theme.surfaceContainer
           border.width: 2
           border.color: root.selectedIndex === cell.index ? Theme.primary : (cellArea.containsMouse ? Theme.surfaceContainerHighest : "transparent")
@@ -577,7 +576,7 @@ PopupBase {
           ClippingRectangle {
             anchors.fill: parent
             anchors.margins: 4
-            radius: 7
+            radius: Theme.shape.sm
             color: "transparent"
             Image {
               id: thumb
@@ -620,14 +619,14 @@ PopupBase {
       height: parent.height
       Rectangle {
         anchors.fill: parent
-        radius: 2
+        radius: height / 2
         color: Theme.surfaceContainer
       }
       Rectangle {
         width: parent.width
         y: parent.view.visibleArea.yPosition * parent.height
         height: Math.max(24, parent.view.visibleArea.heightRatio * parent.height)
-        radius: 2
+        radius: height / 2
         color: Theme.surfaceContainerHighest
       }
     }
@@ -648,7 +647,7 @@ PopupBase {
         anchors.centerIn: parent
         width: toneRow.implicitWidth + 28
         height: toneRow.implicitHeight + toneTitle.implicitHeight + 34
-        radius: 14
+        radius: Theme.shape.popup
         color: Theme.surfaceContainer
         border.width: 1
         border.color: Theme.surfaceContainerHighest
@@ -679,7 +678,7 @@ PopupBase {
               required property int index
               width: 52
               height: 52
-              radius: 12
+              radius: Theme.shape.md
               color: root.toneSel === index ? Theme.surfaceContainerHighest : "transparent"
               border.width: 2
               border.color: root.toneSel === index ? Theme.primary : "transparent"
@@ -730,7 +729,7 @@ PopupBase {
   Rectangle {
     Layout.fillWidth: true
     Layout.preferredHeight: 42
-    radius: 10
+    radius: height / 2
     color: Theme.surfaceContainerHighest
     RowLayout {
       anchors.fill: parent

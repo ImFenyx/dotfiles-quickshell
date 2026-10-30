@@ -3,10 +3,10 @@ import QtQuick.Shapes
 import Quickshell
 import Quickshell.Wayland
 
-// Moldura de janela unica (modelo caelestia ContentWindow, sem o plugin
-// SDF): filetes laterais + inferior + dobras internas arredondadas num so
-// Shape (GPU, CurveRenderer). Mesma geometria do Canvas anterior, mas sem
-// repaint na CPU: o path e binding e so re-triangula ao redimensionar.
+// Moldura (modelo caelestia ContentWindow, sem o plugin SDF): filetes laterais e
+// inferior + os quatro cantos internos num so Shape (GPU, CurveRenderer), comecando
+// na base da barra (sem sobrepor a barra: com vidro, sobreposicao dobra o alfa).
+// Cantos em arco circular de raio Theme.frameR, concentricos ao canto das janelas.
 // Click-through.
 PanelWindow {
   id: root
@@ -19,9 +19,9 @@ PanelWindow {
   color: "transparent"
 
   property color bg: Theme.surface
-  property int edge: Theme.edge
-  property int topH: Theme.topH // barH + scoop: a faixa da barra e dela, aqui recorta
-  property int bendR: Theme.bendR // raio interno da dobra inferior (= scoop - edge)
+  readonly property int e: Theme.edge
+  readonly property int top: Theme.barH
+  readonly property int r: Theme.frameR
 
   Shape {
     id: frame
@@ -35,57 +35,24 @@ PanelWindow {
       pathHints: ShapePath.PathSolid | ShapePath.PathNonIntersecting
 
       startX: 0
-      startY: root.topH
-      // filete esquerdo (desce ate a dobra)
-      PathLine {
-        x: root.edge
-        y: root.topH
-      }
-      PathLine {
-        x: root.edge
-        y: frame.height - root.edge - root.bendR
-      }
-      // dobra inferior esquerda
-      PathQuad {
-        x: root.edge + root.bendR
-        y: frame.height - root.edge
-        controlX: root.edge
-        controlY: frame.height - root.edge
-      }
-      // filete inferior
-      PathLine {
-        x: frame.width - root.edge - root.bendR
-        y: frame.height - root.edge
-      }
-      // dobra inferior direita
-      PathQuad {
-        x: frame.width - root.edge
-        y: frame.height - root.edge - root.bendR
-        controlX: frame.width - root.edge
-        controlY: frame.height - root.edge
-      }
-      // filete direito (sobe ate a barra)
-      PathLine {
-        x: frame.width - root.edge
-        y: root.topH
-      }
-      PathLine {
-        x: frame.width
-        y: root.topH
-      }
-      // contorno externo: desce a lateral, fecha por baixo e volta
-      PathLine {
-        x: frame.width
-        y: frame.height
-      }
-      PathLine {
-        x: 0
-        y: frame.height
-      }
-      PathLine {
-        x: 0
-        y: root.topH
-      }
+      startY: root.top
+      // base da barra ate o canto superior esquerdo
+      PathLine { x: root.e + root.r; y: root.top }
+      PathArc { x: root.e; y: root.top + root.r; radiusX: root.r; radiusY: root.r; direction: PathArc.Counterclockwise }
+      // filete esquerdo e canto inferior esquerdo
+      PathLine { x: root.e; y: frame.height - root.e - root.r }
+      PathArc { x: root.e + root.r; y: frame.height - root.e; radiusX: root.r; radiusY: root.r; direction: PathArc.Counterclockwise }
+      // filete inferior e canto inferior direito
+      PathLine { x: frame.width - root.e - root.r; y: frame.height - root.e }
+      PathArc { x: frame.width - root.e; y: frame.height - root.e - root.r; radiusX: root.r; radiusY: root.r; direction: PathArc.Counterclockwise }
+      // filete direito e canto superior direito
+      PathLine { x: frame.width - root.e; y: root.top + root.r }
+      PathArc { x: frame.width - root.e - root.r; y: root.top; radiusX: root.r; radiusY: root.r; direction: PathArc.Counterclockwise }
+      // base da barra ate a borda e contorno externo
+      PathLine { x: frame.width; y: root.top }
+      PathLine { x: frame.width; y: frame.height }
+      PathLine { x: 0; y: frame.height }
+      PathLine { x: 0; y: root.top }
     }
   }
 }

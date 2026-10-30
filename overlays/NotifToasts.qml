@@ -15,8 +15,8 @@ PanelWindow {
 
   property bool suppress: false          // centro aberto: toasts somem
 
-  readonly property int pad: 14
-  readonly property int ear: Theme.scoop
+  readonly property int pad: Theme.space.lg
+  readonly property int ear: Theme.frameR
   readonly property int tabW: Theme.sideTabW + Theme.edge
   readonly property int maxVisible: 4
 

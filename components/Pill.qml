@@ -19,7 +19,7 @@ Rectangle {
   signal clicked
   signal tipRequested   // hover: quem usa pode atualizar o dado antes do tooltip
 
-  radius: 99
+  radius: height / 2
   implicitHeight: 28
   implicitWidth: row.implicitWidth + hpad
 

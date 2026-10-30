@@ -60,7 +60,7 @@ PanelWindow {
     color: Theme.surface
     border.color: Theme.primary
     border.width: 1
-    radius: 8
+    radius: Theme.shape.sm
     width: tipLabel.implicitWidth + 20
     height: tipLabel.implicitHeight + 16
     x: Math.max(8, Math.min(root.width - width - 8, root.tipX - width / 2))

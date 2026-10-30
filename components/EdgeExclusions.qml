@@ -5,7 +5,7 @@ import Quickshell
 // 1x1 com mascara vazia que so reservam espaco para o tiling. O visual
 // continua Ignore (posicao exata); a reserva vive aqui, entao baixar o
 // gaps_out abaixo de edge nao deixa a janela invadir o filete. O topo
-// dispensa fantasma: a propria barra ja reserva barH + scoop.
+// dispensa fantasma: a propria barra ja reserva barH.
 Scope {
   id: root
 

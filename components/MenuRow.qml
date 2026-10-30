@@ -22,7 +22,7 @@ Item {
 
   Rectangle {
     anchors.fill: parent
-    radius: 8
+    radius: Theme.shape.sm
     color: row.armed ? Theme.error : (area.containsMouse ? Theme.surfaceContainerHighest : "transparent")
   }
   RowLayout {
@@ -56,7 +56,7 @@ Item {
       visible: row.checkable
       Layout.preferredWidth: 18
       Layout.preferredHeight: 18
-      radius: 9
+      radius: height / 2
       color: row.checked ? Theme.primary : "transparent"
       border.color: Theme.primary
       border.width: 1
@@ -64,7 +64,7 @@ Item {
         anchors.centerIn: parent
         width: 8
         height: 8
-        radius: 4
+        radius: height / 2
         color: Theme.fgPrimary
         visible: row.checked
       }

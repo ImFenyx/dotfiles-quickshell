@@ -21,7 +21,7 @@ Rectangle {
 
   Layout.fillWidth: true
   implicitHeight: col.implicitHeight + 24
-  radius: 16
+  radius: Theme.shape.md
   color: Theme.surfaceContainer
 
   // a posicao do MPRIS nao notifica: puxa a cada segundo (so tocando e visivel)
@@ -47,7 +47,7 @@ Rectangle {
       ClippingRectangle {
         Layout.preferredWidth: 58
         Layout.preferredHeight: 58
-        radius: 12
+        radius: Theme.shape.md
         color: Theme.surfaceContainerHighest
         Image {
           anchors.fill: parent
@@ -108,7 +108,7 @@ Rectangle {
         Layout.alignment: Qt.AlignTop
         Layout.preferredWidth: 24
         Layout.preferredHeight: 24
-        radius: 12
+        radius: Theme.shape.md
         color: swapArea.containsMouse ? Theme.surfaceContainerHighest : "transparent"
         Glyph {
           anchors.centerIn: parent
@@ -139,12 +139,12 @@ Rectangle {
           anchors.verticalCenter: parent.verticalCenter
           width: parent.width
           height: 5
-          radius: 3
+          radius: height / 2
           color: Theme.surfaceContainerHighest
           Rectangle {
             width: parent.width * Math.min(1, Media.position / Media.length)
             height: parent.height
-            radius: 3
+            radius: height / 2
             color: Theme.primary
           }
         }
@@ -180,7 +180,7 @@ Rectangle {
       Rectangle {
         Layout.preferredWidth: 36
         Layout.preferredHeight: 36
-        radius: 18
+        radius: height / 2
         opacity: Media.canPrev ? 1 : 0.35
         color: prevArea.containsMouse ? Theme.surfaceContainerHighest : "transparent"
         Glyph {
@@ -200,7 +200,7 @@ Rectangle {
       Rectangle {
         Layout.preferredWidth: 44
         Layout.preferredHeight: 44
-        radius: 22
+        radius: height / 2
         opacity: Media.canToggle ? 1 : 0.35
         color: playArea.containsMouse ? Theme.secondary : Theme.primary
         Glyph {
@@ -221,7 +221,7 @@ Rectangle {
       Rectangle {
         Layout.preferredWidth: 36
         Layout.preferredHeight: 36
-        radius: 18
+        radius: height / 2
         opacity: Media.canNext ? 1 : 0.35
         color: nextArea.containsMouse ? Theme.surfaceContainerHighest : "transparent"
         Glyph {

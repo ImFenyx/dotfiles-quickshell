@@ -11,7 +11,7 @@ PopupBase {
   id: root
 
   panelWidth: 270
-  panelX: root.width - panelWidth - 8
+  panelX: root.width - panelWidth - Theme.edge
 
   property string armed: ""
   property var warns: []     // saida do power-check: o mais importante 1o

@@ -18,7 +18,7 @@ Rectangle {
   Layout.fillWidth: true
   Layout.preferredWidth: 1
   Layout.preferredHeight: 62
-  radius: 14
+  radius: Theme.shape.md
   color: active ? Theme.primary : (area.containsMouse ? Theme.surfaceContainerHighest : Theme.surfaceContainer)
 
   Behavior on color {

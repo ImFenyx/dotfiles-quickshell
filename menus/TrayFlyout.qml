@@ -76,7 +76,7 @@ Item {
 
     Rectangle {
       anchors.fill: parent
-      radius: 16
+      radius: Theme.shape.popup
       color: Theme.surface
     }
     TrayMenuList {

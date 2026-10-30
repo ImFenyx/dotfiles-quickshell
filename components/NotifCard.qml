@@ -26,7 +26,7 @@ Item {
     width: root.width
     implicitHeight: content.implicitHeight + 24
     height: implicitHeight
-    radius: 14
+    radius: Theme.shape.md
     color: area.containsMouse ? Theme.surfaceContainerHighest : Theme.surfaceContainer
     border.width: root.item.urgency === 2 ? 1 : 0
     border.color: Theme.error
@@ -111,7 +111,7 @@ Item {
         Layout.alignment: Qt.AlignTop
         Layout.preferredWidth: 40
         Layout.preferredHeight: 40
-        radius: 12
+        radius: Theme.shape.md
         color: Theme.surfaceContainerHighest
 
         Image {
@@ -152,7 +152,7 @@ Item {
           Rectangle {
             Layout.preferredWidth: 20
             Layout.preferredHeight: 20
-            radius: 10
+            radius: height / 2
             opacity: (area.containsMouse || closeArea.containsMouse || root.toast) ? 1 : 0
             color: closeArea.containsMouse ? Theme.surfaceContainer : "transparent"
             Behavior on opacity {
@@ -207,7 +207,7 @@ Item {
           Layout.topMargin: 4
           Layout.preferredHeight: 110
           visible: root.item.bodyImage !== "" && bodyImg.status === Image.Ready
-          radius: 10
+          radius: Theme.shape.md
           color: Theme.surfaceContainerHighest
           Image {
             id: bodyImg
@@ -225,12 +225,12 @@ Item {
           Layout.topMargin: 4
           Layout.preferredHeight: 6
           visible: root.item.progress >= 0
-          radius: 3
+          radius: height / 2
           color: Theme.surfaceContainerHighest
           Rectangle {
             width: parent.width * root.item.progress / 100
             height: parent.height
-            radius: 3
+            radius: height / 2
             color: Theme.primary
           }
         }
@@ -249,7 +249,7 @@ Item {
               readonly property string iconSrc: root.item.actionIcons ? Quickshell.iconPath(modelData.id, true) : ""
               width: iconSrc !== "" ? 30 : label.implicitWidth + 20
               height: 26
-              radius: 13
+              radius: height / 2
               color: btnArea.containsMouse ? Theme.primary : Theme.surfaceContainerHighest
               IconImage {
                 anchors.centerIn: parent
@@ -286,7 +286,7 @@ Item {
           Layout.topMargin: 4
           Layout.preferredHeight: 32
           visible: root.item.hasReply && !root.toast
-          radius: 16
+          radius: height / 2
           color: Theme.surfaceContainerHighest
           border.width: input.activeFocus ? 1 : 0
           border.color: Theme.primary

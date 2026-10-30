@@ -3,9 +3,8 @@ import QtQuick.Layouts
 import Quickshell
 import qs.components
 
-// Barra colada no topo + scoops invertidos (RoundCorner) nas pontas, fluindo
-// para as laterais da tela. Tudo dentro da propria janela.
-// Medidas em Theme (derivadas do gaps_out do Hyprland, modules/look.lua).
+// Barra colada no topo. Os cantos que descem para as laterais sao da EdgeFrame
+// (comeca na base da barra, sem sobrepor). Medidas em Theme (DESIGN.md).
 //
 // Os widgets vivem em bar/*.qml; esta janela so compoe. Os cliques que abrem
 // menus saem como sinais — quem coordena os menus e o shell.qml.
@@ -23,8 +22,8 @@ PanelWindow {
   anchors.top: true
   anchors.left: true
   anchors.right: true
-  // a propria barra reserva barH + scoop (exclusionMode Auto)
-  implicitHeight: Theme.barH + Theme.scoop
+  // a propria barra reserva a altura dela (exclusionMode Auto): janela a gaps_out abaixo
+  implicitHeight: Theme.barH
   color: "transparent"
 
   // fundo da barra: faixa total, topo reto colado na tela.
@@ -40,36 +39,6 @@ PanelWindow {
       anchors.right: parent.right
       height: Theme.barH
       color: Theme.surface
-    }
-
-    // decoradores: curva concava da ponta da barra ate a lateral da tela.
-    // Encaixe exato, sem stroke e sem sobrepor (o fundo pode ser translucido:
-    // qualquer sobreposicao dobra o alfa e vira linha).
-    Item {
-      anchors.top: barContent.bottom
-      anchors.left: parent.left
-      anchors.right: parent.right
-      height: Theme.scoop
-      RoundCorner {
-        anchors.top: parent.top
-        anchors.bottom: parent.bottom
-        anchors.left: parent.left
-        implicitSize: Theme.scoop
-        tail: Theme.edge
-        color: Theme.surface
-        borderWidth: 0
-        corner: RoundCorner.CornerEnum.TopLeft
-      }
-      RoundCorner {
-        anchors.top: parent.top
-        anchors.bottom: parent.bottom
-        anchors.right: parent.right
-        implicitSize: Theme.scoop
-        tail: Theme.edge
-        color: Theme.surface
-        borderWidth: 0
-        corner: RoundCorner.CornerEnum.TopRight
-      }
     }
   }
 

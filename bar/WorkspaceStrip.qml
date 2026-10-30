@@ -81,7 +81,7 @@ Pill {
 
       Layout.preferredWidth: (isActive ? root.dotActive : root.dot) + root.slots(apps.length, cap) * root.slot
       Layout.preferredHeight: 26
-      radius: 99
+      radius: height / 2
       color: isActive ? Theme.primary : (occupied && !isSpecial ? Theme.outline : Theme.surface)
       // icones entram antes da largura assentar
       clip: true

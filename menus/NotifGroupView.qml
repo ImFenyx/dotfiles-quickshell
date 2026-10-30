@@ -42,7 +42,7 @@ Item {
       ClippingRectangle {
         Layout.preferredWidth: 20
         Layout.preferredHeight: 20
-        radius: 6
+        radius: Theme.shape.sm
         color: Theme.surfaceContainerHighest
         Image {
           anchors.fill: parent
@@ -73,7 +73,7 @@ Item {
       Rectangle {
         implicitWidth: countText.implicitWidth + 12
         implicitHeight: 18
-        radius: 9
+        radius: height / 2
         color: root.group.urgency === 2 ? Theme.error : Theme.surfaceContainerHighest
         UiText {
           id: countText
@@ -90,7 +90,7 @@ Item {
       Rectangle {
         Layout.preferredWidth: 24
         Layout.preferredHeight: 24
-        radius: 12
+        radius: height / 2
         color: toggleArea.containsMouse ? Theme.surfaceContainerHighest : "transparent"
         Glyph {
           anchors.centerIn: parent
@@ -109,7 +109,7 @@ Item {
       Rectangle {
         Layout.preferredWidth: 24
         Layout.preferredHeight: 24
-        radius: 12
+        radius: height / 2
         color: clearArea.containsMouse ? Theme.surfaceContainerHighest : "transparent"
         Glyph {
           anchors.centerIn: parent
@@ -138,7 +138,7 @@ Item {
         y: cards.implicitHeight - 14
         width: parent.width - 16
         height: 24
-        radius: 14
+        radius: Theme.shape.md
         color: Theme.surfaceContainer
         opacity: 0.75
       }
@@ -148,7 +148,7 @@ Item {
         y: cards.implicitHeight - 8
         width: parent.width - 32
         height: 24
-        radius: 14
+        radius: Theme.shape.md
         color: Theme.surfaceContainer
         opacity: 0.45
       }

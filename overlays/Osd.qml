@@ -17,9 +17,9 @@ PopupBase {
   // anima melhor — medido com a tecla de volume/brilho segurada.
   asyncShape: false
   tuck: 1                  // 1px p/ dentro da barra (mesma cor opaca = sem hairline de AA)
-  padTop: 12
-  padBottom: 7
-  padX: 22
+  padTop: Theme.space.md
+  padBottom: Theme.space.md
+  padX: Theme.space.lg
   panelWidth: contentImplicitWidth + 2 * padX
   // barra coberta (fullscreen): OSD vira pill solta, sem notch/fuse
   pill: Fullscreen.barHidden
@@ -85,12 +85,12 @@ PopupBase {
       Layout.preferredWidth: 300
       Layout.preferredHeight: 10
       Layout.alignment: Qt.AlignVCenter
-      radius: 5
+      radius: height / 2
       color: Theme.surfaceContainerHighest
       Rectangle {
         width: parent.width * (root.muted ? 0 : Math.min(root.vol, 100) / 100)
         height: parent.height
-        radius: 5
+        radius: height / 2
         color: root.boosted ? Theme.error : Theme.info
         // overshoot com cauda (o mesmo spring das pills): passa do ponto e assenta depois da tecla
         Behavior on width {

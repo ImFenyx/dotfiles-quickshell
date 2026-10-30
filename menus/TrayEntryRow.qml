@@ -29,7 +29,7 @@ Item {
   Rectangle {
     visible: !row.entry.isSeparator
     anchors.fill: parent
-    radius: 8
+    radius: Theme.shape.sm
     color: (row.active || (area.containsMouse && row.entry.enabled)) ? Theme.surfaceContainerHighest : "transparent"
   }
   RowLayout {
