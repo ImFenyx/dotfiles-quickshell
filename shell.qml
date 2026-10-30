@@ -333,7 +333,12 @@ ShellRoot {
   GlobalShortcut {
     name: "record"
     description: "Gravar tela (de novo, para)"
-    onPressed: Recorder.recording ? Recorder.stop() : capture.start("record")
+    onPressed: Recorder.replaying ? Recorder.saveReplay() : (Recorder.recording ? Recorder.stop() : capture.start("record"))
+  }
+  GlobalShortcut {
+    name: "record-pause"
+    description: "Pausar/retomar gravacao"
+    onPressed: Recorder.togglePause()
   }
   GlobalShortcut {
     name: "session"

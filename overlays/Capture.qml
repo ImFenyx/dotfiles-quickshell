@@ -45,6 +45,11 @@ PanelWindow {
       return;
     }
     mode = m;
+    optionsOpen = false;
+    if (m === "record") {
+      listAudio.running = true;
+      listApps.running = true;
+    }
     sel = Qt.rect(0, 0, 0, 0);
     dragging = false;
     Hyprland.refreshToplevels();
@@ -215,28 +220,98 @@ PanelWindow {
     }
   }
 
-  // barra embaixo: modo + opcoes (clique alterna o valor) + dica
-  readonly property var cycles: ({
-      timer: [0, 3, 5, 10],
-      audio: ["system", "mic", "both", "none"],
-      quality: ["very_high", "ultra", "medium", "high"],
-      fps: [60, 30]
-    })
-  function next(list, v) {
-    return list[(list.indexOf(v) + 1) % list.length];
+  // ---- opcoes (dados): cada uma e uma chave do ShellState e seus valores ----
+  // Dispositivos de audio e apps vem do proprio gpu-screen-recorder ao abrir no modo gravacao.
+  property var sysDevices: []
+  property var micDevices: []
+  property var apps: []
+  property bool optionsOpen: false
+
+  function pairs(list) {
+    return list.map(x => ({ v: x[0], l: x[1] }));
   }
-  readonly property var chips: mode === "record" ? [
-      { label: "Áudio: " + ({ none: "nenhum", system: "sistema", mic: "microfone", both: "sistema + mic" })[ShellState.recAudio], act: () => ShellState.recAudio = next(cycles.audio, ShellState.recAudio) },
-      { label: "Qualidade: " + ({ medium: "média", high: "alta", very_high: "muito alta", ultra: "máxima" })[ShellState.recQuality], act: () => ShellState.recQuality = next(cycles.quality, ShellState.recQuality) },
-      { label: ShellState.recFps + " fps", act: () => ShellState.recFps = next(cycles.fps, ShellState.recFps) },
-      { label: "Cursor: " + (ShellState.recCursor ? "sim" : "não"), act: () => ShellState.recCursor = !ShellState.recCursor },
-      { label: "Pasta: " + Recorder.dir.replace(home, "~"), act: () => pickDir() }
-    ] : [
-      { label: "Copiar: " + (ShellState.captureCopy ? "sim" : "não"), act: () => ShellState.captureCopy = !ShellState.captureCopy },
-      { label: "Salvar: " + (ShellState.captureSave ? "sim" : "não"), act: () => ShellState.captureSave = !ShellState.captureSave },
-      { label: "Temporizador: " + (ShellState.captureTimer > 0 ? ShellState.captureTimer + " s" : "não"), act: () => ShellState.captureTimer = next(cycles.timer, ShellState.captureTimer) },
-      { label: "Pasta: " + outDir.replace(home, "~"), act: () => pickDir() }
-    ]
+  readonly property var recRows: [
+    { g: "Vídeo", label: "Codec", key: "recCodec", values: pairs([["auto", "Auto"], ["h264", "H.264"], ["hevc", "HEVC"], ["hevc_10bit", "HEVC 10-bit"], ["vp9", "VP9"]]) },
+    { g: "Vídeo", label: "Qualidade", key: "recQuality", values: pairs([["medium", "Média"], ["high", "Alta"], ["very_high", "Muito alta"], ["ultra", "Máxima"], ["cbr:8000", "8 Mbps"], ["cbr:16000", "16 Mbps"], ["cbr:32000", "32 Mbps"]]) },
+    { g: "Vídeo", label: "FPS", key: "recFps", values: pairs([[24, "24"], [30, "30"], [60, "60"]]) },
+    { g: "Vídeo", label: "Quadros", key: "recFpsMode", values: pairs([["vfr", "Variável"], ["cfr", "Constante (editores)"]]) },
+    { g: "Vídeo", label: "Resolução", key: "recScale", values: pairs([["0x0", "Original"], ["1920x1080", "1080p"], ["1280x720", "720p"], ["854x480", "480p"]]) },
+    { g: "Vídeo", label: "Cores", key: "recColor", values: pairs([["limited", "Limitada"], ["full", "Completa"]]) },
+    { g: "Vídeo", label: "Codificador", key: "recEncoder", values: pairs([["gpu", "GPU"], ["cpu", "CPU (só H.264)"]]) },
+    { g: "Vídeo", label: "Keyframe", key: "recKeyint", values: pairs([[1, "1 s"], [2, "2 s"], [5, "5 s"]]) },
+    { g: "Áudio", label: "Sistema", key: "recSys", values: pairs([["", "Nenhum"], ["default_output", "Padrão"]].concat(sysDevices)) },
+    { g: "Áudio", label: "Microfone", key: "recMic", values: pairs([["", "Nenhum"], ["default_input", "Padrão"]].concat(micDevices)) },
+    { g: "Áudio", label: "Só um app", key: "recApp", values: pairs([["", "Não"]].concat(apps.map(a => [a, a]))) },
+    { g: "Áudio", label: "Codec", key: "recAudioCodec", values: pairs([["opus", "Opus"], ["aac", "AAC"], ["flac", "FLAC"]]) },
+    { g: "Áudio", label: "Bitrate", key: "recAudioBitrate", values: pairs([[96, "96"], [128, "128"], [192, "192"], [256, "256 kbps"]]) },
+    { g: "Arquivo", label: "Formato", key: "recFormat", values: pairs([["mp4", "MP4"], ["mkv", "MKV"], ["webm", "WebM"], ["mov", "MOV"]]) },
+    { g: "Arquivo", label: "Pasta", key: "", values: [{ v: "pick", l: Recorder.dir.replace(home, "~") }] },
+    { g: "Extras", label: "Webcam (tela inteira)", key: "recWebcam", values: pairs([["none", "Não"], ["br", "↘"], ["bl", "↙"], ["tr", "↗"], ["tl", "↖"]]) },
+    { g: "Extras", label: "Cursor", key: "recCursor", values: pairs([[true, "Sim"], [false, "Não"]]) },
+    { g: "Extras", label: "Replay (últimos)", key: "recReplay", values: pairs([[0, "Não"], [30, "30 s"], [60, "1 min"], [120, "2 min"], [300, "5 min"]]) },
+    { g: "Extras", label: "Replay em", key: "recReplayStorage", values: pairs([["ram", "Memória"], ["disk", "Disco"]]) }
+  ]
+  function row(key) {
+    return recRows.find(r => r.key === key);
+  }
+  function valueLabel(r) {
+    const v = r.values.find(x => x.v === ShellState[r.key]);
+    return v ? v.l : String(ShellState[r.key]);
+  }
+  function pick(r, v) {
+    if (v === "pick")
+      pickDir();
+    else
+      ShellState[r.key] = v;
+  }
+  function cycle(key) {
+    const r = row(key), i = r.values.findIndex(x => x.v === ShellState[key]);
+    ShellState[key] = r.values[(i + 1) % r.values.length].v;
+  }
+  readonly property string audioSummary: {
+    const parts = [];
+    if (ShellState.recSys !== "")
+      parts.push("sistema");
+    if (ShellState.recMic !== "")
+      parts.push("mic");
+    if (ShellState.recApp !== "")
+      parts.push(ShellState.recApp);
+    return parts.length > 0 ? parts.join(" + ") : "nenhum";
+  }
+
+  Process {
+    id: listAudio
+    command: ["gpu-screen-recorder", "--list-audio-devices"]
+    stdout: StdioCollector {
+      onStreamFinished: {
+        const devs = text.split("\n").filter(l => l.includes("|")).map(l => l.split("|"));
+        root.sysDevices = devs.filter(d => d[0].endsWith(".monitor"));
+        root.micDevices = devs.filter(d => !d[0].endsWith(".monitor") && !d[0].startsWith("default_"));
+      }
+    }
+  }
+  Process {
+    id: listApps
+    command: ["gpu-screen-recorder", "--list-application-audio"]
+    stdout: StdioCollector {
+      onStreamFinished: root.apps = text.split("\n").map(l => l.trim()).filter(l => l !== "")
+    }
+  }
+
+  // ---- barra embaixo: modo + opcoes principais (clique alterna) + "Opcoes..." ----
+  readonly property var shotChips: [
+    { label: "Copiar: " + (ShellState.captureCopy ? "sim" : "não"), act: () => ShellState.captureCopy = !ShellState.captureCopy },
+    { label: "Salvar: " + (ShellState.captureSave ? "sim" : "não"), act: () => ShellState.captureSave = !ShellState.captureSave },
+    { label: "Temporizador: " + (ShellState.captureTimer > 0 ? ShellState.captureTimer + " s" : "não"), act: () => ShellState.captureTimer = [0, 3, 5, 10][([0, 3, 5, 10].indexOf(ShellState.captureTimer) + 1) % 4] },
+    { label: "Pasta: " + outDir.replace(home, "~"), act: () => pickDir() }
+  ]
+  readonly property var recChips: [
+    { label: "Áudio: " + audioSummary, act: () => root.optionsOpen = true },
+    { label: "Qualidade: " + valueLabel(row("recQuality")), act: () => cycle("recQuality") },
+    { label: valueLabel(row("recFps")) + " fps", act: () => cycle("recFps") },
+    { label: "Replay: " + valueLabel(row("recReplay")), act: () => cycle("recReplay") },
+    { label: root.optionsOpen ? "Fechar opções" : "Opções…", act: () => root.optionsOpen = !root.optionsOpen }
+  ]
 
   Column {
     z: 10
@@ -245,12 +320,100 @@ PanelWindow {
     anchors.bottomMargin: Theme.space.xxl
     spacing: Theme.space.sm
 
+    // painel com todas as opcoes de gravacao, em 4 colunas por grupo
+    Rectangle {
+      id: panel
+      visible: root.optionsOpen && root.mode === "record"
+      anchors.horizontalCenter: parent.horizontalCenter
+      implicitWidth: groups.implicitWidth + 2 * Theme.space.lg
+      implicitHeight: groups.implicitHeight + 2 * Theme.space.lg
+      radius: Theme.shape.dialog || 28
+      color: Theme.surface
+      MouseArea {
+        anchors.fill: parent      // engole o clique (nao comeca selecao por baixo)
+        acceptedButtons: Qt.AllButtons
+      }
+
+      Row {
+        id: groups
+        anchors.centerIn: parent
+        spacing: Theme.space.xl
+
+        Repeater {
+          model: ["Vídeo", "Áudio", "Arquivo", "Extras"]
+          Column {
+            id: grp
+            required property string modelData
+            width: 230
+            spacing: Theme.space.sm
+            UiText {
+              color: Theme.primary
+              font.pixelSize: Theme.type.title_s
+              font.weight: Font.Bold
+              text: grp.modelData
+            }
+            Repeater {
+              model: root.recRows.filter(r => r.g === grp.modelData)
+              Column {
+                id: opt
+                required property var modelData
+                width: grp.width
+                spacing: 2
+                UiText {
+                  color: Theme.fgSurfaceVariant
+                  font.pixelSize: Theme.type.label_m
+                  font.weight: Font.Medium
+                  text: opt.modelData.label
+                }
+                Flow {
+                  width: parent.width
+                  spacing: Theme.space.xs
+                  Repeater {
+                    model: opt.modelData.values
+                    Rectangle {
+                      id: val
+                      required property var modelData
+                      readonly property bool on: opt.modelData.key !== "" && ShellState[opt.modelData.key] === modelData.v
+                      implicitWidth: Math.min(valText.implicitWidth + 2 * Theme.space.sm, grp.width)
+                      implicitHeight: 26
+                      radius: height / 2
+                      color: on ? Theme.primary : (valArea.containsMouse ? Theme.surfaceContainerHighest : Theme.surfaceContainer)
+                      UiText {
+                        id: valText
+                        anchors.centerIn: parent
+                        width: Math.min(implicitWidth, grp.width - 2 * Theme.space.sm)
+                        elide: Text.ElideMiddle
+                        color: val.on ? Theme.fgPrimary : Theme.fgSurface
+                        font.pixelSize: Theme.type.label_m
+                        text: val.modelData.l
+                      }
+                      MouseArea {
+                        id: valArea
+                        anchors.fill: parent
+                        hoverEnabled: true
+                        cursorShape: Qt.PointingHandCursor
+                        onClicked: root.pick(opt.modelData, val.modelData.v)
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+
     Rectangle {
       anchors.horizontalCenter: parent.horizontalCenter
       implicitWidth: tools.implicitWidth + 2 * Theme.space.sm
       implicitHeight: 44
       radius: height / 2
       color: Theme.surface
+      MouseArea {
+        anchors.fill: parent
+        acceptedButtons: Qt.AllButtons
+      }
 
       Row {
         id: tools
@@ -280,7 +443,13 @@ PanelWindow {
               anchors.fill: parent
               hoverEnabled: true
               cursorShape: Qt.PointingHandCursor
-              onClicked: root.mode = seg.modelData.id
+              onClicked: {
+                root.mode = seg.modelData.id;
+                if (root.mode === "record") {
+                  listAudio.running = true;
+                  listApps.running = true;
+                }
+              }
             }
           }
         }
@@ -292,9 +461,9 @@ PanelWindow {
           color: Theme.outlineVariant
         }
 
-        // opcoes do modo
+        // opcoes principais do modo
         Repeater {
-          model: root.chips
+          model: root.mode === "record" ? root.recChips : root.shotChips
           Rectangle {
             id: chip
             required property var modelData

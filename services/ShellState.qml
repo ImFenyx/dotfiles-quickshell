@@ -24,11 +24,25 @@ Singleton {
   property alias captureSave: adapter.captureSave
   property alias captureTimer: adapter.captureTimer
   property alias captureDir: adapter.captureDir
-  property alias recAudio: adapter.recAudio
   property alias recQuality: adapter.recQuality
   property alias recFps: adapter.recFps
   property alias recCursor: adapter.recCursor
   property alias recDir: adapter.recDir
+  property alias recSys: adapter.recSys
+  property alias recMic: adapter.recMic
+  property alias recApp: adapter.recApp
+  property alias recCodec: adapter.recCodec
+  property alias recFpsMode: adapter.recFpsMode
+  property alias recScale: adapter.recScale
+  property alias recColor: adapter.recColor
+  property alias recEncoder: adapter.recEncoder
+  property alias recKeyint: adapter.recKeyint
+  property alias recAudioCodec: adapter.recAudioCodec
+  property alias recAudioBitrate: adapter.recAudioBitrate
+  property alias recFormat: adapter.recFormat
+  property alias recWebcam: adapter.recWebcam
+  property alias recReplay: adapter.recReplay
+  property alias recReplayStorage: adapter.recReplayStorage
   // o arquivo ja foi lido: antes disso os valores sao os padroes (quem restaura algo na partida espera)
   readonly property bool ready: file.loaded
 
@@ -56,11 +70,25 @@ Singleton {
       property bool captureSave: true               // captura salva em captureDir
       property int captureTimer: 0                  // s de espera depois de escolher a area
       property string captureDir: ""                // "" = ~/Imagens/Screenshots
-      property string recAudio: "system"            // none | system | mic | both
       property string recQuality: "very_high"       // medium | high | very_high | ultra
       property int recFps: 60
       property bool recCursor: true
       property string recDir: ""                    // "" = ~/Videos
+      property string recSys: "default_output"      // som do sistema: "" = nenhum, ou dispositivo
+      property string recMic: ""                    // microfone: "" = nenhum, ou dispositivo
+      property string recApp: ""                    // so o audio deste app ("" = nao usa)
+      property string recCodec: "auto"              // auto | h264 | hevc | hevc_10bit | vp9
+      property string recFpsMode: "vfr"             // vfr | cfr
+      property string recScale: "0x0"               // 0x0 = original, ou limite WxH
+      property string recColor: "limited"           // limited | full
+      property string recEncoder: "gpu"             // gpu | cpu (cpu so h264)
+      property real recKeyint: 2
+      property string recAudioCodec: "opus"         // opus | aac | flac
+      property int recAudioBitrate: 128
+      property string recFormat: "mp4"              // mp4 | mkv | webm | mov
+      property string recWebcam: "none"             // none | br | bl | tr | tl (so tela inteira)
+      property int recReplay: 0                     // s do replay instantaneo (0 = gravacao normal)
+      property string recReplayStorage: "ram"       // ram | disk
     }
   }
 
