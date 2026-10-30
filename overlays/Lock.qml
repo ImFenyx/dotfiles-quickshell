@@ -104,8 +104,8 @@ Scope {
 
         UiText {
           Layout.alignment: Qt.AlignHCenter
-          font.pointSize: 64
-          font.weight: Font.Bold
+          font.pixelSize: 128 // excecao a escala: o relogio e o destaque da tela
+          font.weight: Font.ExtraBold
           text: Time.clockText
         }
         UiText {
@@ -160,7 +160,7 @@ Scope {
             visible: input.text === ""
             verticalAlignment: Text.AlignVCenter
             color: Theme.outline
-            font.pixelSize: Theme.type.title_l
+            font.pixelSize: Theme.type.body_l
             text: pam.active ? "Verificando…" : "Senha"
           }
         }
