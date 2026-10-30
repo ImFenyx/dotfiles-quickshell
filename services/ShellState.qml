@@ -19,6 +19,16 @@ Singleton {
   property alias wallpaperPauseOnBattery: adapter.wallpaperPauseOnBattery
   property alias wallpaperVideoAudio: adapter.wallpaperVideoAudio
   property alias volumeGuard: adapter.volumeGuard
+  // captura e gravacao (barra da tela de captura)
+  property alias captureCopy: adapter.captureCopy
+  property alias captureSave: adapter.captureSave
+  property alias captureTimer: adapter.captureTimer
+  property alias captureDir: adapter.captureDir
+  property alias recAudio: adapter.recAudio
+  property alias recQuality: adapter.recQuality
+  property alias recFps: adapter.recFps
+  property alias recCursor: adapter.recCursor
+  property alias recDir: adapter.recDir
   // o arquivo ja foi lido: antes disso os valores sao os padroes (quem restaura algo na partida espera)
   readonly property bool ready: file.loaded
 
@@ -42,6 +52,15 @@ Singleton {
       property bool wallpaperPauseOnBattery: true   // atalho "Pausar video" no centro
       property bool wallpaperVideoAudio: false      // atalho "Som do video" no centro
       property bool volumeGuard: true               // "Protecao de volume" no mixer (services/Audio)
+      property bool captureCopy: true               // captura vai para o clipboard
+      property bool captureSave: true               // captura salva em captureDir
+      property int captureTimer: 0                  // s de espera depois de escolher a area
+      property string captureDir: ""                // "" = ~/Imagens/Screenshots
+      property string recAudio: "system"            // none | system | mic | both
+      property string recQuality: "very_high"       // medium | high | very_high | ultra
+      property int recFps: 60
+      property bool recCursor: true
+      property string recDir: ""                    // "" = ~/Videos
     }
   }
 

@@ -4,15 +4,22 @@ import QtQuick
 import Quickshell
 import Quickshell.Io
 
-// Gravacao de tela (gpu-screen-recorder): tela de um monitor ou regiao, 60 fps, com o
-// som do sistema, em ~/Videos. SIGINT para e salva. O indicador da barra mostra o tempo.
+// Gravacao de tela (gpu-screen-recorder): tela de um monitor ou regiao, com as opcoes da
+// barra da tela de captura (ShellState: audio, qualidade, fps, cursor, pasta). SIGINT para
+// e salva (codigo 0). O indicador da barra mostra o tempo.
 Singleton {
   id: root
 
   readonly property bool recording: proc.running
   property int elapsed: 0
   property string file: ""
-  readonly property string dir: Quickshell.env("HOME") + "/Vídeos"
+  readonly property string dir: ShellState.recDir || Quickshell.env("HOME") + "/Vídeos"
+  readonly property var audioArgs: ({
+      none: [],
+      system: ["-a", "default_output"],
+      mic: ["-a", "default_input"],
+      both: ["-a", "default_output|default_input"]
+    })
   readonly property string elapsedText: Math.floor(elapsed / 60) + ":" + String(elapsed % 60).padStart(2, "0")
 
   function startMonitor(name) {
@@ -26,7 +33,7 @@ Singleton {
     if (proc.running)
       return;
     file = dir + "/gravacao_" + Qt.formatDateTime(new Date(), "yyyy-MM-dd_HH-mm-ss") + ".mp4";
-    proc.command = ["gpu-screen-recorder"].concat(args, ["-f", "60", "-a", "default_output", "-o", file]);
+    proc.command = ["gpu-screen-recorder"].concat(args, ["-f", String(ShellState.recFps), "-q", ShellState.recQuality, "-cursor", ShellState.recCursor ? "yes" : "no"], audioArgs[ShellState.recAudio] ?? [], ["-o", file]);
     elapsed = 0;
     proc.running = true;
   }

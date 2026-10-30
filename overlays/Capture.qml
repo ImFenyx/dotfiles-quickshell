@@ -10,6 +10,8 @@ import qs.services
 // regiao, mouse sobre uma janela destaca e clique captura ela, Enter = tela toda, Esc ou
 // clique direito cancela. Screenshot: recorta, copia e salva em ~/Imagens/Screenshots.
 // Gravacao: a mesma escolha vira a area do gpu-screen-recorder (services/Recorder).
+// Barra embaixo (como o Cmd+Shift+5 do macOS): troca o modo e as opcoes de cada um, que
+// ficam salvas (ShellState). Temporizador: captura ao vivo depois da contagem.
 PanelWindow {
   id: root
 
@@ -34,7 +36,8 @@ PanelWindow {
   readonly property var monitor: screen ? Hyprland.monitorFor(screen) : null
   readonly property real scaleF: monitor ? monitor.scale : 1
   readonly property string tmp: Quickshell.env("XDG_RUNTIME_DIR") + "/eco-captura.png"
-  readonly property string outDir: Quickshell.env("HOME") + "/Imagens/Screenshots"
+  readonly property string outDir: ShellState.captureDir || Quickshell.env("HOME") + "/Imagens/Screenshots"
+  readonly property string home: Quickshell.env("HOME")
 
   function start(m) {
     if (open) {          // o mesmo atalho de novo cancela
@@ -76,9 +79,13 @@ PanelWindow {
     return null;
   }
 
-  // salva + copia + avisa; $out vira o arquivo final
+  // gera $out (cmd) e, conforme as opcoes, copia e/ou guarda; avisa no fim
   function save(cmd) {
-    const sh = 'out="' + outDir + '/captura_$(date +%F_%H-%M-%S).png"; mkdir -p "' + outDir + '" && ' + cmd.join(" ") + ' && wl-copy -t image/png < "$out" && notify-send -a Captura -i "$out" "Captura copiada" "Salva em ~/Imagens/Screenshots"';
+    const keep = ShellState.captureSave, copy = ShellState.captureCopy || !keep;
+    const dir = outDir.replace(home, "~");
+    const out = keep ? outDir + "/captura_$(date +%F_%H-%M-%S).png" : Quickshell.env("XDG_RUNTIME_DIR") + "/eco-captura-final.png";
+    const title = copy && keep ? "Captura copiada e salva" : (copy ? "Captura copiada" : "Captura salva");
+    const sh = 'out="' + out + '"; mkdir -p "' + outDir + '" && ' + cmd.join(" ") + (copy ? ' && wl-copy -t image/png < "$out"' : "") + ' && notify-send -a Captura -i "$out" "' + title + '" "' + (keep ? "Em " + dir : "Na área de transferência") + '"';
     Quickshell.execDetached(["sh", "-c", sh]);
   }
   function finish(r) {
@@ -93,9 +100,39 @@ PanelWindow {
         Recorder.startRegion(Math.round(monitor.x + r.x), Math.round(monitor.y + r.y), Math.round(r.width), Math.round(r.height));
       return;
     }
+    const t = ShellState.captureTimer;
+    if (t > 0) {
+      // ao vivo depois da contagem (para dar tempo de abrir um menu, por exemplo)
+      Quickshell.execDetached(["notify-send", "-a", "Captura", "-t", String(t * 1000), "Captura em " + t + " s"]);
+      const g = '"' + Math.round(monitor.x + r.x) + "," + Math.round(monitor.y + r.y) + " " + Math.round(r.width) + "x" + Math.round(r.height) + '"';
+      save(["sleep", String(t), "&&", "grim", "-g", g, '"$out"']);
+      return;
+    }
     const s = scaleF;
     const geo = Math.round(r.width * s) + "x" + Math.round(r.height * s) + "+" + Math.round(r.x * s) + "+" + Math.round(r.y * s);
     save(["magick", '"' + tmp + '"', "-crop", geo, "+repage", '"$out"']);
+  }
+
+  function pickDir() {
+    const cur = mode === "record" ? Recorder.dir : outDir;
+    close();
+    dirPick.command = ["kdialog", "--getexistingdirectory", cur, "--title", mode === "record" ? "Pasta das gravações" : "Pasta das capturas"];
+    dirPick.running = true;
+  }
+  Process {
+    id: dirPick
+    stdout: StdioCollector {
+      onStreamFinished: {
+        const d = text.trim();
+        if (d !== "") {
+          if (root.mode === "record")
+            ShellState.recDir = d;
+          else
+            ShellState.captureDir = d;
+        }
+        root.start(root.mode);
+      }
+    }
   }
 
   Process {
@@ -178,20 +215,126 @@ PanelWindow {
     }
   }
 
-  // dica embaixo
-  Rectangle {
+  // barra embaixo: modo + opcoes (clique alterna o valor) + dica
+  readonly property var cycles: ({
+      timer: [0, 3, 5, 10],
+      audio: ["system", "mic", "both", "none"],
+      quality: ["very_high", "ultra", "medium", "high"],
+      fps: [60, 30]
+    })
+  function next(list, v) {
+    return list[(list.indexOf(v) + 1) % list.length];
+  }
+  readonly property var chips: mode === "record" ? [
+      { label: "Áudio: " + ({ none: "nenhum", system: "sistema", mic: "microfone", both: "sistema + mic" })[ShellState.recAudio], act: () => ShellState.recAudio = next(cycles.audio, ShellState.recAudio) },
+      { label: "Qualidade: " + ({ medium: "média", high: "alta", very_high: "muito alta", ultra: "máxima" })[ShellState.recQuality], act: () => ShellState.recQuality = next(cycles.quality, ShellState.recQuality) },
+      { label: ShellState.recFps + " fps", act: () => ShellState.recFps = next(cycles.fps, ShellState.recFps) },
+      { label: "Cursor: " + (ShellState.recCursor ? "sim" : "não"), act: () => ShellState.recCursor = !ShellState.recCursor },
+      { label: "Pasta: " + Recorder.dir.replace(home, "~"), act: () => pickDir() }
+    ] : [
+      { label: "Copiar: " + (ShellState.captureCopy ? "sim" : "não"), act: () => ShellState.captureCopy = !ShellState.captureCopy },
+      { label: "Salvar: " + (ShellState.captureSave ? "sim" : "não"), act: () => ShellState.captureSave = !ShellState.captureSave },
+      { label: "Temporizador: " + (ShellState.captureTimer > 0 ? ShellState.captureTimer + " s" : "não"), act: () => ShellState.captureTimer = next(cycles.timer, ShellState.captureTimer) },
+      { label: "Pasta: " + outDir.replace(home, "~"), act: () => pickDir() }
+    ]
+
+  Column {
+    z: 10
     anchors.horizontalCenter: parent.horizontalCenter
     anchors.bottom: parent.bottom
     anchors.bottomMargin: Theme.space.xxl
-    implicitWidth: hint.implicitWidth + 2 * Theme.space.lg
-    implicitHeight: 36
-    radius: height / 2
-    color: Theme.surface
-    UiText {
-      id: hint
-      anchors.centerIn: parent
-      color: root.mode === "record" ? Theme.error : Theme.fgSurface
-      text: (root.mode === "record" ? "Gravar: " : "") + "arraste uma região · clique numa janela · Enter tela toda · Esc cancela"
+    spacing: Theme.space.sm
+
+    Rectangle {
+      anchors.horizontalCenter: parent.horizontalCenter
+      implicitWidth: tools.implicitWidth + 2 * Theme.space.sm
+      implicitHeight: 44
+      radius: height / 2
+      color: Theme.surface
+
+      Row {
+        id: tools
+        anchors.centerIn: parent
+        spacing: Theme.space.xs
+
+        // modo
+        Repeater {
+          model: [{ id: "shot", label: "Captura" }, { id: "record", label: "Gravação" }]
+          Rectangle {
+            id: seg
+            required property var modelData
+            readonly property bool on: root.mode === modelData.id
+            implicitWidth: segText.implicitWidth + 2 * Theme.space.md
+            implicitHeight: 32
+            radius: height / 2
+            color: on ? (modelData.id === "record" ? Theme.error : Theme.primary) : (segArea.containsMouse ? Theme.surfaceContainerHighest : "transparent")
+            UiText {
+              id: segText
+              anchors.centerIn: parent
+              color: seg.on ? Theme.fgPrimary : Theme.fgSurface
+              font.weight: Font.Bold
+              text: seg.modelData.label
+            }
+            MouseArea {
+              id: segArea
+              anchors.fill: parent
+              hoverEnabled: true
+              cursorShape: Qt.PointingHandCursor
+              onClicked: root.mode = seg.modelData.id
+            }
+          }
+        }
+
+        Rectangle {
+          width: 1
+          height: 24
+          anchors.verticalCenter: parent.verticalCenter
+          color: Theme.outlineVariant
+        }
+
+        // opcoes do modo
+        Repeater {
+          model: root.chips
+          Rectangle {
+            id: chip
+            required property var modelData
+            implicitWidth: chipText.implicitWidth + 2 * Theme.space.md
+            implicitHeight: 32
+            radius: height / 2
+            color: chipArea.containsMouse ? Theme.surfaceContainerHighest : Theme.surfaceContainer
+            UiText {
+              id: chipText
+              anchors.centerIn: parent
+              font.pixelSize: Theme.type.label_l
+              font.weight: Font.DemiBold
+              text: chip.modelData.label
+            }
+            MouseArea {
+              id: chipArea
+              anchors.fill: parent
+              hoverEnabled: true
+              cursorShape: Qt.PointingHandCursor
+              onClicked: chip.modelData.act()
+            }
+          }
+        }
+      }
+    }
+
+    Rectangle {
+      anchors.horizontalCenter: parent.horizontalCenter
+      implicitWidth: hint.implicitWidth + 2 * Theme.space.md
+      implicitHeight: 24
+      radius: height / 2
+      color: Theme.surface
+      UiText {
+        id: hint
+        anchors.centerIn: parent
+        color: Theme.fgSurfaceVariant
+        font.pixelSize: Theme.type.label_m
+        font.weight: Font.Medium
+        text: "arraste uma região · clique numa janela · Enter tela toda · Esc cancela"
+      }
     }
   }
 
