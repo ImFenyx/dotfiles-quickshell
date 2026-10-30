@@ -9,8 +9,8 @@ import qs.services
 
 // Overview (SUPER+A): os workspaces do monitor focado em miniatura, com as janelas ao
 // vivo (ScreencopyView) na posicao real. Clique na janela foca nela; clique no fundo vai
-// para o workspace. Setas escolhem o workspace, Enter vai, Esc fecha. As capturas so
-// existem com o painel visivel.
+// para o workspace; arrastar a janela para outro workspace move (sem seguir). Setas
+// escolhem o workspace, Enter vai, Esc fecha. As capturas so existem com o painel visivel.
 PopupBase {
   id: root
   layerName: "overview"
@@ -55,6 +55,26 @@ PopupBase {
     close();
     Hyprland.dispatch("hl.dsp.focus({ window = \"address:0x" + t.address + "\" })");
   }
+  function moveWindow(t, w) {
+    Hyprland.dispatch("hl.dsp.window.move({ window = \"address:0x" + t.address + "\", workspace = " + wsArg(w) + ", follow = false })");
+    relayout.restart();
+  }
+  // miniatura sob o ponto p (coordenadas do board)
+  function tileAt(p) {
+    for (let i = 0; i < tiles.count; i++) {
+      const t = tiles.itemAt(i);
+      if (t && t.contains(t.mapFromItem(board, p.x, p.y)))
+        return t;
+    }
+    return null;
+  }
+
+  // o Hyprland reorganiza depois de mover: posicoes novas um instante depois
+  Timer {
+    id: relayout
+    interval: 150
+    onTriggered: Hyprland.refreshToplevels()
+  }
 
   Item {
     focus: root.open
@@ -79,89 +99,150 @@ PopupBase {
     }
   }
 
-  GridLayout {
+  Item {
+    id: board
     Layout.alignment: Qt.AlignHCenter
-    columns: root.cols
-    columnSpacing: root.gap
-    rowSpacing: root.gap
+    implicitWidth: grid.implicitWidth
+    implicitHeight: grid.implicitHeight
 
-    Repeater {
-      model: root.visible ? root.list : []
+    GridLayout {
+      id: grid
+      columns: root.cols
+      columnSpacing: root.gap
+      rowSpacing: root.gap
 
-      Rectangle {
-        id: tile
-        required property var modelData
-        required property int index
-        readonly property bool current: root.monitor && root.monitor.activeWorkspace && root.monitor.activeWorkspace.name === modelData.name
+      Repeater {
+        id: tiles
+        model: root.visible ? root.list : []
 
-        Layout.preferredWidth: root.tileW
-        Layout.preferredHeight: root.monH * root.s
-        radius: Theme.shape.md
-        color: Theme.surfaceContainer
-        border.width: root.sel === index ? 2 : 0
-        border.color: Theme.primary
-        clip: true
-
-        MouseArea {
-          anchors.fill: parent
-          hoverEnabled: true
-          cursorShape: Qt.PointingHandCursor
-          onEntered: root.sel = tile.index
-          onClicked: root.go(tile.modelData)
-        }
-
-        Repeater {
-          model: tile.modelData.toplevels ? tile.modelData.toplevels.values : []
-
-          ClippingRectangle {
-            id: win
-            required property var modelData
-            readonly property var ipc: modelData.lastIpcObject
-            visible: !!(ipc && ipc.at && ipc.size) && !ipc.hidden
-            x: visible ? (ipc.at[0] - root.monX) * root.s : 0
-            y: visible ? (ipc.at[1] - root.monY) * root.s : 0
-            width: visible ? ipc.size[0] * root.s : 0
-            height: visible ? ipc.size[1] * root.s : 0
-            z: visible && ipc.floating ? 2 : 1
-            radius: Theme.shape.xs
-            color: Theme.surfaceContainerHighest
-            border.width: winArea.containsMouse ? 2 : 0
-            border.color: Theme.primary
-
-            ScreencopyView {
-              anchors.fill: parent
-              captureSource: win.modelData.wayland
-              live: root.open
-            }
-            MouseArea {
-              id: winArea
-              anchors.fill: parent
-              hoverEnabled: true
-              cursorShape: Qt.PointingHandCursor
-              onEntered: root.sel = tile.index
-              onClicked: root.focusWindow(win.modelData)
-            }
-          }
-        }
-
-        // numero do workspace por cima das janelas
         Rectangle {
-          z: 10
-          x: Theme.space.sm
-          y: Theme.space.sm
-          implicitWidth: label.implicitWidth + 2 * Theme.space.sm
-          implicitHeight: 22
-          radius: height / 2
-          color: tile.current ? Theme.primary : Theme.surface
-          UiText {
-            id: label
-            anchors.centerIn: parent
-            color: tile.current ? Theme.fgPrimary : Theme.fgSurface
-            font.pixelSize: Theme.type.label_m
-            font.weight: Font.Bold
-            text: tile.modelData.name
+          id: tile
+          required property var modelData
+          required property int index
+          readonly property bool current: root.monitor && root.monitor.activeWorkspace && root.monitor.activeWorkspace.name === modelData.name
+
+          Layout.preferredWidth: root.tileW
+          Layout.preferredHeight: root.monH * root.s
+          radius: Theme.shape.md
+          color: Theme.surfaceContainer
+          border.width: root.sel === index ? 2 : 0
+          border.color: Theme.primary
+          clip: true
+
+          MouseArea {
+            anchors.fill: parent
+            hoverEnabled: true
+            cursorShape: Qt.PointingHandCursor
+            onEntered: root.sel = tile.index
+            onClicked: root.go(tile.modelData)
+          }
+
+          Repeater {
+            model: tile.modelData.toplevels ? tile.modelData.toplevels.values : []
+
+            ClippingRectangle {
+              id: win
+              required property var modelData
+              readonly property var ipc: modelData.lastIpcObject
+              visible: !!(ipc && ipc.at && ipc.size) && !ipc.hidden
+              x: visible ? (ipc.at[0] - root.monX) * root.s : 0
+              y: visible ? (ipc.at[1] - root.monY) * root.s : 0
+              width: visible ? ipc.size[0] * root.s : 0
+              height: visible ? ipc.size[1] * root.s : 0
+              z: visible && ipc.floating ? 2 : 1
+              radius: Theme.shape.xs
+              color: Theme.surfaceContainerHighest
+              border.width: winArea.containsMouse ? 2 : 0
+              border.color: Theme.primary
+
+              ScreencopyView {
+                anchors.fill: parent
+                captureSource: win.modelData.wayland
+                live: root.open
+              }
+              MouseArea {
+                id: winArea
+                property point grab
+                property bool dragged: false
+                anchors.fill: parent
+                hoverEnabled: true
+                cursorShape: dragged && pressed ? Qt.ClosedHandCursor : Qt.PointingHandCursor
+                onEntered: root.sel = tile.index
+                onPressed: m => {
+                  grab = Qt.point(m.x, m.y);
+                  dragged = false;
+                }
+                onPositionChanged: m => {
+                  if (!pressed)
+                    return;
+                  if (!dragged && Math.hypot(m.x - grab.x, m.y - grab.y) > 6) {
+                    dragged = true;
+                    ghost.width = win.width;
+                    ghost.height = win.height;
+                    ghost.toplevel = win.modelData;
+                  }
+                  if (dragged) {
+                    const p = win.mapToItem(board, m.x, m.y);
+                    ghost.x = p.x - grab.x;
+                    ghost.y = p.y - grab.y;
+                    const t = root.tileAt(p);
+                    if (t)
+                      root.sel = t.index;
+                  }
+                }
+                onReleased: m => {
+                  if (!dragged)
+                    return;
+                  const t = root.tileAt(win.mapToItem(board, m.x, m.y));
+                  ghost.toplevel = null;
+                  if (t && t.modelData !== tile.modelData)
+                    root.moveWindow(win.modelData, t.modelData);
+                }
+                onClicked: {
+                  if (!dragged)
+                    root.focusWindow(win.modelData);
+                }
+              }
+            }
+          }
+
+          // numero do workspace por cima das janelas
+          Rectangle {
+            z: 10
+            x: Theme.space.sm
+            y: Theme.space.sm
+            implicitWidth: label.implicitWidth + 2 * Theme.space.sm
+            implicitHeight: 22
+            radius: height / 2
+            color: tile.current ? Theme.primary : Theme.surface
+            UiText {
+              id: label
+              anchors.centerIn: parent
+              color: tile.current ? Theme.fgPrimary : Theme.fgSurface
+              font.pixelSize: Theme.type.label_m
+              font.weight: Font.Bold
+              text: tile.modelData.name
+            }
           }
         }
+      }
+    }
+
+    // fantasma da janela arrastada: por cima de todas as miniaturas (fora do recorte delas)
+    ClippingRectangle {
+      id: ghost
+      property var toplevel: null
+      visible: toplevel !== null
+      z: 100
+      radius: Theme.shape.xs
+      opacity: 0.85
+      color: Theme.surfaceContainerHighest
+      border.width: 2
+      border.color: Theme.primary
+      ScreencopyView {
+        anchors.fill: parent
+        captureSource: ghost.toplevel ? ghost.toplevel.wayland : null
+        live: ghost.visible
       }
     }
   }
