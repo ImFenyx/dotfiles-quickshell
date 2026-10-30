@@ -6,7 +6,8 @@ import Quickshell.Widgets
 import qs.components
 import qs.services
 
-// Workspaces (ordenados em services/Workspaces). O ativo estica com spring.
+// Workspaces DESTE monitor (ordenados em services/Workspaces) + os special, que
+// abrem em qualquer um. O ativo estica com spring. Roda do mouse troca de workspace.
 // Cada um mostra o numero + icones dos apps abertos (um por app, ate
 // Config.wsIcons; o resto vira "+N"). A faixa nao passa de Theme.wsStripMax:
 // sem espaco, os outros workspaces perdem icones antes do ativo.
@@ -17,11 +18,18 @@ Pill {
   readonly property int dotActive: 48    // ativo: mais largo
   readonly property int slot: Theme.wsIcon + 3   // icone (ou "+N") + espaco antes dele
 
-  // sincronizado entre monitores: destaca o focado global. O special (ex.:
-  // magic) acende junto com o workspace normal enquanto estiver aberto.
+  property var screen: null
+  readonly property var monitor: screen ? Hyprland.monitorFor(screen) : null
+  readonly property var list: Workspaces.sorted.filter(w => String(w.name).startsWith("special:") || !monitor || !w.monitor || w.monitor === monitor)
+
+  // ativo = o workspace visivel NESTE monitor (cada barra mostra o seu). O special
+  // (ex.: magic) acende junto enquanto estiver aberto aqui.
   function active(w) {
     const name = String(w.name);
-    return name.startsWith("special:") ? Workspaces.activeSpecial === name : (Hyprland.focusedWorkspace != null && Hyprland.focusedWorkspace.name === name);
+    if (name.startsWith("special:"))
+      return (monitor ? Workspaces.specialByMonitor[monitor.name] || "" : Workspaces.activeSpecial) === name;
+    const cur = monitor ? monitor.activeWorkspace : Hyprland.focusedWorkspace;
+    return cur != null && cur.name === name;
   }
   // appIds distintos das janelas, na ordem do modelo. Special fica so com o glifo.
   function apps(w) {
@@ -45,7 +53,7 @@ Pill {
   }
   // maior nivel que cabe em Theme.wsStripMax (larguras exatas: cada slot e fixo)
   readonly property int level: {
-    const ws = Workspaces.sorted.map(w => [active(w), apps(w).length]);
+    const ws = list.map(w => [active(w), apps(w).length]);
     let base = hpad + spacing * (ws.length - 1);
     for (const [a] of ws)
       base += a ? dotActive : dot;
@@ -64,8 +72,21 @@ Pill {
   hpad: 12
   spacing: 4
 
+  // roda: workspace anterior/proximo deste monitor (touchpad acumula ate um "clique")
+  WheelHandler {
+    property real acc: 0
+    acceptedDevices: PointerDevice.Mouse | PointerDevice.TouchPad
+    onWheel: event => {
+      acc += event.angleDelta.y;
+      if (Math.abs(acc) < 120)
+        return;
+      Hyprland.dispatch("hl.dsp.focus({workspace=\"m" + (acc > 0 ? "-1" : "+1") + "\"})");
+      acc = 0;
+    }
+  }
+
   Repeater {
-    model: Workspaces.sorted
+    model: root.list
 
     Rectangle {
       id: ws

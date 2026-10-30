@@ -1,6 +1,6 @@
 import QtQuick
 import QtQuick.Layouts
-import Quickshell
+import Quickshell.Hyprland
 import qs.components
 
 // Bloquear + menu de energia.
@@ -19,7 +19,8 @@ RowLayout {
     MouseArea {
       anchors.fill: parent
       cursorShape: Qt.PointingHandCursor
-      onClicked: Quickshell.execDetached(Config.locker)
+      // mesmo caminho do SUPER+O (atalho global do shell): sem processo
+      onClicked: Hyprland.dispatch('hl.dsp.global("quickshell:lock")')
     }
   }
   Glyph {

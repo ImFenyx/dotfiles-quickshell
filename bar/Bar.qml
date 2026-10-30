@@ -99,7 +99,9 @@ PanelWindow {
         ClockLabel {
           tip: root.tip
         }
-        WorkspaceStrip {}
+        WorkspaceStrip {
+          screen: root.screen
+        }
         AudioPill {
           tip: root.tip
           onClicked: root.audioMenuRequested()

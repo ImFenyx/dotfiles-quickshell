@@ -11,7 +11,7 @@ shell.qml        composicao: so liga as pecas e expoe os atalhos (IPC)
 components/      blocos reutilizaveis
   Theme.qml        cores (papeis M3 de ~/.local/state/eco/colors.json), fontes, tamanhos e geometria
   Icons.qml        glifos Nerd Font (sempre via escape \u...)
-  Config.qml       programas externos (terminal, mixer, locker...)
+  Config.qml       programas externos (terminal, mixer...)
   Pill / PillText / PillGlyph / UiText / Glyph
   Genie.qml        efeito "magic lamp" (abre/fecha painel a partir de um ponto)
   EdgeTab.qml      aba colada no filete direito (orelhas concavas); fundo de toasts e centro
@@ -20,8 +20,9 @@ components/      blocos reutilizaveis
   PopupBase.qml    base de todo popup (menus, launcher, OSD, centro); `floating` = camada p/ paineis extras;
                    `fromRight` = aba no filete direito
   MenuRow.qml      linha de menu
-  Slider.qml       slider proprio (sem QtQuick.Controls); SpringPanel / SpringPill
-  EdgeFrame / EdgeExclusions / RoundCorner
+  Slider.qml       slider proprio (sem QtQuick.Controls); SpringPanel / SpringPill (springs do tokens.json)
+  EdgeFrame / EdgeExclusions   moldura: filetes + cantos internos em arco de raio frameR (20),
+                   concentricos ao canto da janela; a barra reserva so a altura dela
 services/        estado compartilhado (singletons)
   Audio (PipeWire; protecao de volume), Wifi (Quickshell.Networking), Updates, Brightness, Battery,
   Notifs (daemon de notificacoes), Media (MPRIS), Time, Workspaces, Fullscreen
@@ -55,9 +56,14 @@ Regras de bolso:
 - atalho de teclado novo -> `GlobalShortcut { name: "x" }` no `shell.qml` + bind
   `hl.dsp.global("quickshell:x")` com `description` (sem processo por tecla; tem
   onReleased). `IpcHandler` so p/ scripts (hypridle, etc.)
-- animacao -> `Theme.animFast` / `animNormal` / `animMove`; slide de painel =
-  `SpringPanel {}`, largura que muda = `SpringPill {}`. Numero solto so se for
+- animacao -> slide de painel = `SpringPanel {}` (window_in, o spring da janela abrindo no
+  Hyprland), largura que muda = `SpringPill {}` (spatial_fast); cor/opacidade =
+  `Theme.animFast` / `animNormal` / `animMove`. Spring do Qt: spring = k*0,016,
+  damping = c*0,016 (passos de 16 ms; damping > 2 fica instavel). Numero solto so se for
   especifico (ex.: Genie)
+- superficie nova -> `WlrLayershell.namespace: "quickshell:<nome>"` (PopupBase: `layerName`);
+  as regras do Hyprland casam `quickshell.*`. Superficies nao se sobrepoem (popup colado no
+  filete troca a aba pelo canto convexo da moldura)
 - conteudo pesado de popup (listas com imagem, submenus, previas) -> modelo vazio
   com a janela invisivel (`values: root.visible ? ... : []`); o `visible` do
   PopupBase so cai depois da animacao de saida
@@ -82,7 +88,7 @@ Regras de bolso:
 - `pacman-contrib` (`checkupdates`) e `paru` — badge de atualizacoes
 - `kitty`, `pavucontrol`, `cal` (util-linux), `hyprctl`
 - `hyprlock` instalado: o lock nativo usa o PAM dele (`/etc/pam.d/hyprlock`) e ele e o
-  fallback (`Config.locker`)
+  fallback (o SUPER+O cai nele se a shell nao estiver rodando)
 - polkit: a propria shell e o agente (`overlays/PolkitDialog.qml`). So um agente registra
   por sessao: desative os outros (`systemctl --user disable --now hyprpolkitagent`) e
   reinicie a shell (`systemctl --user restart quickshell`); "An authentication agent
@@ -123,7 +129,9 @@ avisa em `platform::fnlock/brightness_hw_changed`, vigiado por inotify.
 
 ## Workspaces
 
-`bar/WorkspaceStrip.qml`: numero + icones dos apps abertos em cada workspace (um
+`bar/WorkspaceStrip.qml`: so os workspaces do monitor da barra (+ os special); o ativo e o
+visivel naquele monitor; a roda do mouse troca de workspace (m-1/m+1). Numero + icones dos
+apps abertos em cada workspace (um
 por app, na ordem das janelas), ate `Config.wsIcons` (3); passou disso, `+N`.
 Vazio = so o numero; special = o glifo. Ativo: mauve e mais largo (spring).
 
@@ -209,7 +217,7 @@ por monitor com a tela borrada, relogio e senha; avisos do PAM (faillock: 3 erro
 travam a conta por 10 min) aparecem embaixo do campo.
 
 ```sh
-qs ipc call lock lock        # cadeado da barra, SUPER+O e lock_cmd do hypridle
+qs ipc call lock lock        # lock_cmd do hypridle (cadeado da barra e SUPER+O usam o atalho global "lock")
 qs ipc call lock isLocked
 ```
 
