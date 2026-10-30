@@ -54,6 +54,7 @@ Singleton {
 
   readonly property var shape: tokens.shape   // xs..xl_inc, window, frame_inner, popup, dialog
   readonly property var space: tokens.space   // xs..xxl, gap_in, gap_out, border
+  readonly property var motion: tokens.motion // springs {k, c}: os mesmos do Hyprland
 
   // ---- moldura (DESIGN.md › Forma/Espaço) ----
   // Janela: gaps_out 8 do filete, canto 12. Filete = gaps_out, entao o canto interno
@@ -74,8 +75,8 @@ Singleton {
   readonly property int wsStripMax: 360
 
   // ---- animacao ----
-  // Duracoes nomeadas (ms). Springs repetidos sao componentes: SpringPanel
-  // (popups/toasts deslizando) e SpringPill (largura de pill/barra do OSD).
+  // Movimento = springs (SpringPanel: paineis grandes; SpringPill: coisas pequenas).
+  // Duracoes so para cor/opacidade, proximas dos springs effects_* do M3.
   readonly property int animFast: 120      // hover: cor e opacidade; seguir a linha do submenu
   readonly property int animNormal: 150    // fade de entrada/saida, cor de pill/atalho, largura dos blocos da barra
   readonly property int animMove: 180      // altura, deslocamento de lista, volta do swipe
@@ -104,6 +105,7 @@ Singleton {
       property var icon: ({})
       property var shape: ({})
       property var space: ({})
+      property var motion: ({})
     }
   }
 }

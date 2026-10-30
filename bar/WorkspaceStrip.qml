@@ -87,11 +87,7 @@ Pill {
       clip: true
 
       Behavior on Layout.preferredWidth {
-        SpringAnimation {
-          spring: 6
-          damping: 2.2
-          epsilon: 0.5
-        }
+        SpringPill {}
       }
       Behavior on color {
         ColorAnimation {
