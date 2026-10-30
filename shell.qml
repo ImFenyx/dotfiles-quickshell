@@ -60,6 +60,20 @@ ShellRoot {
         id: scr
         required property var modelData
 
+        // painel pedido pelo teclado: so o monitor focado abre
+        Connections {
+          target: root
+          function onPanelRequested(name) {
+            if (scr.modelData !== root.focusedScreen)
+              return;
+            const menu = { audio: audioMenu, bluetooth: btMenu, network: netMenu, power: powerMenu }[name];
+            scr.closeMenusExcept(menu);
+            if (menu === audioMenu || menu === btMenu)
+              root.menuScreen = scr.modelData;
+            menu.toggle();
+          }
+        }
+
         // um popup por vez: abrir um fecha os outros (e o tooltip)
         function closeMenusExcept(keep) {
           hoverTip.hide();
@@ -248,6 +262,49 @@ ShellRoot {
     description: "Seletor de wallpaper"
     onPressed: wallpaperPicker.toggle()
   }
+  // Paineis da barra (SUPER+CTRL+A/B/I/P): o Scope do monitor focado abre
+  signal panelRequested(string name)
+  GlobalShortcut {
+    name: "audio"
+    description: "Mixer de audio"
+    onPressed: root.panelRequested("audio")
+  }
+  GlobalShortcut {
+    name: "bluetooth"
+    description: "Bluetooth"
+    onPressed: root.panelRequested("bluetooth")
+  }
+  GlobalShortcut {
+    name: "network"
+    description: "Rede"
+    onPressed: root.panelRequested("network")
+  }
+  GlobalShortcut {
+    name: "power"
+    description: "Energia"
+    onPressed: root.panelRequested("power")
+  }
+
+  // Notificacoes pelo teclado (SUPER+, e SUPER+SHIFT+,)
+  GlobalShortcut {
+    name: "notif-last"
+    description: "Abrir ou dispensar a ultima notificacao"
+    onPressed: {
+      const n = Notifs.popups[0] ?? Notifs.history[0];
+      if (!n)
+        return;
+      if (n.defaultAction)
+        n.activate();
+      else
+        n.dismiss();
+    }
+  }
+  GlobalShortcut {
+    name: "notif-clear"
+    description: "Limpar todas as notificacoes"
+    onPressed: Notifs.clearAll()
+  }
+
   // Sistema (SUPER+CTRL no Hyprland): alterna e mostra no OSD, como o Fn Lock
   GlobalShortcut {
     name: "dnd"
