@@ -3,6 +3,7 @@ pragma Singleton
 import QtQuick
 import Quickshell
 import Quickshell.Io
+import qs.components
 
 // Estado do eco para o shell (~/.local/state/eco, vigiado): tema ativo (gravado pelo
 // eco-theme), efeitos completos e modo jogo (hypr/modules/profile.lua). Os botoes do
@@ -16,15 +17,26 @@ Singleton {
   property bool game: false
 
   readonly property string themeLabel: theme === "latte" ? "Latte" : (theme === "wall" ? "Wallpaper" : "Mocha")
-  // wallpaper so com imagem (o matugen nao le video)
-  readonly property var themes: Wallpapers.image !== "" && Wallpapers.video === "" ? ["mocha", "latte", "wall"] : ["mocha", "latte"]
+  // Wallpaper so quando ha imagem de onde tirar as cores (video: a miniatura)
+  readonly property var themes: Wallpapers.colorSource !== "" ? ["mocha", "latte", "wall"] : ["mocha", "latte"]
 
-  function cycleTheme() {
-    const next = themes[(themes.indexOf(theme) + 1) % themes.length];
-    const cmd = [Quickshell.env("HOME") + "/.local/bin/eco-theme", next];
-    if (next === "wall")
-      cmd.push(Wallpapers.image);
+  function setTheme(name, dark) {
+    const cmd = [Quickshell.env("HOME") + "/.local/bin/eco-theme", name];
+    if (name === "wall")
+      cmd.push(Wallpapers.colorSource, dark ? "dark" : "light");
     Quickshell.execDetached(cmd);
+  }
+  function cycleTheme() {
+    setTheme(themes[(themes.indexOf(theme) + 1) % themes.length], true);
+  }
+
+  // trocou o wallpaper com o tema Wallpaper ativo: cores novas, mesmo claro/escuro
+  Connections {
+    target: Wallpapers
+    function onApplied() {
+      if (root.theme === "wall" && Wallpapers.colorSource !== "")
+        root.setTheme("wall", Theme.dark);
+    }
   }
   function toggleEffects() {
     Quickshell.execDetached(["hyprctl", "eval", "eco_effects()"]);

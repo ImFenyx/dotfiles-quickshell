@@ -25,6 +25,10 @@ Singleton {
   readonly property bool pauseOnBattery: ShellState.wallpaperPauseOnBattery
   readonly property bool paused: video !== "" && pauseOnBattery && Battery.onBattery
   readonly property bool audio: ShellState.wallpaperVideoAudio   // atalho "Som do video"
+  // imagem de onde o eco tira as cores no tema Wallpaper (video: a miniatura do cache;
+  // so conhecida depois que o seletor listou os arquivos)
+  readonly property string colorSource: video === "" ? image : ((items.find(i => i.path === video) ?? {}).thumb ?? "").replace(/^file:\/\//, "")
+  signal applied   // escolhido no seletor (o Eco regenera as cores se o tema for Wallpaper)
 
   // mpvpaper troca ao vivo (trilha aid pelo socket); gslapper nao tem comando de
   // audio: reinicia o player (o video recomeca)
@@ -73,11 +77,13 @@ Singleton {
     if (it.video) {
       ShellState.wallpaperVideo = it.path;
       startVideo(it.path, true);
+      applied();
       return;
     }
     ShellState.wallpaperVideo = "";
     Quickshell.execDetached(["sh", "-c", "systemctl --user stop " + unit + " 2>/dev/null; exec \"$@\"", "sh"].concat(Config.wallpaperApply, [it.path]));
     image = it.path;
+    applied();
   }
 
   // replace: troca o que estiver tocando; senao (partida) so sobe se nao houver nada.
