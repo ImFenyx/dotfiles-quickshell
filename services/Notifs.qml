@@ -152,7 +152,8 @@ Singleton {
 
   function add(n) {
     n.tracked = true;
-    const quiet = dnd && n.urgency !== NotificationUrgency.Critical;
+    // reemitida depois de um reload (keepOnReload): volta ao historico sem toast nem som
+    const quiet = n.lastGeneration || (dnd && n.urgency !== NotificationUrgency.Critical);
     const item = itemComp.createObject(root, {
       notification: n,
       popup: !quiet
@@ -196,7 +197,7 @@ Singleton {
   }
 
   NotificationServer {
-    keepOnReload: false
+    keepOnReload: true
     actionsSupported: true
     actionIconsSupported: true
     bodySupported: true
