@@ -50,7 +50,7 @@ sound=${3:?som 0|1}
 shift 3
 case $player in
 gslapper) opts="loop fill" ;;                         # fill = cobre a tela, corta o excesso
-mpvpaper) opts="loop panscan=1.0 hwdec=auto-safe" ;;  # panscan=1.0 = o mesmo no mpv
+mpvpaper) opts="loop panscan=1.0 hwdec=auto-safe quiet" ;;  # panscan=1.0 = o mesmo no mpv; quiet = sem a linha de status (AV:) no journal
 *)
   echo "player desconhecido: $player" >&2
   exit 1

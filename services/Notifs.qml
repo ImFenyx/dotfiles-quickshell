@@ -28,7 +28,7 @@ Singleton {
   readonly property bool dnd: ShellState.dnd
   readonly property bool sound: ShellState.sound
   // toast sem timeout proprio (expireTimeout < 0)
-  property int defaultTimeout: 6000
+  property int defaultTimeout: 1500
   // teto do historico: cada item segura o Notification (e o image-data) do servidor
   property int maxHistory: 100
 

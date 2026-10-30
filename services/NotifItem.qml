@@ -27,7 +27,7 @@ QtObject {
   property string bodyImage: ""          // 1a imagem local do corpo (file://)
   property string icon: ""               // url pronta p/ Image ("" = sem icone)
   property int urgency: 1                // 0 baixa, 1 normal, 2 critica
-  property real expire: -1               // segundos; <0 = padrao do servidor, 0 = nunca
+  property real expire: -1               // ms (expireTimeout do servidor); <0 = padrao, 0 = nunca
   property bool ephemeral: false         // hint transient: nao vai p/ o historico
   property bool resident: false          // hint resident: fica depois de uma acao
   property int progress: -1              // hint "value" (0..100); -1 = sem barra
@@ -52,13 +52,14 @@ QtObject {
     return Math.floor(s / 86400) + " d";
   }
 
-  // tempo do toast em ms; 0 = fica ate dispensar (critica ou timeout 0)
+  // tempo do toast em ms; 0 = fica ate dispensar (critica ou timeout 0).
+  // O que o app pediu vale como veio (notify-send -t 1000 = 1 s)
   readonly property int timeoutMs: {
     if (urgency === 2 || expire === 0)
       return 0;
     if (expire < 0)
       return Notifs.defaultTimeout;
-    return Math.max(4000, Math.min(expire * 1000, 20000));
+    return Math.round(expire);
   }
 
   // Corpo: o spec so promete <b> <i> <u> <a> <img>. O Qt (StyledText) cobre
