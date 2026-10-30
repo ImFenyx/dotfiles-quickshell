@@ -59,6 +59,7 @@ PanelWindow {
 
     // ---- esquerda: updates + tray ----
     Item {
+      id: leftBlock
       height: 36
       width: leftRow.implicitWidth + 24
       anchors.left: parent.left
@@ -84,8 +85,18 @@ PanelWindow {
       }
     }
 
+    // ---- midia: colada no bloco da esquerda, sem passar do centro ----
+    MediaPill {
+      anchors.left: leftBlock.right
+      anchors.verticalCenter: parent.verticalCenter
+      tip: root.tip
+      room: centerBlock.x - leftBlock.x - leftBlock.width - 8
+      onCenterRequested: root.notifCenterRequested()
+    }
+
     // ---- centro: clock + workspaces + audio + backlight ----
     Item {
+      id: centerBlock
       height: 36
       width: centerRow.implicitWidth + 24
       anchors.horizontalCenter: parent.horizontalCenter
