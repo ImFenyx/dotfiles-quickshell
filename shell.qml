@@ -163,6 +163,12 @@ ShellRoot {
     screen: root.focusedScreen
   }
 
+  // overview dos workspaces (atalho "overview", SUPER+A) no monitor focado
+  Overview {
+    id: overview
+    screen: root.focusedScreen
+  }
+
   // ---- single-instance (segue o foco): launcher + OSD + notificacoes ----
   Launcher {
     id: launcher
@@ -262,6 +268,11 @@ ShellRoot {
     name: "lock"
     description: "Bloquear a tela"
     onPressed: lock.lock()
+  }
+  GlobalShortcut {
+    name: "overview"
+    description: "Overview dos workspaces"
+    onPressed: overview.toggle()
   }
   GlobalShortcut {
     name: "cheatsheet"
