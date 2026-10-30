@@ -12,7 +12,7 @@ UiText {
   property string calDay: ""       // dia do ultimo cal (so muda 1x por dia)
 
   color: Theme.primary
-  font.bold: true
+  font.weight: Font.ExtraBold
   text: Time.barText
 
   Process {

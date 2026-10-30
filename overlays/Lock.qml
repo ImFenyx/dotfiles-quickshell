@@ -111,7 +111,7 @@ Scope {
         UiText {
           Layout.alignment: Qt.AlignHCenter
           color: Theme.fgSurfaceVariant
-          font.pixelSize: Theme.type.body_l
+          font.pixelSize: Theme.type.title_l
           text: Time.longDate
         }
 
@@ -140,7 +140,7 @@ Scope {
             verticalAlignment: TextInput.AlignVCenter
             color: Theme.fgSurface
             font.family: Theme.uiFont
-            font.pixelSize: Theme.type.body_l
+            font.pixelSize: Theme.type.title_l
             echoMode: TextInput.Password
             passwordCharacter: "•"
             focus: true
@@ -160,7 +160,7 @@ Scope {
             visible: input.text === ""
             verticalAlignment: Text.AlignVCenter
             color: Theme.outline
-            font.pixelSize: Theme.type.body_l
+            font.pixelSize: Theme.type.title_l
             text: pam.active ? "Verificando…" : "Senha"
           }
         }
@@ -174,7 +174,7 @@ Scope {
           wrapMode: Text.Wrap
           textFormat: Text.PlainText
           color: Theme.error
-          font.pixelSize: Theme.type.body_m
+          font.pixelSize: Theme.type.body_l
           text: root.status
         }
       }

@@ -57,7 +57,7 @@ PopupBase {
   RowLayout {
     spacing: 10
     Glyph {
-      font.weight: Font.Bold
+      font.weight: Font.DemiBold
       color: root.label !== "" && !root.lit ? Theme.outline : Theme.primary
       text: root.glyph
     }
