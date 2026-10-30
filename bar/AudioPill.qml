@@ -18,6 +18,7 @@ Pill {
   clickable: true
 
   PillText {
+    font.weight: Font.DemiBold // mais leve que as outras pills
     text: Audio.sinkText
   }
   PillGlyph {
@@ -29,6 +30,7 @@ Pill {
     Layout.preferredWidth: 8
   }
   PillText {
+    font.weight: Font.DemiBold // mais leve que as outras pills
     visible: Audio.micVisible
     text: Audio.micText
   }

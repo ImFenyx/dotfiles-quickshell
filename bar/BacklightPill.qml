@@ -13,6 +13,7 @@ Pill {
   tipText: "Brilho " + Brightness.text
 
   PillText {
+    font.weight: Font.DemiBold // mais leve que as outras pills
     text: Brightness.text
   }
   PillGlyph {
