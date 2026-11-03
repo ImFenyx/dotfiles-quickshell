@@ -9,8 +9,9 @@ import qs.components
 import qs.services
 
 // Tela de bloqueio nativa (ext-session-lock), no lugar do hyprlock. PAM pelo
-// mesmo /etc/pam.d/hyprlock (login -> system-auth, com faillock: erros demais
-// travam a conta por um tempo, igual ao hyprlock). Uma superficie por monitor,
+// servico login do sistema (util-linux; o /etc/pam.d/hyprlock era so "auth
+// include login" e sumiu com o pacote): login -> system-auth, com faillock
+// (erros demais travam a conta por um tempo). Uma superficie por monitor,
 // fundo = captura borrada da propria tela. Reload da shell com a tela travada
 // mantem o lock (WlSessionLock e Reloadable).
 //   qs ipc call lock lock | isLocked
@@ -33,7 +34,12 @@ Scope {
       return;
     pending = pw;
     status = "";
-    pam.start();
+    // sem isso a senha sumia calada (config do PAM ausente, usuario invalido...)
+    if (!pam.start()) {
+      pending = "";
+      failed = true;
+      status = "Erro no PAM (não iniciou)";
+    }
   }
 
   // A 1a captura de tela carrega o backend de forma assincrona; se fosse a do
@@ -49,7 +55,7 @@ Scope {
 
   PamContext {
     id: pam
-    config: "hyprlock"
+    config: "login"
     configDirectory: "/etc/pam.d"
 
     onResponseRequiredChanged: {

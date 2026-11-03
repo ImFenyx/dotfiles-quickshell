@@ -87,8 +87,8 @@ Regras de bolso:
   O que nao existe some do painel.
 - `pacman-contrib` (`checkupdates`) e `paru` — badge de atualizacoes
 - `kitty`, `pavucontrol`, `cal` (util-linux), `hyprctl`
-- `hyprlock` instalado: o lock nativo usa o PAM dele (`/etc/pam.d/hyprlock`) e ele e o
-  fallback (o SUPER+O cai nele se a shell nao estiver rodando)
+- PAM: o lock nativo usa o servico `login` do sistema (`/etc/pam.d/login`, do util-linux),
+  sem depender de outro locker; se o PAM nao iniciar, o erro aparece no proprio lock
 - polkit: a propria shell e o agente (`overlays/PolkitDialog.qml`). So um agente registra
   por sessao: desative os outros (`systemctl --user disable --now hyprpolkitagent`) e
   reinicie a shell (`systemctl --user restart quickshell`); "An authentication agent
