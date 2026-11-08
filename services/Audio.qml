@@ -40,6 +40,27 @@ Singleton {
   readonly property var sinks: Pipewire.nodes.values.filter(n => n.audio && n.isSink && !n.isStream)
   readonly property var sources: Pipewire.nodes.values.filter(n => n.audio && !n.isSink && !n.isStream)
   readonly property var streams: Pipewire.nodes.values.filter(n => n.audio && n.isSink && n.isStream)
+  // O que vai p/ Repeater sao linhas primitivas {id, name}, nao o PwNode: o PipeWire
+  // apaga o no na hora, e um modelo segurando o QObject e lido pelo Qt sem checar nulo
+  // ao montar o delegate (segfault no desmonte do grafo: fone saindo, app fechando;
+  // o Omarchy documenta em shell/plugins/panels/audio/Model.js). Cada delegate resolve
+  // o proprio no com nodeFor(); o nome vai junto porque o PipeWire reusa ids. As linhas
+  // saem no ciclo seguinte do loop (Timer 0), depois que a remocao terminou.
+  property var sinkRows: []
+  property var sourceRows: []
+  property var streamRows: []
+  function rowsOf(list) {
+    return list.filter(n => n && n.id !== undefined).map(n => ({
+          id: n.id,
+          name: String(n.name || "")
+        }));
+  }
+  function nodeFor(row) {
+    return row ? (Pipewire.nodes.values.find(n => n.id === row.id && n.name === row.name) || null) : null;
+  }
+  onSinksChanged: rowsLater.restart()
+  onSourcesChanged: rowsLater.restart()
+  onStreamsChanged: rowsLater.restart()
   property bool osdSuppressed: false   // mixer aberto: o slider ja mostra o volume
 
   // volume pela propria shell (mixer): a protecao nao reverte o salto
@@ -184,4 +205,15 @@ Singleton {
     interval: 150
     onTriggered: root.emitMic()
   }
+
+  Timer {
+    id: rowsLater
+    interval: 0
+    onTriggered: {
+      root.sinkRows = root.rowsOf(root.sinks);
+      root.sourceRows = root.rowsOf(root.sources);
+      root.streamRows = root.rowsOf(root.streams);
+    }
+  }
+  Component.onCompleted: rowsLater.start()
 }

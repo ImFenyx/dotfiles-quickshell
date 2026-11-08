@@ -37,6 +37,10 @@ Singleton {
     const n = d.name || d.deviceName || "";
     return n !== "" && n.replace(/-/g, ":") !== d.address;
   }
+  // linha {address} do BtMenu -> dispositivo vivo (null se o BlueZ ja tirou da lista)
+  function deviceFor(row) {
+    return row ? (Bluetooth.devices.values.find(d => d.address === row.address) || null) : null;
+  }
   function label(d) {
     return named(d) ? (d.name || d.deviceName) : d.address;
   }

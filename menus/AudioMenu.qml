@@ -49,16 +49,23 @@ PopupBase {
     visible: Audio.sinkOk
     node: Audio.sink
   }
+  // linhas {id, name} (Audio.sinkRows), nunca o PwNode no modelo; so com o menu aberto
   Repeater {
-    model: Audio.sinks.length > 1 ? Audio.sinks : []
+    model: root.visible && Audio.sinkRows.length > 1 ? Audio.sinkRows : []
     delegate: MenuRow {
+      id: sinkRow
       required property var modelData
+      readonly property var node: Audio.nodeFor(modelData)
+      visible: node !== null
       popup: root
       keepOpen: true
       checkable: true
-      checked: modelData === Audio.sink
-      label: Audio.deviceName(modelData)
-      onFired: Audio.setSink(modelData)
+      checked: node !== null && node === Audio.sink
+      label: node ? Audio.deviceName(node) : ""
+      onFired: {
+        if (sinkRow.node)
+          Audio.setSink(sinkRow.node);
+      }
     }
   }
 
@@ -74,15 +81,21 @@ PopupBase {
     glyphMuted: Icons.micOff
   }
   Repeater {
-    model: Audio.sources.length > 1 ? Audio.sources : []
+    model: root.visible && Audio.sourceRows.length > 1 ? Audio.sourceRows : []
     delegate: MenuRow {
+      id: sourceRow
       required property var modelData
+      readonly property var node: Audio.nodeFor(modelData)
+      visible: node !== null
       popup: root
       keepOpen: true
       checkable: true
-      checked: modelData === Audio.source
-      label: Audio.deviceName(modelData)
-      onFired: Audio.setSource(modelData)
+      checked: node !== null && node === Audio.source
+      label: node ? Audio.deviceName(node) : ""
+      onFired: {
+        if (sourceRow.node)
+          Audio.setSource(sourceRow.node);
+      }
     }
   }
 
@@ -92,11 +105,13 @@ PopupBase {
     text: "Apps"
   }
   Repeater {
-    model: root.visible ? Audio.streams : []
+    model: root.visible ? Audio.streamRows : []
     delegate: ColumnLayout {
       id: app
       required property var modelData
-      readonly property var props: modelData.properties || {}
+      readonly property var node: Audio.nodeFor(modelData)
+      readonly property var props: node ? (node.properties || {}) : {}
+      visible: node !== null
       Layout.fillWidth: true
       spacing: 0
       UiText {
@@ -106,11 +121,11 @@ PopupBase {
         elide: Text.ElideRight
         textFormat: Text.PlainText
         // "Firefox · titulo do video"
-        text: Audio.appName(app.modelData) + (app.props["media.name"] ? "  ·  " + app.props["media.name"] : "")
+        text: app.node ? Audio.appName(app.node) + (app.props["media.name"] ? "  ·  " + app.props["media.name"] : "") : ""
       }
       VolumeRow {
-        node: app.modelData
-        image: Audio.appIcon(app.modelData)
+        node: app.node
+        image: app.node ? Audio.appIcon(app.node) : ""
       }
     }
   }

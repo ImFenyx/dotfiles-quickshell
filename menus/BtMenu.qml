@@ -28,6 +28,19 @@ PopupBase {
   }
 
   readonly property var shown: Bt.devices.filter(d => Bt.rank(d) > 0).slice(0, 12)
+  // o Repeater recebe linhas {address}, nao o BluetoothDevice (o BlueZ tira e poe
+  // dispositivos durante a busca; mesmo cuidado de Audio.sinkRows). Saem no ciclo
+  // seguinte do loop, depois que a remocao terminou.
+  property var shownRows: []
+  onShownChanged: shownLater.restart()
+  Timer {
+    id: shownLater
+    interval: 0
+    onTriggered: root.shownRows = root.shown.filter(d => d && d.address).map(d => ({
+            address: d.address
+          }))
+  }
+  Component.onCompleted: shownLater.start()
 
   // scan so enquanto o menu aparece (o Binding devolve o valor anterior ao fechar)
   Binding {
@@ -88,13 +101,17 @@ PopupBase {
   }
 
   Repeater {
-    model: Bt.on && root.visible ? root.shown : []
+    model: Bt.on && root.visible ? root.shownRows : []
     delegate: Item {
       id: dev
       required property var modelData
-      readonly property bool armed: root.forgetArmed === modelData
+      readonly property var dv: Bt.deviceFor(modelData)
+      readonly property bool armed: dv !== null && root.forgetArmed === dv
+      visible: dv !== null
       readonly property string status: {
-        const d = modelData;
+        const d = dv;
+        if (!d)
+          return "";
         if (d.pairing)
           return "Pareando…";
         if (d.state === BluetoothDeviceState.Connecting)
@@ -125,14 +142,14 @@ PopupBase {
           IconImage {
             id: devIcon
             anchors.fill: parent
-            source: dev.modelData.icon !== "" ? Quickshell.iconPath(dev.modelData.icon, true) : ""
+            source: dev.dv && dev.dv.icon !== "" ? Quickshell.iconPath(dev.dv.icon, true) : ""
             // nome existe no tema mas nao desenha (ou nao existe): cai no glifo
             visible: source !== "" && status === Image.Ready
           }
           Glyph {
             anchors.centerIn: parent
             visible: !devIcon.visible
-            color: dev.modelData.connected ? Theme.success : Theme.primary
+            color: dev.dv && dev.dv.connected ? Theme.success : Theme.primary
             text: Icons.bluetooth
           }
         }
@@ -141,10 +158,10 @@ PopupBase {
           spacing: 0
           UiText {
             Layout.fillWidth: true
-            color: dev.armed ? Theme.error : (dev.modelData.connected ? Theme.success : Theme.fgSurface)
+            color: dev.armed ? Theme.error : (dev.dv && dev.dv.connected ? Theme.success : Theme.fgSurface)
             elide: Text.ElideRight
             textFormat: Text.PlainText
-            text: dev.armed ? "Esquecer " + Bt.label(dev.modelData) + "?" : Bt.label(dev.modelData)
+            text: !dev.dv ? "" : (dev.armed ? "Esquecer " + Bt.label(dev.dv) + "?" : Bt.label(dev.dv))
           }
           UiText {
             Layout.fillWidth: true
@@ -158,7 +175,7 @@ PopupBase {
         Item {
           Layout.preferredWidth: 26
           Layout.fillHeight: true
-          visible: dev.modelData.paired
+          visible: !!dev.dv && dev.dv.paired
           Glyph {
             anchors.centerIn: parent
             color: dev.armed ? Theme.error : Theme.outline
@@ -171,11 +188,13 @@ PopupBase {
             hoverEnabled: true
             cursorShape: Qt.PointingHandCursor
             onClicked: {
+              if (!dev.dv)
+                return;
               if (dev.armed) {
-                dev.modelData.forget();
+                dev.dv.forget();
                 root.forgetArmed = null;
               } else {
-                root.forgetArmed = dev.modelData;
+                root.forgetArmed = dev.dv;
               }
             }
           }
@@ -184,12 +203,13 @@ PopupBase {
       MouseArea {
         id: rowArea
         anchors.fill: parent
-        anchors.rightMargin: dev.modelData.paired ? 32 : 0
+        anchors.rightMargin: dev.dv && dev.dv.paired ? 32 : 0
         hoverEnabled: true
         cursorShape: Qt.PointingHandCursor
         onClicked: {
           root.forgetArmed = null;
-          Bt.activate(dev.modelData);
+          if (dev.dv)
+            Bt.activate(dev.dv);
         }
       }
     }
