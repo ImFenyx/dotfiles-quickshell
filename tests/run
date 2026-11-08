@@ -1,0 +1,39 @@
+#!/bin/bash
+# Roda os testes da shell: tests/*-test.sh (bash) e tests/*-test.js (node --test).
+# Segue depois de uma falha (uma quebrada nao esconde as outras), guarda o log de cada
+# arquivo e mostra so o resumo e as falhas. Saida 77 = pulado (ex.: sem sessao Wayland).
+#   tests/run              todos
+#   tests/run frecency     so os que tem "frecency" no nome
+set -uo pipefail
+dir=$(cd "$(dirname "$0")" && pwd)
+logs=$(mktemp -d "${TMPDIR:-/tmp}/quickshell-tests.XXXX")
+pass=0 fail=0 skip=0
+failed=()
+
+for t in "$dir"/*-test.sh "$dir"/*-test.js; do
+  [[ -f $t ]] || continue
+  name=${t##*/}
+  [[ -n ${1:-} && $name != *"$1"* ]] && continue
+  log=$logs/$name.log
+  if [[ $t == *.js ]]; then
+    node --test "$t" >"$log" 2>&1
+  else
+    bash "$t" >"$log" 2>&1
+  fi
+  rc=$?
+  if ((rc == 0)); then
+    pass=$((pass + 1))
+    printf 'ok    %s\n' "$name"
+  elif ((rc == 77)); then
+    skip=$((skip + 1))
+    printf 'pula  %s (%s)\n' "$name" "$(tail -1 "$log")"
+  else
+    fail=$((fail + 1))
+    failed+=("$name")
+    printf 'FALHA %s\n' "$name"
+    grep -E '^not ok|^✖|Error' "$log" | head -8 | sed 's/^/      /'
+  fi
+done
+
+printf '\n%d ok, %d falha(s), %d pulado(s) - logs em %s\n' "$pass" "$fail" "$skip" "$logs"
+((fail == 0))
