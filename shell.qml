@@ -366,31 +366,38 @@ ShellRoot {
     onPressed: Notifs.clearAll()
   }
 
-  // Sistema (SUPER+CTRL no Hyprland): alterna e mostra no OSD, como o Fn Lock
+  // Sistema (SUPER+CTRL no Hyprland, ou `eco toggle <x>` pelo IPC "system"): alterna e
+  // mostra no OSD, como o Fn Lock. Atalho e IPC chamam as mesmas funcoes.
+  function toggleDnd() {
+    Notifs.toggleDnd();
+    osd.showKey(Notifs.dnd ? Icons.bellSlash : Icons.bell, "Não perturbe", Notifs.dnd);
+    return Notifs.dnd;
+  }
+  function toggleCaffeine() {
+    Caffeine.toggle();
+    osd.showKey(Icons.coffee, "Cafeína", Caffeine.on);
+    return Caffeine.on;
+  }
+  function toggleNightLight() {
+    const next = !NightLight.on; // o hyprsunset responde assincrono
+    NightLight.toggle();
+    osd.showKey(Icons.moon, "Luz noturna", next);
+    return next;
+  }
   GlobalShortcut {
     name: "dnd"
     description: "Nao perturbe"
-    onPressed: {
-      Notifs.toggleDnd();
-      osd.showKey(Notifs.dnd ? Icons.bellSlash : Icons.bell, "Não perturbe", Notifs.dnd);
-    }
+    onPressed: root.toggleDnd()
   }
   GlobalShortcut {
     name: "caffeine"
     description: "Cafeina"
-    onPressed: {
-      Caffeine.toggle();
-      osd.showKey(Icons.coffee, "Cafeína", Caffeine.on);
-    }
+    onPressed: root.toggleCaffeine()
   }
   GlobalShortcut {
     name: "nightlight"
     description: "Luz noturna"
-    onPressed: {
-      const next = !NightLight.on; // o hyprsunset responde assincrono
-      NightLight.toggle();
-      osd.showKey(Icons.moon, "Luz noturna", next);
-    }
+    onPressed: root.toggleNightLight()
   }
   // bind em Caps_Lock/Num_Lock sem consumir a tecla: so avisa p/ reler os LEDs.
   // O bind e `release = true`: o Hyprland manda o global como *released*, nao pressed.
@@ -400,8 +407,8 @@ ShellRoot {
     onReleased: LockKeys.check()
   }
 
-  // Scripts chamam:  qs ipc call <target> <funcao>
-  // qs ipc call launcher toggle | calc | emoji | kaomoji | clip | windows (abre ja no modo)
+  // Scripts chamam:  eco shell <target> <funcao>   (~/eco/bin/eco-shell; nunca `qs ipc` direto)
+  // eco shell launcher toggle | calc | emoji | kaomoji | clip | windows (abre ja no modo)
   IpcHandler {
     target: "launcher"
     function toggle(): void {
@@ -424,7 +431,7 @@ ShellRoot {
     }
   }
 
-  // qs ipc call notifs toggle | clear | dnd | sound
+  // eco shell notifs toggle | clear | dnd | sound
   IpcHandler {
     target: "notifs"
     function toggle(): void {
@@ -452,7 +459,21 @@ ShellRoot {
     }
   }
 
-  // qs ipc call time sync: after_sleep_cmd do hypridle (relogio parado apos suspend)
+  // eco toggle dnd|caffeine|nightlight -> devolve o estado novo
+  IpcHandler {
+    target: "system"
+    function dnd(): bool {
+      return root.toggleDnd();
+    }
+    function caffeine(): bool {
+      return root.toggleCaffeine();
+    }
+    function nightlight(): bool {
+      return root.toggleNightLight();
+    }
+  }
+
+  // eco shell time sync: after_sleep_cmd do hypridle (relogio parado apos suspend)
   IpcHandler {
     target: "time"
     function sync(): void {

@@ -119,7 +119,12 @@ Atalhos do Hyprland (IPC):
 qs ipc call launcher toggle  # apps; tambem: calc | emoji | clip | windows
 qs ipc call osd showBright   # depois de mudar o brilho
 qs ipc call osd showMic      # depois de mutar/desmutar o mic
+qs ipc call system dnd       # alterna e mostra no OSD (devolve o estado novo); tambem: caffeine | nightlight
 ```
+
+No ecossistema eco os scripts e binds chamam `eco shell [-q] <alvo> <funcao>` (o wrapper
+de `qs ipc` em `~/eco/bin/eco-shell`: acha o Wayland de TTY/SSH, timeout, `-q` p/ shell
+parada nao ser erro) e `eco restart shell` (recusa com a tela travada, espera o IPC).
 
 O OSD de volume aparece sozinho (PipeWire).
 
