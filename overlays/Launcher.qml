@@ -114,7 +114,7 @@ PopupBase {
         n: n,
         w: n.split(/[\s._-]+/),
         k: norm((a.genericName || "") + " " + (a.keywords || []).join(" ")),
-        // item fixo por app: o ScriptModel reaproveita o delegate pela identidade
+        // item fixo por app: montado 1x, nao a cada tecla
         item: {
           // IconImage nao resolve nome de tema sozinho; iconPath() gera image:// com fallback
           icon: Quickshell.iconPath(a.icon, "application-x-executable"),
@@ -439,6 +439,11 @@ PopupBase {
   }
 
   property var results: mode === "calc" ? calcResults() : mode === "emoji" ? emojiResults() : mode === "kaomoji" ? kaomojiResults() : mode === "clip" ? clipResults() : mode === "win" ? winResults() : appResults()
+  // Modelo das views = posicoes 0..n-1, nao os itens: so cresce/encolhe no fim e
+  // cada linha le results[index]. Com os itens no ScriptModel, a reordenacao por
+  // tecla virava moves de linha, e o QQmlDelegateModel do Qt dessincroniza o cache
+  // num move (SIGSEGV em _q_itemsMoved logo apos abrir e digitar). Delegates seguem reaproveitados.
+  readonly property var slots: results.map((_, i) => i)
 
   readonly property string emptyText: mode === "calc" ? "Digite uma conta (ex.: 2*3, 10 km to mi)" : mode === "emoji" ? (Emoji.missing ? "Sem dados: instale unicode-emoji e unicode-cldr-annotations" : Emoji.ready ? "Nada encontrado" : "Carregando…") : mode === "kaomoji" ? "Nada encontrado" : mode === "clip" ? (clips.length > 0 ? "Nada encontrado" : "Clipboard vazio") : mode === "win" ? "Nenhuma janela" : (appsSeen ? "Nada encontrado" : "Procurando…")
 
@@ -460,16 +465,15 @@ PopupBase {
       anchors.fill: parent
       visible: !root.imageGrid
       clip: true
-      // ScriptModel reaproveita os delegates por identidade (array puro recriava a cada tecla).
-      // Fechado (fim da animacao de saida), os delegates saem.
+      // posicoes, nao itens (ver `slots`). Fechado (fim da animacao de saida), os delegates saem.
       model: ScriptModel {
-        values: root.visible && !root.imageGrid ? root.results : []
+        values: root.visible && !root.imageGrid ? root.slots : []
       }
       spacing: 2
       delegate: Item {
         id: row
-        required property var modelData
         required property int index
+        readonly property var modelData: root.results[index] || ({})
         property bool selected: root.selectedIndex === index
 
         width: ListView.view.width
@@ -514,7 +518,7 @@ PopupBase {
               elide: Text.ElideRight
               maximumLineCount: 1
               textFormat: Text.PlainText
-              text: row.modelData.title
+              text: row.modelData.title || ""
             }
             UiText {
               visible: text !== ""
@@ -555,12 +559,12 @@ PopupBase {
       cellWidth: width / 3
       cellHeight: 144
       model: ScriptModel {
-        values: root.visible && root.imageGrid ? root.results : []
+        values: root.visible && root.imageGrid ? root.slots : []
       }
       delegate: Item {
         id: cell
-        required property var modelData
         required property int index
+        readonly property var modelData: root.results[index] || ({})
         readonly property string src: root.thumbs[modelData.id] || ""
 
         width: GridView.view.cellWidth
