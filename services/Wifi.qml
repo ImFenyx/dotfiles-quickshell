@@ -24,6 +24,14 @@ Singleton {
   readonly property string icon: sig < 0 ? "" : Icons.level(sig, Icons.wifi)
   // menu: conectada primeiro, depois sinal (oculta = sem nome, fora)
   readonly property var top: networks.filter(n => n.name !== "").sort((a, b) => (b.connected - a.connected) || (b.signalStrength - a.signalStrength)).slice(0, 8)
+  // o NetMenu recebe linhas {name}, nao a WifiNetwork: redes somem da lista o tempo
+  // todo e um Repeater segurando o QObject e lido sem checar nulo (mesmo cuidado de
+  // Audio.sinkRows). Saem no ciclo seguinte do loop; networkFor() resolve no delegate.
+  property var topRows: []
+  onTopChanged: topLater.restart()
+  function networkFor(row) {
+    return row ? (networks.find(n => n.name === row.name) || null) : null;
+  }
 
   property bool scan: false     // NetMenu aberto
   property var pending: null    // rede sendo conectada: mantem o scanner e avisa se falhar
@@ -64,4 +72,13 @@ Singleton {
         root.pending = null;
     }
   }
+
+  Timer {
+    id: topLater
+    interval: 0
+    onTriggered: root.topRows = root.top.filter(n => n && n.name).map(n => ({
+            name: n.name
+          }))
+  }
+  Component.onCompleted: topLater.start()
 }

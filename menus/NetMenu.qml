@@ -82,18 +82,20 @@ PopupBase {
     }
 
     Repeater {
-      model: Wifi.top
+      model: root.visible && root.netsExpanded ? Wifi.topRows : []   // linhas {name}; so com o menu aberto
       delegate: Item {
         id: net
-        required property var modelData
-        property bool secured: modelData.security !== WifiSecurityType.Open && modelData.security !== WifiSecurityType.Owe
-        property bool armed: root.forgetArmed === modelData
+        required property var modelData                 // {name} (Wifi.topRows)
+        readonly property var nw: Wifi.networkFor(modelData)
+        visible: nw !== null
+        property bool secured: nw !== null && nw.security !== WifiSecurityType.Open && nw.security !== WifiSecurityType.Owe
+        property bool armed: nw !== null && root.forgetArmed === nw
         property bool navigable: true
         property bool kbFocus: false
         // esquecer (so salvas), pelo cadeado ou Delete: 1o arma, 2o esquece
         function navForget() {
-          const m = net.modelData;
-          if (!m.known)
+          const m = net.nw;
+          if (!m || !m.known)
             return;
           if (root.forgetArmed === m) {
             m.forget();
@@ -104,7 +106,9 @@ PopupBase {
         }
         // clique no nome ou Enter: conectada fecha; salva ou aberta conecta; senao pede a senha
         function navActivate() {
-          const m = net.modelData;
+          const m = net.nw;
+          if (!m)
+            return;
           if (m.connected) {
             root.close();
             return;
@@ -132,7 +136,7 @@ PopupBase {
           anchors.rightMargin: 6
           spacing: 8
           Glyph {
-            text: Icons.level(net.modelData.signalStrength * 100, Icons.wifi)
+            text: net.nw ? Icons.level(net.nw.signalStrength * 100, Icons.wifi) : ""
           }
           Item {
             Layout.fillWidth: true
@@ -140,11 +144,11 @@ PopupBase {
             UiText {
               anchors.verticalCenter: parent.verticalCenter
               width: parent.width
-              color: net.modelData.connected ? Theme.success : Theme.fgSurface
+              color: net.nw && net.nw.connected ? Theme.success : Theme.fgSurface
               elide: Text.ElideRight
               textFormat: Text.PlainText
               // com foco de teclado, a dica da tecla (o mouse tem o cadeado)
-              text: net.armed ? "Esquecer " + net.modelData.name + "?" + (net.kbFocus ? "  Del confirma" : "") : net.modelData.name + (net.kbFocus && net.modelData.known ? "  ·  Del esquece" : "")
+              text: !net.nw ? "" : (net.armed ? "Esquecer " + net.nw.name + "?" + (net.kbFocus ? "  Del confirma" : "") : net.nw.name + (net.kbFocus && net.nw.known ? "  ·  Del esquece" : ""))
             }
             MouseArea {
               id: ssidArea
@@ -171,8 +175,10 @@ PopupBase {
               hoverEnabled: true
               cursorShape: Qt.PointingHandCursor
               onClicked: {
-                if (!net.modelData.known) {
-                  root.pwNet = net.modelData;
+                if (!net.nw)
+                  return;
+                if (!net.nw.known) {
+                  root.pwNet = net.nw;
                   return;
                 }
                 net.navForget();
