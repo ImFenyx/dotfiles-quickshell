@@ -98,7 +98,8 @@ PopupBase {
       implicitWidth: clearRow.implicitWidth + 20
       implicitHeight: 26
       radius: height / 2
-      color: clearArea.containsMouse ? Theme.surfaceContainerHighest : Theme.surfaceContainer
+      color: Theme.surfaceContainer
+      StateLayer { hovered: clearArea.containsMouse; pressed: clearArea.pressed }
       RowLayout {
         id: clearRow
         anchors.centerIn: parent

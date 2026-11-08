@@ -561,7 +561,8 @@ PopupBase {
         Rectangle {
           anchors.fill: parent
           radius: Theme.shape.sm
-          color: row.selected ? Theme.surfaceContainerHighest : (rowArea.containsMouse ? Theme.surfaceContainer : "transparent")
+          color: row.selected ? Theme.surfaceContainerHighest : "transparent"
+          StateLayer { hovered: rowArea.containsMouse && !row.selected; pressed: rowArea.pressed }
         }
         RowLayout {
           anchors.fill: parent

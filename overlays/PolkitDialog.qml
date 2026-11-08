@@ -199,7 +199,8 @@ PopupBase {
         implicitWidth: btnLabel.implicitWidth + 32
         implicitHeight: 32
         radius: height / 2
-        color: btn.modelData.main ? (btnArea.containsMouse ? Theme.secondary : Theme.primary) : (btnArea.containsMouse ? Theme.surfaceContainerHighest : Theme.surfaceContainer)
+        color: btn.modelData.main ? Theme.primary : Theme.surfaceContainer
+        StateLayer { hovered: btnArea.containsMouse; pressed: btnArea.pressed; tint: btn.modelData.main ? Theme.fgPrimary : Theme.fgSurface }
         opacity: btn.modelData.main && root.waiting ? 0.5 : 1
         UiText {
           id: btnLabel

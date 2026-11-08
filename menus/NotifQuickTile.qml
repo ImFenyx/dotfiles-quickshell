@@ -19,7 +19,8 @@ Rectangle {
   Layout.preferredWidth: 1
   Layout.preferredHeight: 62
   radius: Theme.shape.md
-  color: active ? Theme.primary : (area.containsMouse ? Theme.surfaceContainerHighest : Theme.surfaceContainer)
+  color: active ? Theme.primary : Theme.surfaceContainer
+  StateLayer { hovered: area.containsMouse; pressed: area.pressed; tint: root.active ? Theme.fgPrimary : Theme.fgSurface }
 
   Behavior on color {
     ColorAnimation {

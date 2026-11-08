@@ -27,7 +27,8 @@ Item {
     implicitHeight: content.implicitHeight + 24
     height: implicitHeight
     radius: Theme.shape.md
-    color: area.containsMouse ? Theme.surfaceContainerHighest : Theme.surfaceContainer
+    color: Theme.surfaceContainer
+    StateLayer { hovered: area.containsMouse }
     border.width: root.item.urgency === 2 ? 1 : 0
     border.color: Theme.error
     // some conforme sai pela borda
@@ -154,7 +155,8 @@ Item {
             Layout.preferredHeight: 20
             radius: height / 2
             opacity: (area.containsMouse || closeArea.containsMouse || root.toast) ? 1 : 0
-            color: closeArea.containsMouse ? Theme.surfaceContainer : "transparent"
+            color: "transparent"
+            StateLayer { hovered: closeArea.containsMouse; pressed: closeArea.pressed }
             Behavior on opacity {
               NumberAnimation {
                 duration: Theme.animFast
@@ -250,7 +252,8 @@ Item {
               width: iconSrc !== "" ? 30 : label.implicitWidth + 20
               height: 26
               radius: height / 2
-              color: btnArea.containsMouse ? Theme.primary : Theme.surfaceContainerHighest
+              color: Theme.surfaceContainerHighest
+              StateLayer { hovered: btnArea.containsMouse; pressed: btnArea.pressed }
               IconImage {
                 anchors.centerIn: parent
                 visible: btn.iconSrc !== ""
@@ -261,7 +264,7 @@ Item {
                 id: label
                 anchors.centerIn: parent
                 visible: btn.iconSrc === ""
-                color: btnArea.containsMouse ? Theme.fgPrimary : Theme.fgSurface
+                color: Theme.fgSurface
                 font.pixelSize: Theme.type.label_m
                 text: btn.modelData.text
               }

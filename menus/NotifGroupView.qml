@@ -91,7 +91,8 @@ Item {
         Layout.preferredWidth: 24
         Layout.preferredHeight: 24
         radius: height / 2
-        color: toggleArea.containsMouse ? Theme.surfaceContainerHighest : "transparent"
+        color: "transparent"
+        StateLayer { hovered: toggleArea.containsMouse; pressed: toggleArea.pressed }
         Glyph {
           anchors.centerIn: parent
           color: Theme.fgSurfaceVariant
@@ -110,7 +111,8 @@ Item {
         Layout.preferredWidth: 24
         Layout.preferredHeight: 24
         radius: height / 2
-        color: clearArea.containsMouse ? Theme.surfaceContainerHighest : "transparent"
+        color: "transparent"
+        StateLayer { hovered: clearArea.containsMouse; pressed: clearArea.pressed }
         Glyph {
           anchors.centerIn: parent
           color: Theme.fgSurfaceVariant

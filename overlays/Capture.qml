@@ -377,7 +377,8 @@ PanelWindow {
                       implicitWidth: Math.min(valText.implicitWidth + 2 * Theme.space.sm, grp.width)
                       implicitHeight: 26
                       radius: height / 2
-                      color: on ? Theme.primary : (valArea.containsMouse ? Theme.surfaceContainerHighest : Theme.surfaceContainer)
+                      color: on ? Theme.primary : Theme.surfaceContainer
+                      StateLayer { hovered: valArea.containsMouse; pressed: valArea.pressed; tint: parent.on ? Theme.fgPrimary : Theme.fgSurface }
                       UiText {
                         id: valText
                         anchors.centerIn: parent
@@ -430,7 +431,8 @@ PanelWindow {
             implicitWidth: segText.implicitWidth + 2 * Theme.space.md
             implicitHeight: 32
             radius: height / 2
-            color: on ? (modelData.id === "record" ? Theme.error : Theme.primary) : (segArea.containsMouse ? Theme.surfaceContainerHighest : "transparent")
+            color: on ? (modelData.id === "record" ? Theme.error : Theme.primary) : "transparent"
+            StateLayer { hovered: segArea.containsMouse; pressed: segArea.pressed; tint: parent.on ? (parent.modelData.id === "record" ? Theme.fgError : Theme.fgPrimary) : Theme.fgSurface }
             UiText {
               id: segText
               anchors.centerIn: parent
@@ -470,7 +472,8 @@ PanelWindow {
             implicitWidth: chipText.implicitWidth + 2 * Theme.space.md
             implicitHeight: 32
             radius: height / 2
-            color: chipArea.containsMouse ? Theme.surfaceContainerHighest : Theme.surfaceContainer
+            color: Theme.surfaceContainer
+            StateLayer { hovered: chipArea.containsMouse; pressed: chipArea.pressed }
             UiText {
               id: chipText
               anchors.centerIn: parent

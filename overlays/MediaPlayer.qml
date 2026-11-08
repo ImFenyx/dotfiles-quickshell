@@ -236,7 +236,8 @@ PanelWindow {
           Layout.preferredWidth: 32
           Layout.preferredHeight: 32
           radius: height / 2
-          color: playArea.containsMouse ? Theme.secondary : Theme.primary
+          color: Theme.primary
+          StateLayer { hovered: playArea.containsMouse; pressed: playArea.pressed; tint: Theme.fgPrimary }
           Glyph {
             anchors.centerIn: parent
             color: Theme.fgPrimary

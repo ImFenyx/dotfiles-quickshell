@@ -56,6 +56,13 @@ Singleton {
   readonly property var shape: tokens.shape   // xs..xl_inc, window, frame_inner, popup, dialog
   readonly property var space: tokens.space   // xs..xxl, gap_in, gap_out, border
   readonly property var motion: tokens.motion // springs {k, c}: os mesmos do Hyprland
+  // alpha da camada de estado (StateLayer): hover, focus, pressed, dragged, disabled_*
+  readonly property var stateAlpha: tokens.state.hover !== undefined ? tokens.state : ({
+      hover: 0.08,
+      focus: 0.1,
+      pressed: 0.1,
+      dragged: 0.16
+    })
 
   // ---- moldura (DESIGN.md › Forma/Espaço) ----
   // Janela: gaps_out 8 do filete, canto 12. Filete = gaps_out, entao o canto interno
@@ -122,6 +129,7 @@ Singleton {
       property var shape: ({})
       property var space: ({})
       property var motion: ({})
+      property var state: ({})
     }
   }
 }

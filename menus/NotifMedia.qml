@@ -109,7 +109,8 @@ Rectangle {
         Layout.preferredWidth: 24
         Layout.preferredHeight: 24
         radius: Theme.shape.md
-        color: swapArea.containsMouse ? Theme.surfaceContainerHighest : "transparent"
+        color: "transparent"
+        StateLayer { hovered: swapArea.containsMouse; pressed: swapArea.pressed }
         Glyph {
           anchors.centerIn: parent
           font.pixelSize: Theme.icon.s
@@ -182,7 +183,8 @@ Rectangle {
         Layout.preferredHeight: 36
         radius: height / 2
         opacity: Media.canPrev ? 1 : 0.35
-        color: prevArea.containsMouse ? Theme.surfaceContainerHighest : "transparent"
+        color: "transparent"
+        StateLayer { hovered: prevArea.containsMouse; pressed: prevArea.pressed }
         Glyph {
           anchors.centerIn: parent
           color: Theme.fgSurface
@@ -202,7 +204,8 @@ Rectangle {
         Layout.preferredHeight: 44
         radius: height / 2
         opacity: Media.canToggle ? 1 : 0.35
-        color: playArea.containsMouse ? Theme.secondary : Theme.primary
+        color: Theme.primary
+        StateLayer { hovered: playArea.containsMouse; pressed: playArea.pressed; tint: Theme.fgPrimary }
         Glyph {
           anchors.centerIn: parent
           color: Theme.fgPrimary
@@ -223,7 +226,8 @@ Rectangle {
         Layout.preferredHeight: 36
         radius: height / 2
         opacity: Media.canNext ? 1 : 0.35
-        color: nextArea.containsMouse ? Theme.surfaceContainerHighest : "transparent"
+        color: "transparent"
+        StateLayer { hovered: nextArea.containsMouse; pressed: nextArea.pressed }
         Glyph {
           anchors.centerIn: parent
           color: Theme.fgSurface
