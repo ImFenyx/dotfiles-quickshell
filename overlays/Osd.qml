@@ -95,6 +95,7 @@ PopupBase {
         color: root.boosted ? Theme.error : Theme.info
         // overshoot com cauda (o mesmo spring das pills): passa do ponto e assenta depois da tecla
         Behavior on width {
+          enabled: !Theme.reduceMotion
           SpringPill {}
         }
       }

@@ -150,6 +150,7 @@ PanelWindow {
             // com a janela escondida (o raio ficava preso em 0)
             radius: item.focused || area.containsMouse ? width / 2 : (Theme.shape.dialog || 28)
             Behavior on radius {
+              enabled: !Theme.reduceMotion
               SpringPill {}
             }
             color: item.isArmed ? (item.modelData.id === "shutdown" || item.modelData.id === "reboot" ? Theme.error : Theme.primary) : (item.focused ? Theme.primaryContainer : Theme.surfaceContainer)

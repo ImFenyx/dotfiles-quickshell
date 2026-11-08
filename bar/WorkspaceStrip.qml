@@ -108,6 +108,7 @@ Pill {
       clip: true
 
       Behavior on Layout.preferredWidth {
+        enabled: !Theme.reduceMotion
         SpringPill {}
       }
       Behavior on color {

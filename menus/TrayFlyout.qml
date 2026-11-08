@@ -45,7 +45,7 @@ Item {
   property real progress: wanted ? 1 : 0
   Behavior on progress {
     NumberAnimation {
-      duration: fly.wanted ? 320 : 240
+      duration: Theme.reduceMotion ? 0 : (fly.wanted ? 320 : 240)
       easing.type: fly.wanted ? Easing.OutCubic : Easing.InOutQuad
     }
   }

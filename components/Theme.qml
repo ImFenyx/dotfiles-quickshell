@@ -78,11 +78,26 @@ Singleton {
   // ---- animacao ----
   // Movimento = springs (SpringPanel: paineis grandes; SpringPill: coisas pequenas).
   // Duracoes so para cor/opacidade, proximas dos springs effects_* do M3.
-  readonly property int animFast: 120      // hover: cor e opacidade; seguir a linha do submenu
-  readonly property int animNormal: 150    // fade de entrada/saida, cor de pill/atalho, largura dos blocos da barra
-  readonly property int animMove: 180      // altura, deslocamento de lista, volta do swipe
+  // Movimento reduzido: o modo jogo (eco_game no hypr/modules/profile.lua, o unico
+  // caminho que desliga animations:enabled) grava ~/.local/state/eco/game. As duracoes
+  // viram 0 e os Behaviors com spring se desligam (spring nao tem duracao p/ zerar):
+  // `enabled: !Theme.reduceMotion` em todo Behavior com SpringPanel/SpringPill.
+  property bool reduceMotion: false
+  readonly property int animFast: reduceMotion ? 0 : 120      // hover: cor e opacidade; seguir a linha do submenu
+  readonly property int animNormal: reduceMotion ? 0 : 150    // fade de entrada/saida, cor de pill/atalho, largura dos blocos da barra
+  readonly property int animMove: reduceMotion ? 0 : 180      // altura, deslocamento de lista, volta do swipe
 
   // ---- arquivos ----
+  FileView {
+    id: gameFile
+    path: (Quickshell.env("XDG_STATE_HOME") || Quickshell.env("HOME") + "/.local/state") + "/eco/game"
+    blockLoading: true
+    watchChanges: true
+    onFileChanged: reload()
+    onLoaded: root.reduceMotion = text().trim() === "1"
+    onLoadFailed: root.reduceMotion = false
+    printErrors: false
+  }
   FileView {
     path: (Quickshell.env("XDG_STATE_HOME") || Quickshell.env("HOME") + "/.local/state") + "/eco/colors.json"
     blockLoading: true

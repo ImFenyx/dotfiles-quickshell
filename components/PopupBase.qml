@@ -64,6 +64,7 @@ PanelWindow {
   // 0 = aberto, 1 = fechado. close direto: o spring resolve o colapso.
   property real offsetScale: open ? 0 : 1
   Behavior on offsetScale {
+    enabled: !Theme.reduceMotion
     SpringPanel {}
   }
 

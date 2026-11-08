@@ -52,12 +52,15 @@ PanelWindow {
   property real bh: expanded ? fullH : miniH
   property real hide: shown ? 0 : 1
   Behavior on bw {
+    enabled: !Theme.reduceMotion
     SpringPanel {}
   }
   Behavior on bh {
+    enabled: !Theme.reduceMotion
     SpringPanel {}
   }
   Behavior on hide {
+    enabled: !Theme.reduceMotion
     SpringPanel {}
   }
 

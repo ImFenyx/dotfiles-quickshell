@@ -24,6 +24,7 @@ Rectangle {
   implicitWidth: row.implicitWidth + hpad
 
   Behavior on implicitWidth {
+    enabled: !Theme.reduceMotion
     SpringPill {}
   }
   Behavior on color {

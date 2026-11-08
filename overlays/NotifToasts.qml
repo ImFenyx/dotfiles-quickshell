@@ -43,6 +43,7 @@ PanelWindow {
   // 0 = aberto, 1 = fechado (mesmo spring do PopupBase)
   property real offsetScale: want ? 0 : 1
   Behavior on offsetScale {
+    enabled: !Theme.reduceMotion
     SpringPanel {}
   }
 
