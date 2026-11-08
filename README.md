@@ -93,7 +93,9 @@ Regras de bolso:
   por sessao: desative os outros (`systemctl --user disable --now hyprpolkitagent`) e
   reinicie a shell (`systemctl --user restart quickshell`); "An authentication agent
   already exists" no `qs log` = outro agente ainda rodando
-- `uwsm` (opcional; usado no "Sair")
+- `uwsm` (`uwsm-app`): apps que a shell abre (launcher, updater, mixer...) vao para um
+  scope systemd proprio via `Config.app`; sem isso morrem a cada restart da shell
+  (KillMode=control-group). Sem uwsm, troque `Config.app` por `return cmd;`. Tambem usado no "Sair"
 - Modos do launcher: `qalc` (libqalculate), `cliphist` + `wl-clipboard` (com
   `wl-paste --watch cliphist store` rodando), `wtype` (digitar emoji/kaomoji),
   `unicode-emoji` + `unicode-cldr-annotations` (lista oficial de emojis + nomes em pt/en;
