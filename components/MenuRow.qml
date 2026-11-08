@@ -1,8 +1,9 @@
 import QtQuick
 import QtQuick.Layouts
 
-// Linha de menu: icone + rotulo + (radio | seta). Usada por Net/Power.
+// Linha de menu: icone + rotulo + (radio | seta). Usada por Net/Power/Audio/Bt.
 // popup = janela PopupBase que fecha apos o clique (a menos de keepOpen).
+// Teclado: o PopupBase anda pelas linhas (navigable) e Enter chama navActivate().
 Item {
   id: row
 
@@ -16,6 +17,14 @@ Item {
   property bool armed: false          // estado "confirmar?" (vermelho)
   property string arrow: ""
   property color labelColor: Theme.fgSurface
+  property bool navigable: true
+  property bool kbFocus: false        // posto pelo PopupBase
+
+  function navActivate() {
+    row.fired();
+    if (!row.keepOpen && row.popup)
+      row.popup.close();
+  }
 
   Layout.fillWidth: true
   implicitHeight: Math.max(32, lines.implicitHeight + 14)   // rotulo com \n cresce
@@ -23,7 +32,8 @@ Item {
   Rectangle {
     anchors.fill: parent
     radius: Theme.shape.sm
-    color: row.armed ? Theme.error : (area.containsMouse ? Theme.surfaceContainerHighest : "transparent")
+    color: row.armed ? Theme.error : "transparent"
+    StateLayer { hovered: area.containsMouse; pressed: area.pressed; focused: row.kbFocus; tint: row.armed ? Theme.fgError : Theme.fgSurface }
   }
   RowLayout {
     anchors.fill: parent
@@ -79,10 +89,6 @@ Item {
     anchors.fill: parent
     hoverEnabled: true
     cursorShape: Qt.PointingHandCursor
-    onClicked: {
-      row.fired();
-      if (!row.keepOpen && row.popup)
-        row.popup.close();
-    }
+    onClicked: row.navActivate()
   }
 }

@@ -6,6 +6,7 @@ import qs.services
 
 // Volume de um no do PipeWire (dispositivo ou app): icone (clique = mudo) +
 // slider + %. Quem usa mantem o no rastreado (PwObjectTracker).
+// Teclado (PopupBase): Esquerda/Direita = volume -/+ 5 %, Enter = mudo.
 RowLayout {
   id: root
 
@@ -17,6 +18,16 @@ RowLayout {
   readonly property bool ok: !!node && node.ready && !!node.audio
   readonly property bool muted: ok && node.audio.muted
   readonly property real vol: ok ? node.audio.volume : 0
+  property bool navigable: ok
+  property bool kbFocus: false
+  function navActivate() {
+    if (ok)
+      node.audio.muted = !node.audio.muted;
+  }
+  function navStep(d) {
+    if (ok)
+      Audio.setVolume(node, Math.max(0, Math.min(1, Math.round(vol * 20 + d) / 20)));   // como o slider: ate 100 %
+  }
 
   Layout.fillWidth: true
   spacing: 10
@@ -51,6 +62,7 @@ RowLayout {
     Layout.fillWidth: true
     value: root.vol
     muted: root.muted
+    focused: root.kbFocus
     onMoved: v => {
       if (root.ok)
         Audio.setVolume(root.node, v);

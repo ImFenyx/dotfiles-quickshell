@@ -124,8 +124,63 @@ PanelWindow {
   property bool grabArmed: false
   onOpenChanged: {
     grabArmed = false;
+    navItem = null;
     if (open)
       grabDelay.restart();
+  }
+
+  // ---- teclado nos menus ----
+  // Setas e Tab andam pelas linhas com `navigable: true`, na ordem da tela (filhos
+  // visiveis do conteudo); Enter/Espaco chamam navActivate() da linha e Esquerda/Direita
+  // navStep(-1|1) (ex.: volume). A linha em foco recebe kbFocus = true (StateLayer
+  // focused). Delete/Backspace chamam navForget() (esquecer rede/dispositivo: 1o arma, 2o
+  // confirma, como o clique). O foco so aparece com a 1a tecla e some ao fechar.
+  property Item navItem: null
+  property Item navShown: null
+  onNavItemChanged: {
+    if (navShown)
+      navShown.kbFocus = false;
+    navShown = navItem;
+    if (navItem)
+      navItem.kbFocus = true;
+  }
+  function navItems() {
+    const out = [];
+    const walk = it => {
+      for (const c of it.children) {
+        if (!c.visible)
+          continue;
+        if (c.navigable === true)
+          out.push(c);
+        else
+          walk(c);
+      }
+    };
+    walk(slot);
+    return out;
+  }
+  function navMove(d) {
+    const items = navItems();
+    if (items.length === 0)
+      return;
+    const i = items.indexOf(navItem);
+    navItem = items[i < 0 ? (d > 0 ? 0 : items.length - 1) : (i + d + items.length) % items.length];
+  }
+  function navKey(event) {
+    const k = event.key;
+    if (k === Qt.Key_Down || (k === Qt.Key_Tab && !(event.modifiers & Qt.ShiftModifier)))
+      navMove(1);
+    else if (k === Qt.Key_Up || k === Qt.Key_Backtab || (k === Qt.Key_Tab && (event.modifiers & Qt.ShiftModifier)))
+      navMove(-1);
+    else if ((k === Qt.Key_Return || k === Qt.Key_Enter || k === Qt.Key_Space) && navItem && navItem.navActivate)
+      navItem.navActivate();
+    else if ((k === Qt.Key_Left || k === Qt.Key_Right) && navItem && navItem.navStep)
+      navItem.navStep(k === Qt.Key_Left ? -1 : 1);
+    else if ((k === Qt.Key_Delete || k === Qt.Key_Backspace) && navItem && navItem.navForget)
+      navItem.navForget();
+    else
+      return;
+    event.accepted = true;
   }
   Timer {
     id: grabDelay
@@ -145,6 +200,7 @@ PanelWindow {
     enabled: root.interactive
     focus: root.open && root.backdropFocus
     Keys.onEscapePressed: root.close()
+    Keys.onPressed: event => root.navKey(event)
     onClicked: root.close()
   }
 

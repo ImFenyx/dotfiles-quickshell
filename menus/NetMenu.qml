@@ -74,6 +74,7 @@ PopupBase {
     // a lista e ao vivo (scanner ligado enquanto o menu esta aberto)
     MenuRow {
       visible: Wifi.top.length === 0
+      navigable: false   // so informa
       popup: root
       icon: Icons.netScan
       label: "Procurando…"
@@ -87,6 +88,34 @@ PopupBase {
         required property var modelData
         property bool secured: modelData.security !== WifiSecurityType.Open && modelData.security !== WifiSecurityType.Owe
         property bool armed: root.forgetArmed === modelData
+        property bool navigable: true
+        property bool kbFocus: false
+        // esquecer (so salvas), pelo cadeado ou Delete: 1o arma, 2o esquece
+        function navForget() {
+          const m = net.modelData;
+          if (!m.known)
+            return;
+          if (root.forgetArmed === m) {
+            m.forget();
+            root.close();
+          } else {
+            root.forgetArmed = m;
+          }
+        }
+        // clique no nome ou Enter: conectada fecha; salva ou aberta conecta; senao pede a senha
+        function navActivate() {
+          const m = net.modelData;
+          if (m.connected) {
+            root.close();
+            return;
+          }
+          if (m.known || !net.secured) {
+            Wifi.connect(m);
+            root.close();
+            return;
+          }
+          root.pwNet = m;
+        }
 
         Layout.fillWidth: true
         implicitHeight: 32
@@ -94,7 +123,8 @@ PopupBase {
         Rectangle {
           anchors.fill: parent
           radius: Theme.shape.sm
-          color: (ssidArea.containsMouse || lockArea.containsMouse) ? Theme.surfaceContainerHighest : "transparent"
+          color: "transparent"
+          StateLayer { hovered: ssidArea.containsMouse || lockArea.containsMouse; pressed: ssidArea.pressed || lockArea.pressed; focused: net.kbFocus }
         }
         RowLayout {
           anchors.fill: parent
@@ -113,27 +143,15 @@ PopupBase {
               color: net.modelData.connected ? Theme.success : Theme.fgSurface
               elide: Text.ElideRight
               textFormat: Text.PlainText
-              text: net.armed ? "Esquecer " + net.modelData.name + "?" : net.modelData.name
+              // com foco de teclado, a dica da tecla (o mouse tem o cadeado)
+              text: net.armed ? "Esquecer " + net.modelData.name + "?" + (net.kbFocus ? "  Del confirma" : "") : net.modelData.name + (net.kbFocus && net.modelData.known ? "  ·  Del esquece" : "")
             }
             MouseArea {
               id: ssidArea
               anchors.fill: parent
               hoverEnabled: true
               cursorShape: Qt.PointingHandCursor
-              onClicked: {
-                const m = net.modelData;
-                if (m.connected) {
-                  root.close();
-                  return;
-                }
-                // salva ou aberta: conecta direto; senao pede a senha
-                if (m.known || !net.secured) {
-                  Wifi.connect(m);
-                  root.close();
-                  return;
-                }
-                root.pwNet = m;
-              }
+              onClicked: net.navActivate()
             }
           }
           // cadeado: rede nova -> pede senha; salva -> 1o clique arma, 2o esquece
@@ -153,17 +171,11 @@ PopupBase {
               hoverEnabled: true
               cursorShape: Qt.PointingHandCursor
               onClicked: {
-                const m = net.modelData;
-                if (!m.known) {
-                  root.pwNet = m;
+                if (!net.modelData.known) {
+                  root.pwNet = net.modelData;
                   return;
                 }
-                if (root.forgetArmed === m) {
-                  m.forget();
-                  root.close();
-                } else {
-                  root.forgetArmed = m;
-                }
+                net.navForget();
               }
             }
           }

@@ -59,11 +59,28 @@ PopupBase {
       font.weight: Font.Bold
       text: "Bluetooth"
     }
+    // interruptor: clique ou, no teclado, e a 1a parada (Enter/Espaco alternam)
     Rectangle {
+      id: btSwitch
+      property bool navigable: Bt.available
+      property bool kbFocus: false
+      function navActivate() {
+        Bt.toggle();
+      }
       implicitWidth: 38
       implicitHeight: 22
       radius: height / 2
       color: Bt.on ? Theme.primary : Theme.surfaceContainerHighest
+      // foco de teclado: anel do M3 (secondary), por fora do trilho
+      Rectangle {
+        anchors.fill: parent
+        anchors.margins: -3
+        radius: height / 2
+        color: "transparent"
+        border.width: 2
+        border.color: Theme.secondary
+        visible: btSwitch.kbFocus
+      }
       Behavior on color {
         ColorAnimation {
           duration: Theme.animNormal
@@ -93,6 +110,7 @@ PopupBase {
 
   MenuRow {
     visible: !Bt.on || root.shown.length === 0
+    navigable: false   // so informa (ligar = o interruptor)
     popup: root
     keepOpen: true
     icon: Bt.scanning ? Icons.netScan : Icons.bluetooth
@@ -108,6 +126,24 @@ PopupBase {
       readonly property var dv: Bt.deviceFor(modelData)
       readonly property bool armed: dv !== null && root.forgetArmed === dv
       visible: dv !== null
+      property bool navigable: true
+      property bool kbFocus: false
+      function navActivate() {
+        root.forgetArmed = null;
+        if (dev.dv)
+          Bt.activate(dev.dv);
+      }
+      // esquecer (so pareados), pelo X ou Delete: 1o arma, 2o esquece
+      function navForget() {
+        if (!dev.dv || !dev.dv.paired)
+          return;
+        if (dev.armed) {
+          dev.dv.forget();
+          root.forgetArmed = null;
+        } else {
+          root.forgetArmed = dev.dv;
+        }
+      }
       readonly property string status: {
         const d = dv;
         if (!d)
@@ -118,9 +154,10 @@ PopupBase {
           return "Conectando…";
         if (d.state === BluetoothDeviceState.Disconnecting)
           return "Desconectando…";
+        const hint = dev.kbFocus && d.paired ? "  ·  Del esquece" : "";
         if (d.connected)
-          return "Conectado" + (d.batteryAvailable ? "  ·  " + Math.round(d.battery * 100) + "%" : "");
-        return d.paired ? "Pareado" : "Disponível";
+          return "Conectado" + (d.batteryAvailable ? "  ·  " + Math.round(d.battery * 100) + "%" : "") + hint;
+        return (d.paired ? "Pareado" : "Disponível") + hint;
       }
 
       Layout.fillWidth: true
@@ -129,7 +166,8 @@ PopupBase {
       Rectangle {
         anchors.fill: parent
         radius: Theme.shape.sm
-        color: (rowArea.containsMouse || forgetArea.containsMouse) ? Theme.surfaceContainerHighest : "transparent"
+        color: "transparent"
+        StateLayer { hovered: rowArea.containsMouse || forgetArea.containsMouse; pressed: rowArea.pressed || forgetArea.pressed; focused: dev.kbFocus }
       }
       RowLayout {
         anchors.fill: parent
@@ -161,7 +199,7 @@ PopupBase {
             color: dev.armed ? Theme.error : (dev.dv && dev.dv.connected ? Theme.success : Theme.fgSurface)
             elide: Text.ElideRight
             textFormat: Text.PlainText
-            text: !dev.dv ? "" : (dev.armed ? "Esquecer " + Bt.label(dev.dv) + "?" : Bt.label(dev.dv))
+            text: !dev.dv ? "" : (dev.armed ? "Esquecer " + Bt.label(dev.dv) + "?" + (dev.kbFocus ? "  Del confirma" : "") : Bt.label(dev.dv))
           }
           UiText {
             Layout.fillWidth: true
@@ -188,14 +226,7 @@ PopupBase {
             hoverEnabled: true
             cursorShape: Qt.PointingHandCursor
             onClicked: {
-              if (!dev.dv)
-                return;
-              if (dev.armed) {
-                dev.dv.forget();
-                root.forgetArmed = null;
-              } else {
-                root.forgetArmed = dev.dv;
-              }
+              dev.navForget();
             }
           }
         }
@@ -206,11 +237,7 @@ PopupBase {
         anchors.rightMargin: dev.dv && dev.dv.paired ? 32 : 0
         hoverEnabled: true
         cursorShape: Qt.PointingHandCursor
-        onClicked: {
-          root.forgetArmed = null;
-          if (dev.dv)
-            Bt.activate(dev.dv);
-        }
+        onClicked: dev.navActivate()
       }
     }
   }

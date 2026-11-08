@@ -61,6 +61,14 @@ Regras de bolso:
   `Theme.animFast` / `animNormal` / `animMove`. Spring do Qt: spring = k*0,016,
   damping = c*0,016 (passos de 16 ms; damping > 2 fica instavel). Numero solto so se for
   especifico (ex.: Genie)
+  Todo `Behavior` com spring leva `enabled: !Theme.reduceMotion` (modo jogo: sem animacao)
+- hover, foco e clique -> `StateLayer { hovered: area.containsMouse; pressed: area.pressed }`
+  como 1o filho do Rectangle do fundo (DESIGN.md › Estados: cor do conteudo por cima, 8 %
+  hover, 10 % foco/press; `tint` = a cor do conteudo). Nunca trocar a cor do fundo no hover
+- linha de menu usavel pelo teclado -> `navigable: true`, `kbFocus` (o PopupBase poe) e
+  `navActivate()` (Enter/Espaco); `navStep(d)` p/ Esquerda/Direita; `navForget()` p/
+  Delete/Backspace (esquecer: 1o arma, 2o confirma). `MenuRow` ja tem; setas e Tab andam
+  na ordem da tela. Linha so informativa: `navigable: false`
 - superficie nova -> `WlrLayershell.namespace: "quickshell:<nome>"` (PopupBase: `layerName`);
   as regras do Hyprland casam `quickshell.*`. Superficies nao se sobrepoem (popup colado no
   filete troca a aba pelo canto convexo da moldura)

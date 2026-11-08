@@ -10,6 +10,7 @@ Item {
   property real value: 0
   property bool muted: false        // preenchimento apagado
   property color fill: Theme.info
+  property bool focused: false      // foco de teclado (VolumeRow): mostra a bolinha
   signal moved(real value)
 
   readonly property real frac: Math.max(0, Math.min(1, value))
@@ -38,7 +39,7 @@ Item {
     height: 14
     radius: height / 2
     color: Theme.fgSurface
-    visible: area.containsMouse || area.pressed
+    visible: area.containsMouse || area.pressed || root.focused
   }
 
   MouseArea {
