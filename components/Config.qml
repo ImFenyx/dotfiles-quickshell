@@ -11,6 +11,12 @@ Singleton {
   readonly property string connectionEditor: "nm-connection-editor"
   readonly property string bluetoothManager: "blueman-manager"
   readonly property string powerManager: "tlpui"
+  // Apps graficos num scope systemd proprio (uwsm-app). Sem isso ficam no cgroup do
+  // quickshell.service (KillMode=control-group) e um restart da shell mata tudo o que
+  // ela abriu, inclusive o paru do updater no meio de uma atualizacao.
+  function app(cmd) {
+    return ["uwsm-app", "--"].concat(cmd);
+  }
   readonly property int nightTemp: 4000                            // luz noturna (K); hyprsunset: 1000-20000
   readonly property var batteryWarn: [20, 10, 5]                   // % que avisam ao descer na bateria; <= 10 = critica
   // protecao de volume (services/Audio): subir mais que isso (%) de uma vez, de fora da

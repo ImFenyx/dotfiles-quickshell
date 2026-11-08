@@ -28,7 +28,7 @@ GridLayout {
     label: "Wi-Fi"
     active: Wifi.on
     onClicked: Wifi.toggle()
-    onSecondary: Quickshell.execDetached([Config.connectionEditor])
+    onSecondary: Quickshell.execDetached(Config.app([Config.connectionEditor]))
   }
   NotifQuickTile {
     visible: Bt.available
@@ -87,7 +87,7 @@ GridLayout {
     sub: Energy.label
     active: Energy.profile !== "" && !Energy.balanced
     onClicked: Energy.cycle()
-    onSecondary: Quickshell.execDetached([Config.powerManager])
+    onSecondary: Quickshell.execDetached(Config.app([Config.powerManager]))
   }
   // eco: tema (Mocha -> Latte -> Wallpaper), efeitos completos na bateria e modo jogo
   NotifQuickTile {

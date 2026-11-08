@@ -135,6 +135,6 @@ PopupBase {
     popup: root
     icon: Icons.volumeDefault
     label: "Abrir mixer completo"
-    onFired: Quickshell.execDetached([Config.mixer])
+    onFired: Quickshell.execDetached(Config.app([Config.mixer]))
   }
 }

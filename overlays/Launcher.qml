@@ -264,8 +264,11 @@ PopupBase {
     freq[entry.id] = (freq[entry.id] || 0) + 1;
     Quickshell.execDetached(["sh", Quickshell.shellPath("scripts/frecency.sh"), "hit", entry.id]);
     close();
+    // fora do cgroup da shell (Config.app); so o execute() respeita o Path= do .desktop
     if (entry.runInTerminal)
-      Quickshell.execDetached(Config.terminal.concat(entry.command));
+      Quickshell.execDetached(Config.app(Config.terminal.concat(entry.command)));
+    else if (entry.workingDirectory === "")
+      Quickshell.execDetached(Config.app(entry.command));
     else
       entry.execute();
   }

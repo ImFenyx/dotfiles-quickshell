@@ -206,6 +206,6 @@ PopupBase {
     popup: root
     icon: Icons.bluetooth
     label: "Abrir blueman"
-    onFired: Quickshell.execDetached([Config.bluetoothManager])
+    onFired: Quickshell.execDetached(Config.app([Config.bluetoothManager]))
   }
 }

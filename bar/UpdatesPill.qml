@@ -16,7 +16,7 @@ Pill {
   tipWindow: root.tip
   tipText: Updates.tip
   clickable: true
-  onClicked: Quickshell.execDetached(Config.updater)
+  onClicked: Quickshell.execDetached(Config.app(Config.updater))
 
   // onda deterministica: um relogio so (tick), fase por aritmetica.
   // Cada ponto ativo 360ms exclusivo, periodo 1080ms. Sem Animation =

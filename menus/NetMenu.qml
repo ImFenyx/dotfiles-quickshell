@@ -246,6 +246,6 @@ PopupBase {
     popup: root
     icon: Icons.netEdit
     label: "Editar conexões"
-    onFired: Quickshell.execDetached([Config.connectionEditor])
+    onFired: Quickshell.execDetached(Config.app([Config.connectionEditor]))
   }
 }
