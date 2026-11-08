@@ -186,12 +186,19 @@ Modo pelo 1o caractere da busca (o IPC ja abre com ele):
 
 | prefixo | modo | Enter |
 |---|---|---|
-| (nada) | apps (ranking por campo + frecency) | abre |
+| (nada) | apps (ranking por campo + fuzzy + frecency) | abre |
 | `=` | calculadora (`qalc`: contas, unidades, moedas) | copia o resultado |
 | `:` | emoji (`services/Emoji.qml`: Unicode oficial, busca em pt e en) | copia e digita na janela focada; com `›` abre o popup de tom de pele |
 | `;` | kaomoji (lista propria, `data/kaomoji.tsv`) | copia e digita na janela focada |
 | `#` | clipboard (`cliphist`, mais novo primeiro): abas texto e imagens | copia de volta |
 | `@` | janelas abertas | foca (troca de workspace se precisar) |
+
+Apps: cada termo pontua pelo campo onde casa (inicio do nome > inicio de palavra >
+nome > generico/keywords > resto). Termo que nao casa exato tenta o fuzzy no nome e no
+fim do id (`org.gnome.Nautilus` -> "nautilus"): letras em ordem (`frfx`, `vsc`) e,
+com 5+ letras, 1 erro de digitacao (`spotfy`); fica sempre abaixo dos acertos exatos.
+O uso (`scripts/frecency.sh`, em `~/.local/state/quickshell/frecency`) ordena a lista
+sem busca e desempata com busca; os pontos caem pela metade a cada 14 dias sem abrir.
 
 Atalho que chama o mesmo modo ja aberto fecha o launcher.
 
