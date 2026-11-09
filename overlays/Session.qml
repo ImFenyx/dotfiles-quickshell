@@ -105,11 +105,10 @@ PanelWindow {
           root.armed = "";
         else
           root.close();
-      } else if (event.key === Qt.Key_Left) {
-        root.sel = Math.max(0, root.sel - 1);
-        root.armed = "";
-      } else if (event.key === Qt.Key_Right) {
-        root.sel = Math.min(root.actions.length - 1, root.sel + 1);
+      } else if (event.key === Qt.Key_Left || event.key === Qt.Key_Right) {
+        // da a volta: Esquerda no 1o vai p/ o ultimo, Direita no ultimo vai p/ o 1o
+        const n = root.actions.length;
+        root.sel = (root.sel + (event.key === Qt.Key_Left ? n - 1 : 1)) % n;
         root.armed = "";
       } else if (event.key === Qt.Key_Enter || event.key === Qt.Key_Return || event.key === Qt.Key_Space) {
         root.fire(root.sel);
